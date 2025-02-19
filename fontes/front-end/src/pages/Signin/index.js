@@ -30,7 +30,7 @@ const Signin = () => {
 
   return (
     <C.Container>
-      <C.Label>SISTEMA DE CONTROLE DE PRODUTOS QUIMICOS</C.Label>
+      <C.Label>SISTEMA DOS PRODUTOS QUIMICOS CONTROLADOS</C.Label>
       <C.Content>
         <Input
           type="cpf"
