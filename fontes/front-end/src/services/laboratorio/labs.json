@@ -1,0 +1,13 @@
+[
+  {
+    "cpf": "12345678901",
+    "labs": [
+      { "id": "1", "nome": "Laboratório 1" },
+      { "id": "2", "nome": "Laboratório 2" }
+    ]
+  },
+  {
+    "cpf": "98765432100",
+    "labs": [{ "id": "3", "nome": "Laboratório 3" }]
+  }
+]

@@ -25,7 +25,8 @@ const Signin = () => {
       return;
     }
 
-    navigate("/home");
+    localStorage.setItem("user_cpf", cpf);
+    navigate("/selecionar-lab");
   };
 
   return (

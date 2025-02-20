@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Signin from "../pages/Signin";
+import SelecionarLab from "../pages/SelecionarLab";
 
 const Private = ({ Item }) => {
   const { signed } = useAuth();
@@ -15,6 +16,7 @@ const RoutesApp = () => {
       <Fragment>
         <Routes>
           <Route path="/" element={<Signin />} />
+          <Route path="/selecionar-lab" element={<SelecionarLab />} />
           <Route path="*" element={<Signin />} />
         </Routes>
       </Fragment>
