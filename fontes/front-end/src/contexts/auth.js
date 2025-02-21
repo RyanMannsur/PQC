@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
   const signout = () => {
     setUsuario(null);
     localStorage.removeItem("user_token");
+    localStorage.removeItem("labId");
   };
 
   return (

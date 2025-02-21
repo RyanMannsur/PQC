@@ -6,10 +6,14 @@ import {
   ListItemText,
   ListItemIcon,
 } from "@mui/material";
-import { Home } from "@mui/icons-material";
+import { Home, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
+  const handleClearLabAndNavigate = () => {
+    localStorage.removeItem("labId");
+  };
+
   return (
     <Drawer
       variant="permanent"
@@ -34,6 +38,18 @@ const Sidebar = () => {
             <Home />
           </ListItemIcon>
           <ListItemText primary="Início" />
+        </ListItem>
+
+        <ListItem
+          button
+          component={Link}
+          to="/selecionar-lab"
+          onClick={handleClearLabAndNavigate}
+        >
+          <ListItemIcon>
+            <Settings />
+          </ListItemIcon>
+          <ListItemText primary="Trocar Laboratório" />
         </ListItem>
       </List>
     </Drawer>

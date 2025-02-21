@@ -45,7 +45,7 @@ const Header = ({ children, withSidebar, showSignoutIcon = true }) => {
           display: "flex",
           flexDirection: "row",
           flex: 1,
-          marginTop: "64px", // Ajuste a altura conforme o tamanho do AppBar
+          marginTop: "64px",
           overflow: "hidden",
         }}
       >
