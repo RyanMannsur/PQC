@@ -1,10 +1,11 @@
 import React from "react";
+import Header from "../components/Header";
 
 const PublicoLayout = ({ children }) => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <Header withSidebar={false} showSignoutIcon={false}>
       {children}
-    </div>
+    </Header>
   );
 };
 

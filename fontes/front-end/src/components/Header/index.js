@@ -26,7 +26,7 @@ const Header = ({ children, withSidebar, showSignoutIcon = true }) => {
       <AppBar position="fixed" style={{ width: "100%" }}>
         <Toolbar style={{ justifyContent: "space-between" }}>
           <Typography variant="h6">
-            PQC - Sistema dos Produtos Quimicos Controlados
+            CEFETMG - Sistema dos Produtos Quimicos Controlados
           </Typography>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Typography variant="subtitle1" style={{ marginRight: "16px" }}>
