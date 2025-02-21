@@ -1,39 +1,38 @@
 import { createContext, useEffect, useState } from "react";
 import { signin as signinService } from "../services/authService";
-import users from "../services/users.json";
 
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const [usuario, setUsuario] = useState();
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    const userCpf = localStorage.getItem("user_cpf");
+    const storedUser = localStorage.getItem("user_token");
 
-    if (userCpf) {
-      const usuarioList = users.filter((user) => user.cpf === userCpf);
-
-      if (usuarioList.length) setUsuario(usuarioList[0]);
+    if (storedUser) {
+      setUsuario(JSON.parse(storedUser));
     }
   }, []);
 
-  const signin = (cpf) => {
-    const resultado = signinService(cpf);
+  const signin = (cpf, senha) => {
+    const resultado = signinService(cpf, senha);
     if (typeof resultado === "string") {
       return resultado;
     } else {
-      setUsuario(resultado);
+      const { nomUsuario, token } = resultado;
+      setUsuario({ nomUsuario, token });
+      localStorage.setItem("user_token", JSON.stringify({ nomUsuario, token }));
+      return null;
     }
   };
 
   const signout = () => {
     setUsuario(null);
+    localStorage.removeItem("user_token");
   };
 
   return (
-    <AuthContext.Provider
-      value={{ usuario: usuario, logado: !!usuario, signin, signout }}
-    >
+    <AuthContext.Provider value={{ usuario, signin, signout }}>
       {children}
     </AuthContext.Provider>
   );

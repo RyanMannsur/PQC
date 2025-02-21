@@ -3,29 +3,27 @@ import Select from "../../components/InputSelect";
 import Button from "../../components/Button";
 import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
-import { getLabsByCpf } from "../../services/laboratorio/service";
+import { getLabsByToken } from "../../services/laboratorio/service";
+import useAuth from "../../hooks/useAuth";
 
-const SelectLab = () => {
+const SelecionarLab = () => {
   const navigate = useNavigate();
+  const { usuario } = useAuth();
 
   const [lab, setLab] = useState("");
   const [error, setError] = useState("");
   const [labOptions, setLabOptions] = useState([]);
 
   useEffect(() => {
-    const cpf = localStorage.getItem("user_cpf");
-    console.log("CPF recuperado:", cpf);
-
-    if (cpf) {
-      const labs = getLabsByCpf(cpf);
-      console.log("Labs encontrados:", labs);
+    if (usuario) {
+      const labs = getLabsByToken(usuario.token);
       setLabOptions(labs);
 
       if (labs.length === 1) {
         navigate(`/laboratorio/${labs[0].id}`);
       }
     }
-  }, [navigate]);
+  }, [usuario, navigate]);
 
   const handleSelect = () => {
     if (!lab) {
@@ -33,7 +31,6 @@ const SelectLab = () => {
       return;
     }
 
-    console.log("Laboratório selecionado:", lab); // Verifique o laboratório selecionado
     navigate(`/laboratorio/${lab}`);
   };
 
@@ -56,4 +53,4 @@ const SelectLab = () => {
   );
 };
 
-export default SelectLab;
+export default SelecionarLab;

@@ -1,26 +1,55 @@
-import { Fragment } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Signin from "../pages/Signin";
 import SelecionarLab from "../pages/SelecionarLab";
-
-const Private = ({ Item }) => {
-  const { signed } = useAuth();
-
-  return signed > 0 ? <Item /> : <Signin />;
-};
+import Home from "../pages/Home";
+import PrivateRoute from "./private";
+import AppNotSidebar from "../layout/AppNotSidebar";
+import AppLayout from "../layout/App";
+import useAuth from "../hooks/useAuth";
+import PublicoLayout from "../layout/publico";
 
 const RoutesApp = () => {
+  const { usuario } = useAuth();
+
   return (
-    <BrowserRouter>
-      <Fragment>
-        <Routes>
-          <Route path="/" element={<Signin />} />
-          <Route path="/selecionar-lab" element={<SelecionarLab />} />
-          <Route path="*" element={<Signin />} />
-        </Routes>
-      </Fragment>
-    </BrowserRouter>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PublicoLayout>
+              {usuario ? <Navigate to="/selecionar-lab" /> : <Signin />}
+            </PublicoLayout>
+          }
+        />
+        <Route
+          path="/selecionar-lab"
+          element={
+            <PrivateRoute>
+              <AppNotSidebar>
+                <SelecionarLab />
+              </AppNotSidebar>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/laboratorio/:id"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Home />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 };
 

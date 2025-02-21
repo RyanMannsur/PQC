@@ -9,10 +9,14 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
     width: 100vw;
     height: 100vh;
     background-color: #f0f2f5;
-    font-family: Arial, Helvetica, sans-serif
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-y: hidden;
   }
 `;
 
