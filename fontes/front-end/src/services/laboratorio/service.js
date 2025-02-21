@@ -7,3 +7,8 @@ export const getLabsByToken = (token) => {
     return [];
   }
 };
+
+export const getLabById = (id) => {
+  const lab = labsData.labs.find((lab) => lab.id === id);
+  return lab || null; 
+};

@@ -23,7 +23,7 @@ const Header = ({ children, withSidebar, showSignoutIcon = true }) => {
         overflow: "hidden",
       }}
     >
-      <AppBar position="fixed" style={{ width: "100%" }}>
+      <AppBar position="fixed" style={{ width: "100%", zIndex: 1201 }}>
         <Toolbar style={{ justifyContent: "space-between" }}>
           <Typography variant="h6">
             CEFETMG - Sistema dos Produtos Quimicos Controlados
@@ -45,12 +45,20 @@ const Header = ({ children, withSidebar, showSignoutIcon = true }) => {
           display: "flex",
           flexDirection: "row",
           flex: 1,
-          marginTop: "64px",
+          marginTop: "64px", // Ajuste a altura conforme o tamanho do AppBar
           overflow: "hidden",
         }}
       >
         {withSidebar && <Sidebar />}
-        <div style={{ flex: 1, overflow: "auto" }}>{children}</div>
+        <div
+          style={{
+            flex: 1,
+            overflow: "auto",
+            paddingLeft: withSidebar ? 240 : 0,
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

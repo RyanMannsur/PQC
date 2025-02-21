@@ -5,10 +5,12 @@ import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
 import { getLabsByToken } from "../../services/laboratorio/service";
 import useAuth from "../../hooks/useAuth";
+import { useLab } from "../../contexts/lab";
 
 const SelecionarLab = () => {
   const navigate = useNavigate();
   const { usuario } = useAuth();
+  const { setLabId } = useLab();
 
   const [lab, setLab] = useState("");
   const [error, setError] = useState("");
@@ -20,10 +22,11 @@ const SelecionarLab = () => {
       setLabOptions(labs);
 
       if (labs.length === 1) {
-        navigate(`/laboratorio/${labs[0].id}`);
+        setLabId(labs[0].id);
+        navigate("/home");
       }
     }
-  }, [usuario, navigate]);
+  }, [usuario, navigate, setLabId]);
 
   const handleSelect = () => {
     if (!lab) {
@@ -31,7 +34,8 @@ const SelecionarLab = () => {
       return;
     }
 
-    navigate(`/laboratorio/${lab}`);
+    setLabId(lab);
+    navigate("/home");
   };
 
   return (
@@ -44,7 +48,10 @@ const SelecionarLab = () => {
             label: lab.nome,
           }))}
           value={lab}
-          onChange={(e) => [setLab(e.target.value), setError("")]}
+          onChange={(e) => {
+            setLab(e.target.value);
+            setError("");
+          }}
         />
         <C.labelError>{error}</C.labelError>
         <Button Text="Selecionar" onClick={handleSelect} />

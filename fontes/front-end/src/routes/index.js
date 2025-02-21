@@ -17,6 +17,9 @@ import PublicoLayout from "../layout/publico";
 const RoutesApp = () => {
   const { usuario } = useAuth();
 
+  // Recupera o labId do localStorage
+  const labId = localStorage.getItem("labId");
+
   return (
     <Router>
       <Routes>
@@ -24,7 +27,15 @@ const RoutesApp = () => {
           path="/"
           element={
             <PublicoLayout>
-              {usuario ? <Navigate to="/selecionar-lab" /> : <Signin />}
+              {usuario ? (
+                labId ? (
+                  <Navigate to="/home" />
+                ) : (
+                  <Navigate to="/selecionar-lab" />
+                )
+              ) : (
+                <Signin />
+              )}
             </PublicoLayout>
           }
         />
@@ -39,7 +50,7 @@ const RoutesApp = () => {
           }
         />
         <Route
-          path="/laboratorio/:id"
+          path="/home"
           element={
             <PrivateRoute>
               <AppLayout>
