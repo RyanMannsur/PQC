@@ -6,7 +6,7 @@ import {
   ListItemText,
   ListItemIcon,
 } from "@mui/material";
-import { Home, Settings } from "@mui/icons-material";
+import { Home, Settings, Inventory } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
@@ -50,6 +50,13 @@ const Sidebar = () => {
             <Settings />
           </ListItemIcon>
           <ListItemText primary="Trocar Laboratório" />
+        </ListItem>
+
+        <ListItem button component={Link} to="/inventario">
+          <ListItemIcon>
+            <Inventory />
+          </ListItemIcon>
+          <ListItemText primary="Inventário" />
         </ListItem>
       </List>
     </Drawer>

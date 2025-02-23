@@ -8,6 +8,8 @@ import {
 import Signin from "../pages/Signin";
 import SelecionarLab from "../pages/SelecionarLab";
 import Home from "../pages/Home";
+import Inventario from "../pages/Inventario";
+import InventarioDetalhes from "../pages/Inventario/updateInventario";
 import PrivateRoute from "./private";
 import AppNotSidebar from "../layout/AppNotSidebar";
 import AppLayout from "../layout/App";
@@ -17,7 +19,6 @@ import PublicoLayout from "../layout/publico";
 const RoutesApp = () => {
   const { usuario } = useAuth();
 
-  // Recupera o labId do localStorage
   const labId = localStorage.getItem("labId");
 
   return (
@@ -55,6 +56,26 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <Home />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/inventario"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Inventario />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/inventario/:idProduto"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <InventarioDetalhes />
               </AppLayout>
             </PrivateRoute>
           }

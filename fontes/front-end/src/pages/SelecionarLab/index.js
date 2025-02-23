@@ -30,7 +30,7 @@ const SelecionarLab = () => {
 
   const handleSelect = () => {
     if (!lab) {
-      setError("Por favor, selecione um laboratório");
+      setError("Por favor, selecione um local");
       return;
     }
 
@@ -40,12 +40,12 @@ const SelecionarLab = () => {
 
   return (
     <C.Container>
-      <C.Label>SELECIONE O LABORATÓRIO</C.Label>
+      <C.Label>SELECIONE O LOCAL</C.Label>
       <C.Content>
         <Select
           options={labOptions.map((lab) => ({
             value: lab.id,
-            label: lab.nome,
+            label: lab.nomUnidade,
           }))}
           value={lab}
           onChange={(e) => {

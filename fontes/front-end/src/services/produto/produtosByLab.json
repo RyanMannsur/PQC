@@ -1,0 +1,338 @@
+[
+  {
+    "idLab": 1,
+    "produtos": [
+      {
+        "codProduto": 1,
+        "nomProduto": "1,2-DICLOROETANO",
+        "nomLista": "Lista II",
+        "perPureza": 99.99,
+        "vlrDensidade": 1.3,
+        "uniMedida": "L",
+        "quantidadeAtual": 10
+      },
+      {
+        "codProduto": 2,
+        "nomProduto": "ACETATO DE ETILA",
+        "nomLista": "Lista II",
+        "perPureza": 99.8,
+        "vlrDensidade": 0.9,
+        "uniMedida": "L",
+        "quantidadeAtual": 5
+      }
+    ]
+  },
+  {
+    "idLab": 2,
+    "produtos": [
+      {
+        "codProduto": 1,
+        "nomProduto": "1,2-DICLOROETANO",
+        "nomLista": "Lista II",
+        "perPureza": 99.99,
+        "vlrDensidade": 1.3,
+        "uniMedida": "L",
+        "quantidadeAtual": 15
+      },
+      {
+        "codProduto": 3,
+        "nomProduto": "ACETONA",
+        "nomLista": "Lista II",
+        "perPureza": 99.5,
+        "vlrDensidade": 0.79,
+        "uniMedida": "L",
+        "quantidadeAtual": 8
+      }
+    ]
+  },
+  {
+    "idLab": 3,
+    "produtos": [
+      {
+        "codProduto": 4,
+        "nomProduto": "ÁCIDO CLORÍDRICO",
+        "nomLista": "Lista III",
+        "perPureza": 36.0,
+        "vlrDensidade": 1.18,
+        "uniMedida": "L",
+        "quantidadeAtual": 6
+      },
+      {
+        "codProduto": 5,
+        "nomProduto": "ÁCIDO BENZÓICO",
+        "nomLista": "Lista IV",
+        "perPureza": 99.5,
+        "vlrDensidade": 1.27,
+        "uniMedida": "kg",
+        "quantidadeAtual": 3
+      }
+    ]
+  },
+  {
+    "idLab": 4,
+    "produtos": [
+      {
+        "codProduto": 6,
+        "nomProduto": "BROMO",
+        "nomLista": "Lista IV",
+        "perPureza": 99.0,
+        "vlrDensidade": 3.12,
+        "uniMedida": "kg",
+        "quantidadeAtual": 2
+      }
+    ]
+  },
+  {
+    "idLab": 5,
+    "produtos": [
+      {
+        "codProduto": 7,
+        "nomProduto": "ÁCIDO BROMÍDRICO",
+        "nomLista": "Lista IV",
+        "perPureza": 48.0,
+        "vlrDensidade": 1.49,
+        "uniMedida": "L",
+        "quantidadeAtual": 4
+      },
+      {
+        "codProduto": 3,
+        "nomProduto": "ACETONA",
+        "nomLista": "Lista II",
+        "perPureza": 99.5,
+        "vlrDensidade": 0.79,
+        "uniMedida": "L",
+        "quantidadeAtual": 12
+      }
+    ]
+  },
+  {
+    "idLab": 6,
+    "produtos": [
+      {
+        "codProduto": 8,
+        "nomProduto": "TETRA-HIDROFURANO",
+        "nomLista": "Lista III",
+        "perPureza": 99.9,
+        "vlrDensidade": 0.89,
+        "uniMedida": "L",
+        "quantidadeAtual": 7
+      },
+      {
+        "codProduto": 2,
+        "nomProduto": "ACETATO DE ETILA",
+        "nomLista": "Lista II",
+        "perPureza": 99.8,
+        "vlrDensidade": 0.9,
+        "uniMedida": "L",
+        "quantidadeAtual": 9
+      }
+    ]
+  },
+  {
+    "idLab": 7,
+    "produtos": [
+      {
+        "codProduto": 9,
+        "nomProduto": "BENZENO",
+        "nomLista": "Lista I",
+        "perPureza": 99.7,
+        "vlrDensidade": 0.88,
+        "uniMedida": "L",
+        "quantidadeAtual": 4
+      },
+      {
+        "codProduto": 5,
+        "nomProduto": "ÁCIDO BENZÓICO",
+        "nomLista": "Lista IV",
+        "perPureza": 99.5,
+        "vlrDensidade": 1.27,
+        "uniMedida": "kg",
+        "quantidadeAtual": 6
+      }
+    ]
+  },
+  {
+    "idLab": 8,
+    "produtos": [
+      {
+        "codProduto": 10,
+        "nomProduto": "METANOL",
+        "nomLista": "Lista I",
+        "perPureza": 99.9,
+        "vlrDensidade": 0.79,
+        "uniMedida": "L",
+        "quantidadeAtual": 15
+      },
+      {
+        "codProduto": 3,
+        "nomProduto": "ACETONA",
+        "nomLista": "Lista II",
+        "perPureza": 99.5,
+        "vlrDensidade": 0.79,
+        "uniMedida": "L",
+        "quantidadeAtual": 10
+      }
+    ]
+  },
+  {
+    "idLab": 9,
+    "produtos": [
+      {
+        "codProduto": 11,
+        "nomProduto": "ÁCIDO SULFÚRICO",
+        "nomLista": "Lista III",
+        "perPureza": 98.0,
+        "vlrDensidade": 1.84,
+        "uniMedida": "L",
+        "quantidadeAtual": 5
+      },
+      {
+        "codProduto": 6,
+        "nomProduto": "BROMO",
+        "nomLista": "Lista IV",
+        "perPureza": 99.0,
+        "vlrDensidade": 3.12,
+        "uniMedida": "kg",
+        "quantidadeAtual": 3
+      }
+    ]
+  },
+  {
+    "idLab": 10,
+    "produtos": [
+      {
+        "codProduto": 12,
+        "nomProduto": "TOLUENO",
+        "nomLista": "Lista II",
+        "perPureza": 99.9,
+        "vlrDensidade": 0.87,
+        "uniMedida": "L",
+        "quantidadeAtual": 8
+      },
+      {
+        "codProduto": 7,
+        "nomProduto": "ÁCIDO BROMÍDRICO",
+        "nomLista": "Lista IV",
+        "perPureza": 48.0,
+        "vlrDensidade": 1.49,
+        "uniMedida": "L",
+        "quantidadeAtual": 7
+      }
+    ]
+  },
+  {
+    "idLab": 11,
+    "produtos": [
+      {
+        "codProduto": 13,
+        "nomProduto": "HEXANO",
+        "nomLista": "Lista II",
+        "perPureza": 99.5,
+        "vlrDensidade": 0.66,
+        "uniMedida": "L",
+        "quantidadeAtual": 12
+      },
+      {
+        "codProduto": 4,
+        "nomProduto": "ÁCIDO CLORÍDRICO",
+        "nomLista": "Lista III",
+        "perPureza": 37.0,
+        "vlrDensidade": 1.19,
+        "uniMedida": "L",
+        "quantidadeAtual": 6
+      }
+    ]
+  },
+  {
+    "idLab": 12,
+    "produtos": [
+      {
+        "codProduto": 14,
+        "nomProduto": "N-HEPTANO",
+        "nomLista": "Lista II",
+        "perPureza": 99.3,
+        "vlrDensidade": 0.68,
+        "uniMedida": "L",
+        "quantidadeAtual": 9
+      },
+      {
+        "codProduto": 8,
+        "nomProduto": "TETRA-HIDROFURANO",
+        "nomLista": "Lista III",
+        "perPureza": 99.9,
+        "vlrDensidade": 0.89,
+        "uniMedida": "L",
+        "quantidadeAtual": 7
+      }
+    ]
+  },
+  {
+    "idLab": 13,
+    "produtos": [
+      {
+        "codProduto": 15,
+        "nomProduto": "PERÓXIDO DE HIDROGÊNIO",
+        "nomLista": "Lista IV",
+        "perPureza": 35.0,
+        "vlrDensidade": 1.13,
+        "uniMedida": "L",
+        "quantidadeAtual": 11
+      },
+      {
+        "codProduto": 9,
+        "nomProduto": "BENZENO",
+        "nomLista": "Lista I",
+        "perPureza": 99.7,
+        "vlrDensidade": 0.88,
+        "uniMedida": "L",
+        "quantidadeAtual": 4
+      }
+    ]
+  },
+  {
+    "idLab": 14,
+    "produtos": [
+      {
+        "codProduto": 16,
+        "nomProduto": "PROPANO",
+        "nomLista": "Lista II",
+        "perPureza": 99.5,
+        "vlrDensidade": 0.49,
+        "uniMedida": "kg",
+        "quantidadeAtual": 14
+      },
+      {
+        "codProduto": 10,
+        "nomProduto": "METANOL",
+        "nomLista": "Lista I",
+        "perPureza": 99.9,
+        "vlrDensidade": 0.79,
+        "uniMedida": "L",
+        "quantidadeAtual": 8
+      }
+    ]
+  },
+  {
+    "idLab": 15,
+    "produtos": [
+      {
+        "codProduto": 17,
+        "nomProduto": "ETANOL",
+        "nomLista": "Lista I",
+        "perPureza": 99.8,
+        "vlrDensidade": 0.79,
+        "uniMedida": "L",
+        "quantidadeAtual": 13
+      },
+      {
+        "codProduto": 11,
+        "nomProduto": "ÁCIDO SULFÚRICO",
+        "nomLista": "Lista III",
+        "perPureza": 98.0,
+        "vlrDensidade": 1.84,
+        "uniMedida": "L",
+        "quantidadeAtual": 6
+      }
+    ]
+  }
+]

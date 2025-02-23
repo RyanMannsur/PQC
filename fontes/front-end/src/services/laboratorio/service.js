@@ -9,6 +9,6 @@ export const getLabsByToken = (token) => {
 };
 
 export const getLabById = (id) => {
-  const lab = labsData.labs.find((lab) => lab.id === id);
-  return lab || null; 
+  const lab = labsData.labs.find((lab) => lab.id === Number(id));
+  return lab || null;
 };
