@@ -36,6 +36,6 @@ export const getPacotesByLabIdAndCodProduto = (idLab, codProduto) => {
 
   return resultado.pacotes.map((pacote) => ({
     ...pacote,
-    uniMedida: resultado.uniMedida, // Adicionando a unidade de medida
+    uniMedida: resultado.uniMedida,
   }));
 };
