@@ -3,14 +3,10 @@ import * as C from "./styles";
 import { MoreVert } from "@mui/icons-material";
 
 const ItemList = ({ columns, data, onInputChange, onActionSelect }) => {
-  const [openMenu, setOpenMenu] = useState(null);
   const [editableData, setEditableData] = useState(() =>
     data.map((item) => ({ ...item }))
   );
-
-  const handleMenuOpen = (index) => {
-    setOpenMenu(openMenu === index ? null : index);
-  };
+  const [openMenu, setOpenMenu] = useState(null);
 
   const handleInputChange = (rowIndex, key, value) => {
     const updatedData = editableData.map((item, index) =>
@@ -18,6 +14,10 @@ const ItemList = ({ columns, data, onInputChange, onActionSelect }) => {
     );
     setEditableData(updatedData);
     if (onInputChange) onInputChange(updatedData);
+  };
+
+  const handleMenuOpen = (index) => {
+    setOpenMenu(openMenu === index ? null : index);
   };
 
   return (
@@ -35,13 +35,19 @@ const ItemList = ({ columns, data, onInputChange, onActionSelect }) => {
             {columns.map((col, colIndex) => (
               <C.Td key={colIndex}>
                 {col.type === "input" ? (
-                  <input
-                    type="text"
-                    value={item[col.key]}
-                    onChange={(e) =>
-                      handleInputChange(rowIndex, col.key, e.target.value)
-                    }
-                  />
+                  col.render ? (
+                    // Se a coluna possuir render, utiliza-o (ex: Input Select)
+                    col.render(item, rowIndex)
+                  ) : (
+                    // Caso contrário, renderiza um input normal
+                    <input
+                      type="text"
+                      value={item[col.key]}
+                      onChange={(e) =>
+                        handleInputChange(rowIndex, col.key, e.target.value)
+                      }
+                    />
+                  )
                 ) : col.type === "actions" ? (
                   <div style={{ position: "relative" }}>
                     <MoreVert
@@ -61,7 +67,12 @@ const ItemList = ({ columns, data, onInputChange, onActionSelect }) => {
                       </C.ActionMenu>
                     )}
                   </div>
+                ) : col.type === "button" ? (
+                  <C.Button onClick={() => col.onClick(item)}>
+                    {col.label}
+                  </C.Button>
                 ) : (
+                  // Para outros tipos, renderiza o valor diretamente
                   item[col.key]
                 )}
               </C.Td>

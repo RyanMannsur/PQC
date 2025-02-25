@@ -34,3 +34,20 @@ export const ActionItem = styled.div`
     background: #f5f5f5;
   }
 `;
+
+// Estilos para o tipo de botão
+export const Button = styled.button`
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  &:hover {
+    background-color: #0056b3;
+  }
+  &:focus {
+    outline: none;
+  }
+`;

@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signin from "../pages/Signin";
 import SelecionarLab from "../pages/SelecionarLab";
 import Home from "../pages/Home";
@@ -13,14 +8,10 @@ import InventarioDetalhes from "../pages/Inventario/updateInventario";
 import PrivateRoute from "./private";
 import AppNotSidebar from "../layout/AppNotSidebar";
 import AppLayout from "../layout/App";
-import useAuth from "../hooks/useAuth";
 import PublicoLayout from "../layout/publico";
+import Traferencia from "../pages/Transferencia";
 
 const RoutesApp = () => {
-  const { usuario } = useAuth();
-
-  const labId = localStorage.getItem("labId");
-
   return (
     <Router>
       <Routes>
@@ -28,18 +19,11 @@ const RoutesApp = () => {
           path="/"
           element={
             <PublicoLayout>
-              {usuario ? (
-                labId ? (
-                  <Navigate to="/home" />
-                ) : (
-                  <Navigate to="/selecionar-lab" />
-                )
-              ) : (
-                <Signin />
-              )}
+              <Signin />
             </PublicoLayout>
           }
         />
+
         <Route
           path="/selecionar-lab"
           element={
@@ -76,6 +60,16 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <InventarioDetalhes />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/transferencias"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Traferencia />
               </AppLayout>
             </PrivateRoute>
           }
