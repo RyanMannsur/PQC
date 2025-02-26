@@ -1,0 +1,42 @@
+CSU00 - Login - Tela T02
+
+endpointExterna autentica {login, senha} siape
+
+
+componente - Definição do Contexto de Local de Estocagem
+    (Só fica editável se houver mais de um local o estiver na tela de Menu)
+
+    endpoint obterLocaisEstoque {siape} json(locaisEstoque)
+    se retornar:
+       Vazio - Mostrar a mensagem e não dar acesso ao sistema;
+       se retornar 1 local Mostrar em um box fixo
+       Se retornar mais de 1 (mostrar no header um listbox para escolha)
+
+    A escolha deverá fazer parte de um objeto global (codCampus, codUnidade, codPredio, codLaboratorio)
+
+CSU01 - Cadastrar Produtos - Tela T03
+
+Antes de rendenrizar Mostrar o grid de Produtos
+  endpoint obterProdutosPorUnidadeOrganizacional(codCampus, codUnidade) 
+           retorna json(produtosControladosNaUnidade)
+
+Ao Editar - Acessar Tela 04 (Modal)
+  Antes de renderizar chamar @produto_bp.route("/produtos/<int:codProduto>")
+                             @produto_bp.route("/obterOrgaoControle")
+
+  Ao Salvar - Acessar @produto_bp.route("/produtos/<int:codProduto>", methods=["PUT"]) 
+  
+         mostra a lista com botão de editar excluir
+
+         botão de incluir
+
+        endpoint post, put, delete
+
+        
+http://127.0.0.1:5000/api/produtos
+http://127.0.0.1:5000/api/obterProdutosPorUnidadeOrganizacional/NS/11.52.11
+
+
+
+Casos
+   
