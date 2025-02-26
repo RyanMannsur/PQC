@@ -4,50 +4,67 @@ export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-`;
 
-export const Th = styled.th`
-  background-color: #f0f0f0;
-  padding: 12px;
-  text-align: left;
-  border-bottom: 2px solid #ddd;
-`;
+  th,
+  td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
 
-export const Td = styled.td`
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-`;
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
 
-export const ActionMenu = styled.div`
-  position: absolute;
-  background: white;
-  border: 1px solid #ddd;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  z-index: 10;
-`;
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
 
-export const ActionItem = styled.div`
-  padding: 8px 12px;
-  cursor: pointer;
-  &:hover {
-    background: #f5f5f5;
+  tr:hover {
+    background-color: #f1f1f1;
   }
 `;
 
-// Estilos para o tipo de botão
 export const Button = styled.button`
-  padding: 8px 12px;
   background-color: #007bff;
   color: white;
+  padding: 8px 12px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
+  transition: background 0.3s;
+
   &:hover {
     background-color: #0056b3;
   }
-  &:focus {
-    outline: none;
-  }
+`;
+
+export const Input = styled.input`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+`;
+
+export const Select = styled.select`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: white;
+`;
+
+export const Td = styled.td`
+  padding: 12px;
+  border: 1px solid #ddd;
+`;
+
+export const Th = styled.th`
+  padding: 12px;
+  border: 1px solid #ddd;
+  background-color: #f4f4f4;
+  font-weight: bold;
 `;

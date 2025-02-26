@@ -26,3 +26,16 @@ export const Button = styled.button`
     background-color: #0056b3;
   }
 `;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+`;
+
+export const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+`;

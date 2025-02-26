@@ -13,18 +13,33 @@ const InventarioDetalhes = () => {
   useEffect(() => {
     if (labId && idProduto) {
       const pacotesFiltrados = getPacotesByLabIdAndCodProduto(labId, idProduto);
-      setPacotes(pacotesFiltrados);
+      const pacotesComNovaQuantidade = pacotesFiltrados.map((pacote) => ({
+        ...pacote,
+        nova_quantidade: pacote.quantidade, // Inicializa com a quantidade atual
+      }));
+      setPacotes(pacotesComNovaQuantidade);
     }
   }, [labId, idProduto]);
 
-  const handleInputChange = (updatedData) => {
-    setPacotes(updatedData);
+  const handleInputChange = (id, key, value) => {
+    setPacotes((prevPacotes) =>
+      prevPacotes.map((pacote) =>
+        pacote.sequencia === id ? { ...pacote, [key]: value } : pacote
+      )
+    );
+  };
+
+  const handleConfirmarInventario = () => {
+    console.log("Dados confirmados:", pacotes);
+    // Aqui futuramente você pode enviar os dados atualizados para o backend
+    navigate("/inventario");
   };
 
   const columns = [
     { key: "sequencia", label: "Sequência", type: "string" },
     { key: "ultimaModificacao", label: "Última Modificação", type: "string" },
-    { key: "quantidade", label: "Quantidade", type: "input" },
+    { key: "quantidade_anterio", label: "Quantidade Atual" },
+    { key: "nova_quantidade", label: "Nova Quantidade", type: "input" },
     { key: "uniMedida", label: "Unidade de Medida", type: "string" },
   ];
 
@@ -32,7 +47,8 @@ const InventarioDetalhes = () => {
     id: pacote.sequencia,
     sequencia: pacote.sequencia,
     ultimaModificacao: new Date(pacote.ultimaModificacao).toLocaleString(),
-    quantidade: pacote.quantidade,
+    quantidade_anterio: pacote.quantidade,
+    nova_quantidade: pacote.nova_quantidade,
     uniMedida: pacote.uniMedida,
   }));
 
@@ -49,7 +65,7 @@ const InventarioDetalhes = () => {
         <p>Nenhum pacote encontrado.</p>
       )}
       <C.ButtonGroup>
-        <C.Button onClick={() => navigate("/inventario")}>
+        <C.Button onClick={handleConfirmarInventario}>
           Confirmar Inventário
         </C.Button>
         <C.CancelButton onClick={() => window.location.reload()}>
