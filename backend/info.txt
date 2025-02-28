@@ -1,0 +1,154 @@
+/flask_api
+│── app.py                # Arquivo principal (Gateway do servidor)
+│── config.py             # Configurações do banco de dados
+│── db.py                 # Conexão com o banco de dados
+│── routes/
+│   ├── __init__.py       # Inicializa as rotas
+│   ├── produto_routes.py # Rotas para manipulação de produtos
+│── requirements.txt      # Dependências do projeto
+
+1 - Crie um ambiente virtual e instale as bibliotecas necessárias:
+python -m venv venv
+source venv/bin/activate  # No Windows use: venv\Scripts\activate
+pip install flask psycopg2-binary
+
+2 - Crie um arquivo requirements.txt:
+Flask
+psycopg2-binary
+
+Para instalar futuramente, execute:
+pip install -r requirements.txt
+
+3 - Crie um arquivo config.py para armazenar as credenciais do banco.
+# config.py
+
+DB_CONFIG = {
+    "dbname": "seu_banco",
+    "user": "seu_usuario",
+    "password": "sua_senha",
+    "host": "localhost",
+    "port": "5432"
+}
+
+
+4 - Criamos um módulo para gerenciar a conexão com o PostgreSQL. db.py
+
+# db.py
+import psycopg2
+from config import DB_CONFIG
+
+def get_connection():
+    """Retorna uma conexão com o banco de dados."""
+    return psycopg2.connect(**DB_CONFIG)
+
+
+5 - Agora, criamos as rotas para manipular os produtos.
+
+# routes/produto_routes.py
+from flask import Blueprint, request, jsonify
+from db import get_connection
+
+produto_bp = Blueprint("produto_bp", __name__)
+
+# Rota para listar todos os produtos
+@produto_bp.route("/produtos", methods=["GET"])
+def get_produtos():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Produto")
+    produtos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(produtos)
+
+# Rota para obter um produto pelo ID
+@produto_bp.route("/produtos/<int:codProduto>", methods=["GET"])
+def get_produto(codProduto):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Produto WHERE codProduto = %s", (codProduto,))
+    produto = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if produto:
+        return jsonify(produto)
+    return jsonify({"error": "Produto não encontrado"}), 404
+
+# Rota para adicionar um novo produto
+@produto_bp.route("/produtos", methods=["POST"])
+def add_produto():
+    data = request.get_json()
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO Produto (codProduto, nomProduto, nomLista, perPureza, vlrDensidade, uniMedida) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (data["codProduto"], data["nomProduto"], data["nomLista"], data.get("perPureza"), data.get("vlrDensidade"), data.get("uniMedida")))
+        conn.commit()
+        return jsonify({"message": "Produto inserido com sucesso"}), 201
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# Rota para atualizar um produto
+@produto_bp.route("/produtos/<int:codProduto>", methods=["PUT"])
+def update_produto(codProduto):
+    data = request.get_json()
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE Produto 
+            SET nomProduto = %s, nomLista = %s, perPureza = %s, vlrDensidade = %s, uniMedida = %s
+            WHERE codProduto = %s
+        """, (data["nomProduto"], data["nomLista"], data.get("perPureza"), data.get("vlrDensidade"), data.get("uniMedida"), codProduto))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Produto não encontrado"}), 404
+        return jsonify({"message": "Produto atualizado com sucesso"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# Rota para excluir um produto
+@produto_bp.route("/produtos/<int:codProduto>", methods=["DELETE"])
+def delete_produto(codProduto):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM Produto WHERE codProduto = %s", (codProduto,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Produto não encontrado"}), 404
+        return jsonify({"message": "Produto excluído com sucesso"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+6 - O servidor app.py age como um gateway, importando todas as rotas.
+# app.py
+from flask import Flask
+from routes.produto_routes import produto_bp
+
+app = Flask(__name__)
+
+# Registrando as rotas
+app.register_blueprint(produto_bp, url_prefix="/api")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+7 - Para rodar o servidor, execute:
+python app.py
