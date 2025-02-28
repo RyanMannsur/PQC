@@ -1,0 +1,147 @@
+[
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.52.11",
+    "sglUnidade": "CDIP_NS",
+    "nomUnidade": "COORDENAÇÃO DE DESENVOLVIMENTO DA INFRAESTRUTURA DE PESQUISA"
+  },
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.55.12",
+    "sglUnidade": "DCB_NS",
+    "nomUnidade": "DEPARTAMENTO DE CIÊNCIAS BIOLÓGICAS"
+  },
+  {
+    "codCampus": "NP",
+    "codUnidade": "11.62.05",
+    "sglUnidade": "DCM_NP",
+    "nomUnidade": "DEPARTAMENTO DE COMPUTAÇÃO E MECÂNICA"
+  },
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.55.03",
+    "sglUnidade": "DCTA_NS",
+    "nomUnidade": "DEPARTAMENTO DE CIÊNCIA E TECNOLOGIA AMBIENTAL"
+  },
+  {
+    "codCampus": "CN",
+    "codUnidade": "11.58.05",
+    "sglUnidade": "DECAQ_CN",
+    "nomUnidade": "DEPARTAMENTO DE CONTROLE AMBIENTAL E QUÍMICA"
+  },
+  {
+    "codCampus": "CV",
+    "codUnidade": "11.59.04",
+    "sglUnidade": "DECM_CV",
+    "nomUnidade": "DEPARTAMENTO DE ENGENHARIA CIVIL E MEIO AMBIENTE"
+  },
+  {
+    "codCampus": "NG",
+    "codUnidade": "11.56.12",
+    "sglUnidade": "DEEB_NG",
+    "nomUnidade": "DEPARTAMENTO DE ELETRÔNICA E BIOMÉDICA"
+  },
+  {
+    "codCampus": "AX",
+    "codUnidade": "11.57.05",
+    "sglUnidade": "DELM_AX",
+    "nomUnidade": "DEPARTAMENTO DE ELETROMECÂNICA"
+  },
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.55.06",
+    "sglUnidade": "DEMAT_NS",
+    "nomUnidade": "DEPARTAMENTO DE ENGENHARIA DE MATERIAIS"
+  },
+  {
+    "codCampus": "NG",
+    "codUnidade": "11.55.09",
+    "sglUnidade": "DEQUI_NG",
+    "nomUnidade": "LABORATÓRIO DE QUÍMICA"
+  },
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.55.09",
+    "sglUnidade": "DEQUI_NS",
+    "nomUnidade": "DEPARTAMENTO DE QUÍMICA"
+  },
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.55.11",
+    "sglUnidade": "DET_NS",
+    "nomUnidade": "DEPARTAMENTO DE ENGENHARIA DE TRANSPORTES"
+  },
+  {
+    "codCampus": "AX",
+    "codUnidade": "11.57.03",
+    "sglUnidade": "DFG_AX",
+    "nomUnidade": "DEPARTAMENTO DE FORMAÇÃO GERAL"
+  },
+  {
+    "codCampus": "CV",
+    "codUnidade": "11.59.03",
+    "sglUnidade": "DFG_CV",
+    "nomUnidade": "DEPARTAMENTO DE FORMAÇÃO GERAL"
+  },
+  {
+    "codCampus": "DV",
+    "codUnidade": "11.60.03",
+    "sglUnidade": "DFG_DV",
+    "nomUnidade": "DEPARTAMENTO DE FORMAÇÃO GERAL"
+  },
+  {
+    "codCampus": "LP",
+    "codUnidade": "11.61.03",
+    "sglUnidade": "DFG_LP",
+    "nomUnidade": "DEPARTAMENTO DE FORMAÇÃO GERAL"
+  },
+  {
+    "codCampus": "NP",
+    "codUnidade": "11.62.03",
+    "sglUnidade": "DFG_NP",
+    "nomUnidade": "DEPARTAMENTO DE FORMAÇÃO GERAL"
+  },
+  {
+    "codCampus": "VG",
+    "codUnidade": "11.64.03",
+    "sglUnidade": "DFG_VG",
+    "nomUnidade": "DEPARTAMENTO DE FORMAÇÃO GERAL"
+  },
+  {
+    "codCampus": "AX",
+    "codUnidade": "11.57.04",
+    "sglUnidade": "DMC_AX",
+    "nomUnidade": "DEPARTAMENTO DE MINAS E CONSTRUÇÃO CIVIL"
+  },
+  {
+    "codCampus": "TM",
+    "codUnidade": "11.63.04",
+    "sglUnidade": "DMQ_TM",
+    "nomUnidade": "DEPARTAMENTO DE METALURGIA E QUÍMICA)"
+  },
+  {
+    "codCampus": "NG",
+    "codUnidade": "11.52.06",
+    "sglUnidade": "PPGEC_NG",
+    "nomUnidade": "PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHARIA CIVIL"
+  },
+  {
+    "codCampus": "NG",
+    "codUnidade": "11.52.08",
+    "sglUnidade": "PPGEL_NG",
+    "nomUnidade": "PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHARIA ELÉTRICA"
+  },
+  {
+    "codCampus": "GM",
+    "codUnidade": "11.52.12",
+    "sglUnidade": "PPGMQ_GM",
+    "nomUnidade": "PROGRAMA DE PÓS-GRADUAÇÃO MULTICÊNTRICO EM QUÍMICA"
+  },
+  {
+    "codCampus": "GM",
+    "codUnidade": "11.52.15",
+    "sglUnidade": "PPGTPP_GM",
+    "nomUnidade": "PROGRAMA DE PÓS-GRADUAÇÃO EM TECNOLOGIA DE PRODUTOS E PROCESSOS"
+  }
+]
+
