@@ -1,0 +1,14 @@
+[
+  {
+    "codOrgaoControle": "PF",
+    "nomOrgaoControle": "Polícia Federal"
+  },
+  {
+    "codOrgaoControle": "EX",
+    "nomOrgaoControle": "Exército"
+  },
+  {
+    "codOrgaoControle": "AN",
+    "nomOrgaoControle": "ANVISA"
+  }
+]

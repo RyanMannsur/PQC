@@ -1,0 +1,150 @@
+[
+  {
+    "codProduto": 1,
+    "nomProduto": "1,2-DICLOROETANO",
+    "nomLista": "Lista II",
+    "perPureza": 99.99,
+    "vlrDensidade": 1.30,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 2,
+    "nomProduto": "ACETATO DE ETILA",
+    "nomLista": "Lista II",
+    "perPureza": 99.80,
+    "vlrDensidade": 0.90,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 3,
+    "nomProduto": "ACETONA",
+    "nomLista": "Lista II",
+    "perPureza": 99.50,
+    "vlrDensidade": 0.79,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 4,
+    "nomProduto": "ÁCIDO ACÉTICO",
+    "nomLista": "Lista IV",
+    "perPureza": 99.70,
+    "vlrDensidade": 1.05,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 5,
+    "nomProduto": "ÁCIDO BENZÓICO",
+    "nomLista": "Lista IV",
+    "perPureza": 99.50,
+    "vlrDensidade": 1.27,
+    "uniMedida": "kg"
+  },
+  {
+    "codProduto": 6,
+    "nomProduto": "ÁCIDO BÓRICO e seus sais",
+    "nomLista": "Lista IV",
+    "perPureza": 99.50,
+    "vlrDensidade": 1.44,
+    "uniMedida": "kg"
+  },
+  {
+    "codProduto": 7,
+    "nomProduto": "ÁCIDO BROMÍDRICO",
+    "nomLista": "Lista IV",
+    "perPureza": 48.00,
+    "vlrDensidade": 1.49,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 8,
+    "nomProduto": "ÁCIDO CLORÍDRICO (37%)",
+    "nomLista": "Lista IV",
+    "perPureza": 37.00,
+    "vlrDensidade": 1.19,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 9,
+    "nomProduto": "ÁCIDO CLORÍDRICO solução 0,1 N",
+    "nomLista": "Lista IV",
+    "perPureza": 0.80,
+    "vlrDensidade": 1.01,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 10,
+    "nomProduto": "ÁCIDO CLORÍDRICO solução 1,0 N",
+    "nomLista": "Lista IV",
+    "perPureza": 8.00,
+    "vlrDensidade": 1.01,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 11,
+    "nomProduto": "ÁCIDO FÓRMICO (86%)",
+    "nomLista": "Lista IV",
+    "perPureza": 86.00,
+    "vlrDensidade": 1.20,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 12,
+    "nomProduto": "ÁCIDO FÓRMICO (98%)",
+    "nomLista": "Lista IV",
+    "perPureza": 98.00,
+    "vlrDensidade": 1.22,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 13,
+    "nomProduto": "ÁCIDO SULFÚRICO",
+    "nomLista": "Lista IV",
+    "perPureza": 98.00,
+    "vlrDensidade": 1.83,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 14,
+    "nomProduto": "ANIDO ACÉTICO",
+    "nomLista": "Lista VI",
+    "perPureza": 99.00,
+    "vlrDensidade": 1.08,
+    "uniMedida": "L"
+  },
+  {
+    "codProduto": 15,
+    "nomProduto": "BICARBONATO DE POTÁSSIO",
+    "nomLista": "Lista V",
+    "perPureza": 100.00,
+    "vlrDensidade": 2.17,
+    "uniMedida": "kg"
+  },
+  {
+    "codProduto": 40,
+    "nomProduto": "SAFROL",
+    "nomLista": "Lista I",
+    "perPureza": 97.00,
+    "vlrDensidade": 1.10,
+    "uniMedida": "kg"
+  },
+  {
+    "codProduto": 43,
+    "nomProduto": "2, 2' DICLORO-DIETIL-METILAMINA (HN-2)",
+    "nomLista": "EXÉRCITO"
+  },
+  {
+    "codProduto": 44,
+    "nomProduto": "ÁCIDO BENZÍLICO (ÁCIDO-ALFA-HIDROXI-ALFA-FENIL-BENZENOACÉTICO; ÁCIDO 2,2-DIFENIL-2-HIDROXIACÉTICO)",
+    "nomLista": "EXÉRCITO"
+  },
+  {
+    "codProduto": 45,
+    "nomProduto": "ÁCcodProdutoO FLUORÍDRICO (FLUORETO DE HIDROGÊNIO)",
+    "nomLista": "EXÉRCITO"
+  },
+  {
+    "codProduto": 69,
+    "nomProduto": "TRIETANOLAMINA (TRI(2-HIDROXIETIL) AMINA)",
+    "nomLista": "EXÉRCITO"
+  }
+]
