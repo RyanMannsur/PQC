@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_URL = "http://localhost:5000/api";
+import { API_URL } from "../../config/config";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -27,9 +26,7 @@ export const getLabs = async () => {
 };
 
 export const setLabId = (lab) => {
-  console.log("Setting lab id1:", lab);
   const { codCampus, codUnidade, codPredio, codLaboratorio } = lab;
   const labId = { codCampus, codUnidade, codPredio, codLaboratorio };
-  console.log("Setting lab id2:", labId);
   localStorage.setItem("labId", JSON.stringify(labId));
 };
