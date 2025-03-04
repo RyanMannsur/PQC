@@ -8,12 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user_token");
-
+    const storedUser = localStorage.getItem("user_data");
     if (storedUser) {
       setUsuario(JSON.parse(storedUser));
     }
-
     setLoading(false);
   }, []);
 
@@ -22,16 +20,14 @@ export const AuthProvider = ({ children }) => {
     if (typeof resultado === "string") {
       return resultado;
     } else {
-      const { nomUsuario, token } = resultado;
-      setUsuario({ nomUsuario, token });
-      localStorage.setItem("user_token", JSON.stringify({ nomUsuario, token }));
+      setUsuario(resultado);
       return null;
     }
   };
 
   const signout = () => {
     setUsuario(null);
-    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_data");
     localStorage.removeItem("labId");
   };
 

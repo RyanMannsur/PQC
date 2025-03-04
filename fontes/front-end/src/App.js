@@ -1,16 +1,16 @@
 import React from "react";
 import RoutesApp from "./routes";
 import { AuthProvider } from "./contexts/auth";
-import { LabProvider } from "./contexts/lab";
+import { LocalProvider } from "./contexts/local";
 import GlobalStyle from "./styles/global";
 
 const App = () => (
-  <LabProvider>
+  <LocalProvider>
     <AuthProvider>
       <RoutesApp />
       <GlobalStyle />
     </AuthProvider>
-  </LabProvider>
+  </LocalProvider>
 );
 
 export default App;

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import * as C from "./styles";
-import { useLab } from "../../contexts/lab";
+import { useLocal } from "../../contexts/local";
 import { getProdutosByLabId } from "../../services/produto/service";
-import ItemList from "../../components/ItemList"; // Mantendo o nome
+import ItemList from "../../components/ItemList";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 
 const Inventario = () => {
-  const { labId } = useLab();
+  const { labId } = useLocal();
   const [produtos, setProdutos] = useState([]);
   const navigate = useNavigate();
 

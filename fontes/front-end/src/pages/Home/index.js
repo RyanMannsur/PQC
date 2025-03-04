@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import * as C from "./styles";
-import { useLab } from "../../contexts/lab";
-import { getLabById } from "../../services/laboratorio/service";
+import { useLocal } from "../../contexts/local";
+import { getLabs } from "../../services/laboratorio/service";
 
 const Home = () => {
-  const { labId } = useLab();
+  const { labId } = useLocal();
   const [labDetails, setLabDetails] = useState(null);
 
   useEffect(() => {
     const fetchLabDetails = () => {
       if (labId) {
-        const lab = getLabById(labId);
+        const lab = getLabs(labId);
         setLabDetails(lab);
       }
     };

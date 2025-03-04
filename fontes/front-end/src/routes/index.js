@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signin from "../pages/Signin";
-import SelecionarLab from "../pages/SelecionarLab";
+import SelecionarLocal from "../pages/SelecionarLocal";
 import Home from "../pages/Home";
 import Inventario from "../pages/Inventario";
 import InventarioDetalhes from "../pages/Inventario/updateInventario";
@@ -29,7 +29,7 @@ const RoutesApp = () => {
           element={
             <PrivateRoute>
               <AppNotSidebar>
-                <SelecionarLab />
+                <SelecionarLocal />
               </AppNotSidebar>
             </PrivateRoute>
           }
