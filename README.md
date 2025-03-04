@@ -21,8 +21,6 @@ Certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
    python -m venv venv
    ```
 
-````
-
 2. Ative o ambiente virtual:
 
    ```bash
