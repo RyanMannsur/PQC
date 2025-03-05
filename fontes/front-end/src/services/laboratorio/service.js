@@ -30,3 +30,20 @@ export const setLabId = (lab) => {
   const labId = { codCampus, codUnidade, codPredio, codLaboratorio };
   localStorage.setItem("labId", JSON.stringify(labId));
 };
+
+export const getEstoqueLocalEstocagem = async (
+  codCampus,
+  codUnidade,
+  codPredio,
+  codLaboratorio
+) => {
+  try {
+    const response = await api.get(
+      `/obterLocalEstocagemPorId/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar estoque local de estocagem:", error);
+    return [];
+  }
+};

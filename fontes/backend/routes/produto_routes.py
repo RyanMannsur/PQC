@@ -632,3 +632,42 @@ def obter_orgao_controle():
     conn = get_connection()
     cursor = conn.cursor()
    
+
+@produto_bp.route("/obterLocalEstocagemPorId/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
+def obter_local_estocagem_por_id(codCampus, codUnidade, codPredio, codLaboratorio):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT codCampus, 
+                   codUnidade,
+                   codPredio,
+                   codLaboratorio,
+                   nomLocal 
+              FROM LocalEstocagem
+             WHERE codCampus = %s
+               AND codUnidade = %s
+               AND codPredio = %s
+               AND codLaboratorio = %s
+        """
+        cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio))
+        local_estocagem = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if local_estocagem:
+            resultado = {
+                "codCampus": local_estocagem[0],
+                "codUnidade": local_estocagem[1],
+                "codPredio": local_estocagem[2],
+                "codLaboratorio": local_estocagem[3],
+                "nomLocal": local_estocagem[4]
+            }
+            return jsonify(resultado)
+        else:
+            return jsonify({"message": "Local de estocagem não encontrado"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

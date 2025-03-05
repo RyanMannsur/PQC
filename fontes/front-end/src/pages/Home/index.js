@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import * as C from "./styles";
 import { useLocal } from "../../contexts/local";
-import { getLabs } from "../../services/laboratorio/service";
+import { getEstoqueLocalEstocagem } from "../../services/laboratorio/service";
 
 const Home = () => {
   const { labId } = useLocal();
   const [labDetails, setLabDetails] = useState(null);
 
   useEffect(() => {
-    const fetchLabDetails = () => {
+    const fetchLabDetails = async () => {
       if (labId) {
-        const lab = getLabs(labId);
+        const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
+        const lab = await getEstoqueLocalEstocagem(
+          codCampus,
+          codUnidade,
+          codPredio,
+          codLaboratorio
+        );
         setLabDetails(lab);
       }
     };
@@ -25,7 +31,7 @@ const Home = () => {
   return (
     <C.Container>
       <C.Content>
-        <C.Label>Bem-vindo ao {labDetails.nomUnidade}</C.Label>
+        <C.Label>Bem-vindo ao {labDetails.nomLocal}</C.Label>
       </C.Content>
     </C.Container>
   );
