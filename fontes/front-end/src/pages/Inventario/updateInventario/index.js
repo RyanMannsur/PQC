@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as C from "./styles";
 import { getPacotesByLabIdAndCodProduto } from "../../../services/produto/service";
@@ -75,5 +75,10 @@ const InventarioDetalhes = () => {
     </C.Container>
   );
 };
+
+export default InventarioDetalhes;
+*/
+
+const InventarioDetalhes = () => {};
 
 export default InventarioDetalhes;

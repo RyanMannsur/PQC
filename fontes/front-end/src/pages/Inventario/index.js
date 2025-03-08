@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as C from "./styles";
 import { useLocal } from "../../contexts/local";
-import { getProdutosByLabId } from "../../services/produto/service";
+import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
 import ItemList from "../../components/ItemList";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
@@ -12,19 +12,53 @@ const Inventario = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (labId) {
-      const produtosFiltrados = getProdutosByLabId(labId);
-      setProdutos(Array.isArray(produtosFiltrados) ? produtosFiltrados : []);
-    }
+    const fetchProdutos = async () => {
+      if (labId) {
+        const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
+
+        try {
+          // Chamada para obter produtos e estoques
+          const produtosResponse = await obterEstoqueLocalEstocagem(
+            codCampus,
+            codUnidade,
+            codPredio,
+            codLaboratorio
+          );
+
+          // Ajusta as quantidades nos produtos
+          const produtosComQuantidade = produtosResponse.map((produto) => {
+            return {
+              codProduto: produto.codProduto,
+              nomProduto: produto.nomProduto,
+              perPureza: produto.perPureza,
+              vlrDensidade: produto.vlrDensidade,
+              datValidade: produto.datValidade,
+              seqItem: produto.seqItem,
+              quantidade: produto.qtdEstoque,
+            };
+          });
+
+          setProdutos(produtosComQuantidade);
+        } catch (error) {
+          console.error("Erro ao buscar produtos e quantidades:", error);
+          setProdutos([]);
+        }
+      }
+    };
+
+    fetchProdutos();
   }, [labId]);
 
   const columns = [
-    { key: "nome", label: "Produto", type: "string" },
+    { key: "nomProduto", label: "Produto", type: "string" },
+    { key: "perPureza", label: "Pureza", type: "string" },
+    { key: "vlrDensidade", label: "Densidade", type: "string" },
+    { key: "datValidade", label: "Validade", type: "string" },
+    { key: "seqItem", label: "Item", type: "numeric" },
     { key: "quantidade", label: "Quantidade", type: "numeric" },
-    { key: "acoes", label: "Atualizar", type: "button" }, // Define um botão automaticamente
+    { key: "acoes", label: "Atualizar", type: "button" },
   ];
 
-  // Função para lidar com ações nos botões gerados automaticamente
   const handleActionClick = (id, key) => {
     if (key === "acoes") {
       navigate(`/inventario/${id}`);
@@ -32,9 +66,13 @@ const Inventario = () => {
   };
 
   const data = produtos.map((produto) => ({
-    id: produto.codProduto,
-    nome: produto.nomProduto,
-    quantidade: `${produto.quantidadeAtual} ${produto.uniMedida}`,
+    id: `${produto.codProduto}-${produto.seqItem}`, // Geração de chave única
+    nomProduto: produto.nomProduto,
+    perPureza: produto.perPureza,
+    vlrDensidade: produto.vlrDensidade,
+    datValidade: produto.datValidade,
+    seqItem: produto.seqItem,
+    quantidade: produto.quantidade,
   }));
 
   return (

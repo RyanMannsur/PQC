@@ -252,7 +252,7 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
                     "vlrDensidade": p[3],
                     "datValidade": p[4],
                     "seqItem": p[5],
-                    "qtdEstoque": float(p[5]),  # Convertendo Decimal para float
+                    "qtdEstoque": float(p[6]),  # Convertendo Decimal para float
                     "qtdEstoqueInventario": 0
                 }
                 for p in produtos

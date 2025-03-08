@@ -1,41 +1,42 @@
-import produtosByLab from "./produtosByLab.json";
-import pacotesByProdutos from "./pacotesByProduto.json";
+import axios from "axios";
+import { API_URL } from "../../config/config";
 
-export const getProdutosByLabId = (idLab) => {
-  const produtosFiltrados = produtosByLab
-    .filter((lab) => Number(lab.idLab) === Number(idLab))
-    .flatMap((lab) => lab.produtos)
-    .filter((produto) => produto.quantidadeAtual > 0);
+const api = axios.create({
+  baseURL: API_URL,
+});
 
-  return Array.isArray(produtosFiltrados) ? produtosFiltrados : [];
-};
+export default api;
 
-export const getProdutosByLabIdAndCodProduto = (idLab, codProduto) => {
-  const produtosFiltrados = produtosByLab
-    .filter((lab) => Number(lab.idLab) === Number(idLab))
-    .flatMap((lab) => lab.produtos)
-    .filter(
-      (produto) =>
-        produto.quantidadeAtual > 0 &&
-        Number(produto.codProduto) === Number(codProduto)
+export const obterProdutosPorLaboratorio = async (
+  codCampus,
+  codUnidade,
+  codPredio,
+  codLaboratorio
+) => {
+  try {
+    const response = await api.get(
+      `/obterProdutosPorLaboratorio/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
     );
-
-  return Array.isArray(produtosFiltrados) ? produtosFiltrados : [];
-};
-
-export const getPacotesByLabIdAndCodProduto = (idLab, codProduto) => {
-  const resultado = pacotesByProdutos.find(
-    (item) =>
-      Number(item.idLab) === Number(idLab) &&
-      Number(item.codProduto) === Number(codProduto)
-  );
-
-  if (!resultado) {
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar produtos por laboratório:", error);
     return [];
   }
+};
 
-  return resultado.pacotes.map((pacote) => ({
-    ...pacote,
-    uniMedida: resultado.uniMedida,
-  }));
+export const obterEstoqueLocalEstocagem = async (
+  codCampus,
+  codUnidade,
+  codPredio,
+  codLaboratorio
+) => {
+  try {
+    const response = await api.get(
+      `/obterEstoqueLocalEstocagem/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao obter estoque no local de estocagem:", error);
+    return [];
+  }
 };
