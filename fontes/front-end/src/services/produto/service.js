@@ -28,15 +28,66 @@ export const obterEstoqueLocalEstocagem = async (
   codCampus,
   codUnidade,
   codPredio,
-  codLaboratorio
+  codLaboratorio,
+  data = null
 ) => {
   try {
-    const response = await api.get(
-      `/obterEstoqueLocalEstocagem/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
-    );
+    let url = `/obterEstoqueLocalEstocagem/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`;
+    if (data) {
+      url += `?data=${data}`;
+    }
+    const response = await api.get(url);
     return response.data;
   } catch (error) {
     console.error("Erro ao obter estoque no local de estocagem:", error);
     return [];
+  }
+};
+
+export const obterProduto = async (
+  codCampus,
+  codUnidade,
+  codPredio,
+  codLaboratorio,
+  codProduto,
+  seqItem,
+  data = null // Parâmetro de data opcional
+) => {
+  try {
+    let url = `/ObterProdutoBYCodigoAndSequencia/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}/${codProduto}/${seqItem}`;
+    if (data) {
+      url += `?data=${data}`; // Adiciona a data à URL se fornecida
+    }
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao obter produto:", error);
+    return {};
+  }
+};
+
+export const atualizarInventario = async (
+  codProduto,
+  seqItem,
+  qtdEstoque,
+  codCampus,
+  codUnidade,
+  codPredio,
+  codLaboratorio
+) => {
+  try {
+    const response = await api.post("/atualizarInventarioBySequencia", {
+      codProduto,
+      seqItem,
+      qtdEstoque,
+      codCampus,
+      codUnidade,
+      codPredio,
+      codLaboratorio,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar inventário:", error);
+    return { error: "Erro ao atualizar inventário" };
   }
 };

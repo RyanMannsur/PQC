@@ -55,7 +55,7 @@ const RoutesApp = () => {
           }
         />
         <Route
-          path="/inventario/:idProduto"
+          path="/inventario/:codProduto/:seqItem"
           element={
             <PrivateRoute>
               <AppLayout>

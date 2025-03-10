@@ -5,11 +5,15 @@ import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
 import ItemList from "../../components/ItemList";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
+import { formatarData } from "../../helpers/dataHelper";
 
 const Inventario = () => {
   const { labId } = useLocal();
   const [produtos, setProdutos] = useState([]);
+  const [erro, setErro] = useState("");
   const navigate = useNavigate();
+
+  const dataInicial = "1900-01-01";
 
   useEffect(() => {
     const fetchProdutos = async () => {
@@ -17,31 +21,46 @@ const Inventario = () => {
         const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
 
         try {
-          // Chamada para obter produtos e estoques
           const produtosResponse = await obterEstoqueLocalEstocagem(
             codCampus,
             codUnidade,
             codPredio,
-            codLaboratorio
+            codLaboratorio,
+            dataInicial
           );
 
-          // Ajusta as quantidades nos produtos
-          const produtosComQuantidade = produtosResponse.map((produto) => {
-            return {
-              codProduto: produto.codProduto,
-              nomProduto: produto.nomProduto,
-              perPureza: produto.perPureza,
-              vlrDensidade: produto.vlrDensidade,
-              datValidade: produto.datValidade,
-              seqItem: produto.seqItem,
-              quantidade: produto.qtdEstoque,
-            };
-          });
+          const produtosNegativos = produtosResponse.filter(
+            (produto) => produto.qtdEstoque < 0
+          );
+          if (produtosNegativos.length > 0) {
+            setErro("Há produtos com quantidade negativa no estoque!");
+            setProdutos([]);
+            return;
+          }
+
+          const produtosComQuantidade = produtosResponse
+            .filter((produto) => produto.qtdEstoque > 0)
+            .map((produto) => {
+              return {
+                codProduto: produto.codProduto,
+                nomProduto: produto.nomProduto,
+                perPureza: produto.perPureza,
+                vlrDensidade: produto.vlrDensidade,
+                datValidade: formatarData(produto.datValidade),
+                seqItem: produto.seqItem,
+                quantidade: produto.qtdEstoque,
+              };
+            })
+            .sort((a, b) =>
+              a.quantidade === 0 ? 1 : b.quantidade === 0 ? -1 : 0
+            );
 
           setProdutos(produtosComQuantidade);
+          setErro("");
         } catch (error) {
           console.error("Erro ao buscar produtos e quantidades:", error);
           setProdutos([]);
+          setErro("Erro ao buscar produtos e quantidades");
         }
       }
     };
@@ -61,12 +80,13 @@ const Inventario = () => {
 
   const handleActionClick = (id, key) => {
     if (key === "acoes") {
-      navigate(`/inventario/${id}`);
+      const [codProduto, seqItem] = id.split("-");
+      navigate(`/inventario/${codProduto}/${seqItem}`);
     }
   };
 
   const data = produtos.map((produto) => ({
-    id: `${produto.codProduto}-${produto.seqItem}`, // Geração de chave única
+    id: `${produto.codProduto}-${produto.seqItem}`,
     nomProduto: produto.nomProduto,
     perPureza: produto.perPureza,
     vlrDensidade: produto.vlrDensidade,
@@ -78,6 +98,8 @@ const Inventario = () => {
   return (
     <C.Container>
       <h1>Inventário</h1>
+      {erro && <p style={{ color: "red" }}>{erro}</p>}{" "}
+      {/* Exibe mensagem de erro em vermelho */}
       {produtos.length > 0 ? (
         <ItemList
           columns={columns}
@@ -89,7 +111,7 @@ const Inventario = () => {
       )}
       <C.ButtonGroup>
         <Button
-          Text="Cadastrar Produto"
+          Text="Adicionar Produto"
           onClick={() => navigate("/cadastrar-produto")}
         />
       </C.ButtonGroup>

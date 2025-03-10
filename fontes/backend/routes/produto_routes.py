@@ -24,7 +24,7 @@ def datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio):
                AND codUnidade = %s
                AND codPredio = %s
                AND codLaboratorio = %s
-               AND idtTipoMovto in ('IM', 'IN')
+               AND idtTipoMovto in ('IM', 'IN', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
                AND datMovto <= NOW() 
         """
         cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio))
@@ -208,8 +208,17 @@ def verifica_local_estocagem_Ja_implantado(codCampus, codUnidade, codPredio, cod
 ##################################################################
 @produto_bp.route("/obterEstoqueLocalEstocagem/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaboratorio):
-   
     try:
+        # Obtém a data a partir dos parâmetros de consulta, se fornecida
+        data = request.args.get("data")
+
+        # Usa a data do último inventário se nenhuma data for fornecida
+        if not data:
+            data = datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio)
+        else:
+            # Converte a data fornecida para o formato apropriado se necessário
+            data = datetime.strptime(data, '%Y-%m-%d').date()
+
         query = """
             SELECT A.codProduto,
                    A.nomProduto,
@@ -217,7 +226,7 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
                    A.vlrDensidade,
                    C.datValidade,
                    B.seqItem,
-                   sum(coalesce(B.qtdEstoque, 0))
+                   SUM(COALESCE(B.qtdEstoque, 0)) AS qtdEstoque
               FROM Produto A
               LEFT JOIN MovtoEstoque B
                 ON B.codProduto = A.codProduto
@@ -230,19 +239,18 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
                AND B.codLaboratorio = %s
                AND B.datMovto >= %s
                AND B.idtTipoMovto in ('IM', 'IN', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
-             GROUP BY 1,2,3,4,5,6 
-            HAVING sum(coalesce(B.qtdEstoque, 0)) <> 0
-            """
+             GROUP BY A.codProduto, A.nomProduto, A.perPureza, A.vlrDensidade, C.datValidade, B.seqItem
+             HAVING SUM(COALESCE(B.qtdEstoque, 0)) <> 0
+        """
+
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio,
-                               datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio)))
+        cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio, data))
         produtos = cursor.fetchall()
 
         cursor.close()
         conn.close()
 
-        # Convertendo resultado para JSON
         if produtos:
             resultado = [
                 {
@@ -671,3 +679,100 @@ def obter_local_estocagem_por_id(codCampus, codUnidade, codPredio, codLaboratori
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@produto_bp.route("/ObterProdutoBYCodigoAndSequencia/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>/<int:codProduto>/<int:seqItem>", methods=["GET"])
+def obter_produto_por_codigo_e_sequencia(codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem):
+    try:
+        query = """
+            SELECT A.codProduto,
+                   A.nomProduto,
+                   A.perPureza,
+                   A.vlrDensidade,
+                   C.datValidade,
+                   B.seqItem,
+                   SUM(COALESCE(B.qtdEstoque, 0)) AS qtdEstoque
+              FROM Produto A
+              LEFT JOIN MovtoEstoque B
+                ON B.codProduto = A.codProduto
+              LEFT JOIN ProdutoItem C
+                ON C.codProduto = B.codProduto
+               AND C.SeqItem = B.SeqItem
+             WHERE B.codCampus = %s
+               AND B.codUnidade = %s
+               AND B.codPredio = %s
+               AND B.codLaboratorio = %s
+               AND B.codProduto = %s
+               AND B.seqItem = %s
+               AND B.idtTipoMovto in ('IM', 'IN', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
+             GROUP BY A.codProduto, A.nomProduto, A.perPureza, A.vlrDensidade, C.datValidade, B.seqItem
+            """
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem))
+        produto = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        # Convertendo resultado para JSON
+        if produto:
+            resultado = {
+                "codProduto": produto[0],
+                "nomProduto": produto[1],
+                "perPureza": produto[2],
+                "vlrDensidade": produto[3],
+                "datValidade": produto[4],
+                "seqItem": produto[5],
+                "qtdEstoque": float(produto[6])  # Convertendo Decimal para float
+            }
+            return jsonify(resultado)
+        else:
+            return jsonify({"message": "Produto não encontrado"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/atualizarInventarioBySequencia", methods=["POST"])
+def atualizar_inventario_by_sequencia():
+    data = request.get_json()
+
+    # Verifica se os dados necessários estão presentes
+    if not data or "codProduto" not in data or "seqItem" not in data or "qtdEstoque" not in data:
+        return jsonify({"error": "JSON inválido. Deve conter 'codProduto', 'seqItem' e 'qtdEstoque'."}), 400
+
+    codProduto = data["codProduto"]
+    seqItem = data["seqItem"]
+    qtdEstoque = data["qtdEstoque"]
+    codCampus = data["codCampus"]
+    codUnidade = data["codUnidade"]
+    codPredio = data["codPredio"]
+    codLaboratorio = data["codLaboratorio"]
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Define a data do movimento como a data atual
+        datMovto = datetime.now()
+
+        # Dados fixos (simulados para este exemplo)
+        idtTipoMovto = "IN"
+        txtJustificativa = "Atualização de inventário"
+
+        # Inserir no MovtoEstoque sem a cláusula ON CONFLICT
+        cursor.execute("""
+            INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                      codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Inventário atualizado com sucesso"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
