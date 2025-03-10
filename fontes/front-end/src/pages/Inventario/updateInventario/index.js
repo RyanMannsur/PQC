@@ -35,7 +35,7 @@ const InventarioDetalhes = () => {
           );
           setProduto({
             ...produtoResponse,
-            datValidade: formatarData(produtoResponse.datValidade), // Formatando a data
+            datValidade: formatarData(produtoResponse.datValidade),
           });
         } catch (error) {
           console.error("Erro ao buscar produto:", error);
@@ -54,9 +54,9 @@ const InventarioDetalhes = () => {
     const valorAnterior = parseFloat(produto.qtdEstoque);
     const qtdMovimentacao = -(valorAnterior - valorAtual);
 
-    if (qtdMovimentacao > 0) {
+    if (qtdMovimentacao > 0 || valorAtual < 0) {
       setMensagem(
-        "A quantidade nova não pode ser maior que a quantidade anterior."
+        "A quantidade nova não pode ser maior que a quantidade anterior. E nem menor que 0."
       );
       return;
     }
