@@ -776,3 +776,103 @@ def atualizar_inventario_by_sequencia():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@produto_bp.route("/buscarProdutos", methods=["GET"])
+def buscar_produtos():
+    codCampus = request.args.get("codCampus")
+    codUnidade = request.args.get("codUnidade")
+    codPredio = request.args.get("codPredio")
+    codLaboratorio = request.args.get("codLaboratorio")
+    nomeProduto = request.args.get("nomeProduto", "")
+    pureza = request.args.get("pureza", "")
+    densidade = request.args.get("densidade", "")
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT A.codProduto,
+                   A.nomProduto,
+                   A.perPureza,
+                   A.vlrDensidade,
+                   C.datValidade,
+                   B.seqItem,
+                   SUM(COALESCE(B.qtdEstoque, 0)) AS qtdEstoque
+              FROM Produto A
+              LEFT JOIN MovtoEstoque B
+                ON B.codProduto = A.codProduto
+              LEFT JOIN ProdutoItem C
+                ON C.codProduto = B.codProduto
+               AND C.SeqItem = B.SeqItem
+             WHERE B.codCampus = %s
+               AND B.codUnidade = %s
+               AND B.codPredio = %s
+               AND B.codLaboratorio = %s
+               AND (%s = '' OR A.nomProduto ILIKE %s)
+               AND (%s = '' OR A.perPureza::text ILIKE %s)
+               AND (%s = '' OR A.vlrDensidade::text ILIKE %s)
+               AND B.idtTipoMovto in ('IM', 'IN', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
+             GROUP BY A.codProduto, A.nomProduto, A.perPureza, A.vlrDensidade, C.datValidade, B.seqItem
+        """
+        cursor.execute(query, (
+            codCampus, codUnidade, codPredio, codLaboratorio,
+            nomeProduto, f'%{nomeProduto}%', 
+            pureza, f'%{pureza}%', 
+            densidade, f'%{densidade}%'
+        ))
+        produtos = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        resultado = [
+            {
+                "codProduto": p[0],
+                "nomProduto": p[1],
+                "perPureza": p[2],
+                "vlrDensidade": p[3],
+                "datValidade": p[4],
+                "seqItem": p[5],
+                "qtdEstoque": float(p[6])  # Convertendo Decimal para float
+            }
+            for p in produtos
+        ]
+
+        return jsonify(resultado)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/obterTodosLaboratorios", methods=["GET"])
+def obter_todos_laboratorios():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT codCampus, codUnidade, codPredio, codLaboratorio, nomLocal 
+              FROM LocalEstocagem
+        """
+        cursor.execute(query)
+        laboratorios = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        resultado = [
+            {
+                "codCampus": lab[0],
+                "codUnidade": lab[1],
+                "codPredio": lab[2],
+                "codLaboratorio": lab[3],
+                "nomLocal": lab[4]
+            }
+            for lab in laboratorios
+        ]
+
+        return jsonify(resultado)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

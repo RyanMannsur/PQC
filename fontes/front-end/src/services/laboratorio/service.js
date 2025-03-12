@@ -47,3 +47,13 @@ export const getEstoqueLocalEstocagem = async (
     return [];
   }
 };
+
+export const obterTodosLaboratorios = async () => {
+  try {
+    const response = await api.get("/obterTodosLaboratorios");
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar laboratórios:", error);
+    return [];
+  }
+};

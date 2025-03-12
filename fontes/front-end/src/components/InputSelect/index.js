@@ -6,13 +6,20 @@ const Select = ({
   onChange,
   placeholder = "Selecione a opção",
 }) => {
+  const handleChange = (e) => {
+    const selectedOption = options.find(
+      (option) => option.value === e.target.value
+    );
+    onChange(selectedOption);
+  };
+
   return (
-    <C.Select value={value} onChange={onChange}>
+    <C.Select value={value} onChange={handleChange}>
       <option value="" disabled>
         {placeholder}
       </option>
       {options.map((option, index) => (
-        <option key={index} value={option.value}>
+        <option key={index} value={option.value} object={option}>
           {option.label}
         </option>
       ))}

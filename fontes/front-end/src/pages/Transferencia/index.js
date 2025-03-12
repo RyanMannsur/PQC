@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as C from "./styles";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import ItemList from "../../components/ItemList";
+import { buscarProdutos } from "../../services/produto/service";
 
 const Transferencias = () => {
   const navigate = useNavigate();
@@ -11,53 +12,38 @@ const Transferencias = () => {
   const [pureza, setPureza] = useState("");
   const [densidade, setDensidade] = useState("");
   const [produtos, setProdutos] = useState([]);
+  const [localData, setLocalData] = useState(null);
 
-  const handlePesquisar = () => {
-    // Mock atualizado para refletir a nova estrutura
-    const produtosMock = [
-      {
-        id: 1,
-        codigo: "001",
-        nome: "Ácido Sulfúrico",
-        quantidade: "10L",
-        validade: "2025-12-31",
-        pureza: "98%",
-        densidade: "1.84 g/cm³",
-      },
-      {
-        id: 2,
-        codigo: "002",
-        nome: "Hidróxido de Sódio",
-        quantidade: "5kg",
-        validade: "2024-06-30",
-        pureza: "99%",
-        densidade: "2.13 g/cm³",
-      },
-      {
-        id: 3,
-        codigo: "003",
-        nome: "Etanol",
-        quantidade: "20L",
-        validade: "2025-05-15",
-        pureza: "96%",
-        densidade: "0.789 g/cm³",
-      },
-      {
-        id: 4,
-        codigo: "004",
-        nome: "Glicerina",
-        quantidade: "8L",
-        validade: "2025-03-22",
-        pureza: "99.5%",
-        densidade: "1.26 g/cm³",
-      },
-    ];
+  useEffect(() => {
+    const localStorageData = JSON.parse(localStorage.getItem("labId"));
+    setLocalData(localStorageData);
+  }, []);
 
-    setProdutos(produtosMock);
+  const handlePesquisar = async () => {
+    if (localData) {
+      const { codCampus, codUnidade, codPredio, codLaboratorio } = localData;
+      const produtosResponse = await buscarProdutos(
+        codCampus,
+        codUnidade,
+        codPredio,
+        codLaboratorio,
+        produto,
+        pureza,
+        densidade
+      );
+      setProdutos(produtosResponse);
+    } else {
+      console.error("Dados de local não encontrados no local storage.");
+    }
   };
 
-  const handleTransferir = (item) => {
-    navigate(`/transferir/${item.id}`);
+  const handleActionClick = (id, key) => {
+    console.log("id", id);
+    console.log("key", key);
+    if (key === "acoes") {
+      const [codProduto, seqItem] = id.split("-");
+      navigate(`/transferir/${codProduto}/${seqItem}`);
+    }
   };
 
   const columns = [
@@ -68,21 +54,21 @@ const Transferencias = () => {
     { key: "pureza", label: "Pureza", type: "string" },
     { key: "densidade", label: "Densidade", type: "string" },
     {
-      key: "transferencia",
+      key: "acoes",
       label: "Transferir",
       type: "button",
-      onClick: handleTransferir,
     },
   ];
 
   const data = produtos.map((produto) => ({
-    id: produto.id,
-    codigo: produto.codigo,
-    nome: produto.nome,
-    quantidade: produto.quantidade,
-    validade: produto.validade,
-    pureza: produto.pureza,
-    densidade: produto.densidade,
+    id: `${produto.codProduto}-${produto.seqItem}`,
+    codigo: produto.codProduto,
+    nome: produto.nomProduto,
+    quantidade: produto.qtdEstoque,
+    validade: produto.datValidade,
+    pureza: produto.perPureza,
+    densidade: produto.vlrDensidade,
+    seqItem: produto.seqItem,
   }));
 
   return (
@@ -115,7 +101,11 @@ const Transferencias = () => {
       </C.FilterContainer>
 
       {produtos.length > 0 ? (
-        <ItemList columns={columns} data={data} />
+        <ItemList
+          columns={columns}
+          data={data}
+          onActionClick={handleActionClick}
+        />
       ) : (
         <p>Nenhum produto encontrado.</p>
       )}

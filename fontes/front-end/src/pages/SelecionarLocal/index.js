@@ -3,12 +3,12 @@ import Select from "../../components/InputSelect";
 import Button from "../../components/Button";
 import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
-import api, { setLabId, getLabs } from "../../services/laboratorio/service";
+import { setLabId, getLabs } from "../../services/laboratorio/service";
 
 const SelecionarLocal = () => {
   const navigate = useNavigate();
 
-  const [lab, setLab] = useState("");
+  const [lab, setLab] = useState(null);
   const [error, setError] = useState("");
   const [labOptions, setLabOptions] = useState([]);
 
@@ -17,7 +17,16 @@ const SelecionarLocal = () => {
       try {
         const labs = await getLabs();
         if (labs && Array.isArray(labs)) {
-          setLabOptions(labs);
+          setLabOptions(
+            labs.map((lab, index) => ({
+              id: index.toString(),
+              nomLocal: lab[4],
+              codCampus: lab[0],
+              codUnidade: lab[1],
+              codPredio: lab[2],
+              codLaboratorio: lab[3],
+            }))
+          );
 
           if (labs.length === 1) {
             const selectedLab = labs[0];
@@ -44,14 +53,12 @@ const SelecionarLocal = () => {
       return;
     }
 
-    const selectedLab = labOptions.find((option) => option.id === lab);
-
-    if (selectedLab) {
+    if (lab) {
       setLabId({
-        codCampus: selectedLab[0],
-        codUnidade: selectedLab[1],
-        codPredio: selectedLab[2],
-        codLaboratorio: selectedLab[3],
+        codCampus: lab.codCampus,
+        codUnidade: lab.codUnidade,
+        codPredio: lab.codPredio,
+        codLaboratorio: lab.codLaboratorio,
       });
       navigate("/home");
     }
@@ -65,10 +72,11 @@ const SelecionarLocal = () => {
           options={labOptions.map((lab) => ({
             value: lab.id,
             label: lab.nomLocal,
+            object: lab,
           }))}
-          value={lab}
-          onChange={(e) => {
-            setLab(e.value);
+          value={lab ? lab.id : ""}
+          onChange={(selectedOption) => {
+            setLab(selectedOption.object);
             setError("");
           }}
         />

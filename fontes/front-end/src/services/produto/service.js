@@ -91,3 +91,32 @@ export const atualizarInventario = async (
     return { error: "Erro ao atualizar inventário" };
   }
 };
+
+// Função para buscar produtos por nome, pureza e densidade
+export const buscarProdutos = async (
+  codCampus,
+  codUnidade,
+  codPredio,
+  codLaboratorio,
+  nomeProduto,
+  pureza,
+  densidade
+) => {
+  try {
+    const response = await api.get(`/buscarProdutos`, {
+      params: {
+        codCampus,
+        codUnidade,
+        codPredio,
+        codLaboratorio,
+        nomeProduto,
+        pureza,
+        densidade,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+    return [];
+  }
+};

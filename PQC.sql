@@ -71,7 +71,7 @@ create table LocalEstocagem (
     codUnidade  char(8) not null,
     codPredio char(2) not null,
     codLaboratorio  char(3) not null,
-    nomLocal varchar(60) not null,
+    nomLocal varchar(100) not null,
     codSiapeResponsavel int not null,
     primary key (codCampus, codUnidade, codPredio, codLaboratorio)
 );
@@ -220,16 +220,20 @@ insert into UnidadeOrganizacional
   
 insert into LocalEstocagem (codCampus, codUnidade, codPredio, codLaboratorio, nomLocal, codSiapeResponsavel)
    values
-    ('NG', '11.56.12', '17', '101', 'Laboratório de Química', '2418912');
+    ('NG', '11.56.12', '17', '101', 'Laboratório de Química', '2418912'),
+    ('NS', '11.55.11', '01', '001', 'COORDENAÇÃO DE DESENVOLVIMENTO DA INFRAESTRUTURA DE PESQUISA', '2418912'),
+    ('NS', '11.55.11', '11', '102', 'DEPARTAMENTO DE CIÊNCIAS BIOLÓGICAS', '1045235'),
+    ('NP', '11.62.05', '20', '051', 'DEPARTAMENTO DE COMPUTAÇÃO E MECÂNICA', '16760510'),
+    ('NS', '11.55.11', '11', '141', 'DEPARTAMENTO DE CIÊNCIA E TECNOLOGIA AMBIENTAL', '2092847');
 
-insert into MovtoEstoque
-   (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
- values
-   (1, 1, 'NG', '11.56.12', '17', '101', '31-12-2024', 'IM', 100, 'Implantação'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '01-01-2025', 'IN', 80, 'Inventario'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '01-01-2025', 'AC', -20, 'Ajuste Saida'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '05-01-2025', 'EC', 200, 'Implantação'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '05-01-2025', 'ED', 30, 'Implantação');
+insert into MovtoEstoque 
+    (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+values
+   (1, 1, 'NG', '11.56.12', '17', '101', '2024-12-31', 'IM', 100, 'Implantação'),
+   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-01', 'IN', 80, 'Inventario'),
+   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-01', 'AC', -20, 'Ajuste Saida'),
+   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-05', 'EC', 200, 'Implantação'),
+   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-05', 'ED', 30, 'Implantação');
    
 
     EC entrada compra
