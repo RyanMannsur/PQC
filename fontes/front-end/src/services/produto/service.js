@@ -92,7 +92,6 @@ export const atualizarInventario = async (
   }
 };
 
-// Função para buscar produtos por nome, pureza e densidade
 export const buscarProdutos = async (
   codCampus,
   codUnidade,
