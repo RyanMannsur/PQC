@@ -236,7 +236,7 @@ values
    (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-05', 'ED', 30, 'Implantação');
    
 
-    EC entrada compra
+--    EC entrada compra
 --  ED entrada doacao
 --  TE transferencia entrada
 --  TS transferencia saida

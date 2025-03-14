@@ -1,4 +1,5 @@
 # routes/produto_routes.py
+import os 
 from flask import Blueprint, request, jsonify
 from db import get_connection
 from datetime import datetime
@@ -40,14 +41,15 @@ def datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio):
 
 
 def get_connection():
-    """Função para obter a conexão com o banco de dados."""
-    return psycopg2.connect(
-        dbname="PQC",
-        user="postgres",
-        password="postgres",
-        host="localhost",
-        port="5432"
-    )
+ """Função para obter a conexão com o banco de dados."""
+ # Obter a URL do banco de dados a partir das variáveis de ambiente
+ DATABASE_URL = os.getenv("DATABASE_URL")
+ 
+ if not DATABASE_URL:
+     raise Exception("A variável de ambiente DATABASE_URL não está definida.")
+
+ # Conectar ao banco de dados usando a URL fornecida
+ return psycopg2.connect(DATABASE_URL)
 
 # Rota para listar todos os produtos
 @produto_bp.route("/produtos", methods=["GET"])
