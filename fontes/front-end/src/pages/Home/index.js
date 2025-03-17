@@ -22,7 +22,7 @@ const Home = () => {
     };
 
     fetchLabDetails();
-  }, [labId]);
+  });
 
   if (!labDetails) {
     return <C.Label>Carregando informações...</C.Label>;

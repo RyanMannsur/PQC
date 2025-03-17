@@ -878,3 +878,66 @@ def obter_todos_laboratorios():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/adicionar_produtos", methods=["POST"])
+def adicionar_produtos():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "JSON inválido ou ausente"}), 400
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        for item in data:
+            codCampus = item["codCampus"]
+            codUnidade = item["codUnidade"]
+            codPredio = item["codPredio"]
+            codLaboratorio = item["codLaboratorio"]
+                        
+            for produto in item.values():
+                if isinstance(produto, dict):  # Filtrar apenas os objetos produto
+
+                    # Verifica se o produto já existe
+                    cursor.execute("SELECT 1 FROM Produto WHERE codProduto = %s", (produto["codProduto"],))
+                    produto_existe = cursor.fetchone()
+
+                    if produto_existe:  # Modificação: verifica se o produto existe
+                        # Busca o próximo seqItem disponível
+                        cursor.execute("SELECT COALESCE(MAX(seqItem), 0) + 1 FROM ProdutoItem WHERE codProduto = %s", (produto["codProduto"],))
+                        seqItem = cursor.fetchone()[0]
+
+                        # Inserir no ProdutoItem
+                        cursor.execute("""
+                            INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+                            VALUES (%s, %s, %s, %s, %s)
+                        """, (produto["codProduto"], seqItem, produto["idNFe"], produto["datValidade"], 'UNID'))  # codEmbalagem fixo para 'UNID'
+
+                        # Inserir no MovtoEstoque
+                        cursor.execute("""
+                            INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                                    codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificatica)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """, (produto["codProduto"], seqItem, codCampus, codUnidade, codPredio, 
+                            codLaboratorio, produto["datMovto"], produto["idtTipoMovto"], produto["qtdEstoque"], produto["txtJustificativa"]))
+
+                        # Inserir no MovtoLaboratorio
+                        cursor.execute("""
+                            INSERT INTO MovtoLaboratorio (codCampus, codUnidade, codPredio, codLaboratorio, 
+                                                        datMovto, idtTipoMovto, txtJustificativa)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        """, (codCampus, codUnidade, codPredio, codLaboratorio, produto["datMovto"], 
+                            produto["idtTipoMovto"], produto["txtJustificativa"]))
+
+                    else:
+                        return jsonify({"error": f"Produto com código {produto['codProduto']} não encontrado."}), 404
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Produtos adicionados com sucesso"}), 201  # Código de status 201 (Created)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

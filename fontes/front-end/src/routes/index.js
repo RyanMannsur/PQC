@@ -6,11 +6,13 @@ import Home from "../pages/Home";
 import Inventario from "../pages/Inventario";
 import InventarioDetalhes from "../pages/Inventario/updateInventario";
 import TransferirProduto from "../pages/Transferencia/tranferirProduto";
+import CreateProdutos from "../pages/Inventario/createProduto";
 import PrivateRoute from "./private";
 import AppNotSidebar from "../layout/AppNotSidebar";
 import AppLayout from "../layout/App";
 import PublicoLayout from "../layout/publico";
 import Traferencia from "../pages/Transferencia";
+import CadastrarProduto from "../pages/Inventario/createProduto/criarProduto";
 
 const RoutesApp = () => {
   return (
@@ -81,6 +83,26 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <TransferirProduto />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/cadastrar-produto"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <CreateProdutos />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/cadastrar-produto/:id"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <CadastrarProduto />
               </AppLayout>
             </PrivateRoute>
           }

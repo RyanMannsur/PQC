@@ -5,6 +5,7 @@ import Input from "../../components/Input";
 import Button from "../../components/Button";
 import ItemList from "../../components/ItemList";
 import { buscarProdutos } from "../../services/produto/service";
+import { formatarData } from "../../helpers/dataHelper";
 
 const Transferencias = () => {
   const navigate = useNavigate();
@@ -60,12 +61,12 @@ const Transferencias = () => {
     },
   ];
 
-  const data = produtos.map((produto) => ({
+  const data = produtos.filter((produto) => produto.qtdEstoque > 0).map((produto) => ({
     id: `${produto.codProduto}-${produto.seqItem}`,
     codigo: produto.codProduto,
     nome: produto.nomProduto,
     quantidade: produto.qtdEstoque,
-    validade: produto.datValidade,
+    validade: formatarData(produto.datValidade),
     pureza: produto.perPureza,
     densidade: produto.vlrDensidade,
     seqItem: produto.seqItem,

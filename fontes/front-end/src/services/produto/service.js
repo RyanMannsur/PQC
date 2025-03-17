@@ -119,3 +119,23 @@ export const buscarProdutos = async (
     return [];
   }
 };
+
+export const adicionarProdutos = async (produtos) => {
+  try {
+    const response = await api.post("/adicionar_produtos", produtos);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao adicionar produtos:", error);
+    return { error: "Erro ao adicionar produtos" };
+  }
+  };
+
+  export const obterProdutos = async () => {
+    try {
+      const response = await api.get("/produtos");
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao obter produtos:", error);
+      return []; // Retorna uma lista vazia em caso de erro
+    }
+    };
