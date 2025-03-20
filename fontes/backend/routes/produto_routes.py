@@ -902,3 +902,35 @@ def adicionar_produto(codProduto):
     except Exception as e:
         print(f"Erro durante a execução: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@produto_bp.route("/obterTodosLaboratorios", methods=["GET"])
+def obter_todos_laboratorios():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT codCampus, codUnidade, codPredio, codLaboratorio, nomLocal 
+              FROM LocalEstocagem
+        """
+        cursor.execute(query)
+        laboratorios = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        resultado = [
+            {
+                "codCampus": lab[0],
+                "codUnidade": lab[1],
+                "codPredio": lab[2],
+                "codLaboratorio": lab[3],
+                "nomLocal": lab[4]
+            }
+            for lab in laboratorios
+        ]
+
+        return jsonify(resultado)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
