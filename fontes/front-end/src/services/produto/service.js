@@ -120,15 +120,15 @@ export const buscarProdutos = async (
   }
 };
 
-export const adicionarProdutos = async (produtos) => {
+export const adicionarProduto = async (codProduto, produto) => {
   try {
-    const response = await api.post("/adicionar_produtos", produtos);
+    const response = await api.post(`/adicionar_produto/${codProduto}`, produto);
     return response.data;
   } catch (error) {
-    console.error("Erro ao adicionar produtos:", error);
-    return { error: "Erro ao adicionar produtos" };
+    console.error("Erro ao adicionar produto:", error);
+    throw error; // Propagar o erro para ser tratado no componente
   }
-  };
+};
 
   export const obterProdutos = async () => {
     try {

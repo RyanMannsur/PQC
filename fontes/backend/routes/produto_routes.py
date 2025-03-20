@@ -847,41 +847,8 @@ def buscar_produtos():
         return jsonify({"error": str(e)}), 500
 
 
-@produto_bp.route("/obterTodosLaboratorios", methods=["GET"])
-def obter_todos_laboratorios():
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        query = """
-            SELECT codCampus, codUnidade, codPredio, codLaboratorio, nomLocal 
-              FROM LocalEstocagem
-        """
-        cursor.execute(query)
-        laboratorios = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
-        resultado = [
-            {
-                "codCampus": lab[0],
-                "codUnidade": lab[1],
-                "codPredio": lab[2],
-                "codLaboratorio": lab[3],
-                "nomLocal": lab[4]
-            }
-            for lab in laboratorios
-        ]
-
-        return jsonify(resultado)
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@produto_bp.route("/adicionar_produtos", methods=["POST"])
-def adicionar_produtos():
+@produto_bp.route("/adicionar_produto/<codProduto>", methods=["POST"])
+def adicionar_produto(codProduto):
     data = request.get_json()
 
     if not data:
@@ -890,54 +857,48 @@ def adicionar_produtos():
     try:
         conn = get_connection()
         cursor = conn.cursor()
+        print(f"Conexão com o banco de dados estabelecida. CodProduto da URL: {codProduto}")
 
-        for item in data:
-            codCampus = item["codCampus"]
-            codUnidade = item["codUnidade"]
-            codPredio = item["codPredio"]
-            codLaboratorio = item["codLaboratorio"]
-                        
-            for produto in item.values():
-                if isinstance(produto, dict):  # Filtrar apenas os objetos produto
+        # Verificar parâmetros obrigatórios no payload
+        obrigatorios = ["qtdEstoque", "datMovto", "idtTipoMovto", "codEmbalagem", "datValidade", "codCampus", "codUnidade", "codPredio", "codLaboratorio"]
+        for campo in obrigatorios:
+            if campo not in data or not data[campo]:
+                return jsonify({"error": f"Campo '{campo}' ausente ou vazio."}), 400
 
-                    # Verifica se o produto já existe
-                    cursor.execute("SELECT 1 FROM Produto WHERE codProduto = %s", (produto["codProduto"],))
-                    produto_existe = cursor.fetchone()
+        # Verifica se o produto existe no banco
+        cursor.execute("SELECT 1 FROM Produto WHERE codProduto = %s", (codProduto,))
+        produto_existe = cursor.fetchone()
+        if not produto_existe:
+            return jsonify({"error": f"Produto com código {codProduto} não encontrado."}), 404
 
-                    if produto_existe:  # Modificação: verifica se o produto existe
-                        # Busca o próximo seqItem disponível
-                        cursor.execute("SELECT COALESCE(MAX(seqItem), 0) + 1 FROM ProdutoItem WHERE codProduto = %s", (produto["codProduto"],))
-                        seqItem = cursor.fetchone()[0]
+        # Buscar o próximo seqItem disponível
+        cursor.execute("SELECT COALESCE(MAX(seqItem), 0) + 1 FROM ProdutoItem WHERE codProduto = %s", (codProduto,))
+        seqItem = cursor.fetchone()[0]
+        print(f"Próximo seqItem calculado para o Produto {codProduto}: {seqItem}")
 
-                        # Inserir no ProdutoItem
-                        cursor.execute("""
-                            INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
-                            VALUES (%s, %s, %s, %s, %s)
-                        """, (produto["codProduto"], seqItem, produto["idNFe"], produto["datValidade"], 'UNID'))  # codEmbalagem fixo para 'UNID'
+        # Inserir no ProdutoItem
+        cursor.execute("""
+            INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (codProduto, seqItem, None, data["datValidade"], data["codEmbalagem"]))
+        print(f"ProdutoItem inserido: codProduto={codProduto}, seqItem={seqItem}, codEmbalagem={data['codEmbalagem']}")
 
-                        # Inserir no MovtoEstoque
-                        cursor.execute("""
-                            INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
-                                                    codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificatica)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                        """, (produto["codProduto"], seqItem, codCampus, codUnidade, codPredio, 
-                            codLaboratorio, produto["datMovto"], produto["idtTipoMovto"], produto["qtdEstoque"], produto["txtJustificativa"]))
+        # Inserir no MovtoEstoque
+        cursor.execute("""
+            INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, 
+                                      datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (codProduto, seqItem, data["codCampus"], data["codUnidade"], data["codPredio"],
+              data["codLaboratorio"], data["datMovto"], data["idtTipoMovto"], data["qtdEstoque"], data["txtJustificativa"]))
+        print(f"MovtoEstoque inserido: codProduto={codProduto}, seqItem={seqItem}")
 
-                        # Inserir no MovtoLaboratorio
-                        cursor.execute("""
-                            INSERT INTO MovtoLaboratorio (codCampus, codUnidade, codPredio, codLaboratorio, 
-                                                        datMovto, idtTipoMovto, txtJustificativa)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s)
-                        """, (codCampus, codUnidade, codPredio, codLaboratorio, produto["datMovto"], 
-                            produto["idtTipoMovto"], produto["txtJustificativa"]))
-
-                    else:
-                        return jsonify({"error": f"Produto com código {produto['codProduto']} não encontrado."}), 404
-
+        # Finalizar transação
         conn.commit()
         cursor.close()
         conn.close()
-        return jsonify({"message": "Produtos adicionados com sucesso"}), 201  # Código de status 201 (Created)
+        print("Conexão com o banco de dados fechada.")
+        return jsonify({"message": "Produto adicionado com sucesso"}), 201
 
     except Exception as e:
+        print(f"Erro durante a execução: {str(e)}")
         return jsonify({"error": str(e)}), 500
