@@ -7,6 +7,7 @@ import calendar
 from flask import jsonify
 import psycopg2
 produto_bp = Blueprint("produto_bp", __name__)
+from datetime import datetime, timedelta  # Importando timedelta
 
 # funcoes privadas
 def ultimo_dia_do_mes(mes, ano):
@@ -210,72 +211,94 @@ def verifica_local_estocagem_Ja_implantado(codCampus, codUnidade, codPredio, cod
 ##################################################################
 @produto_bp.route("/obterEstoqueLocalEstocagem/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaboratorio):
-    try:
-        # Obtém a data a partir dos parâmetros de consulta, se fornecida
-        data = request.args.get("data")
+  try:
+      # Obtém a data a partir dos parâmetros de consulta, se fornecida
+      data = request.args.get("data")
 
-        # Usa a data do último inventário se nenhuma data for fornecida
-        if not data:
-            data = datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio)
-        else:
-            # Converte a data fornecida para o formato apropriado se necessário
-            data = datetime.strptime(data, '%Y-%m-%d').date()
+      # Usa a data do último inventário se nenhuma data for fornecida
+      if not data:
+          data = datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio)
+      else:
+          # Converte a data fornecida para o formato apropriado se necessário
+          data = datetime.strptime(data, '%Y-%m-%d').date()
 
-        query = """
-            SELECT A.codProduto,
-                   A.nomProduto,
-                   A.perPureza,
-                   A.vlrDensidade,
-                   C.datValidade,
-                   B.seqItem,
-                   SUM(COALESCE(B.qtdEstoque, 0)) AS qtdEstoque
-              FROM Produto A
-              LEFT JOIN MovtoEstoque B
-                ON B.codProduto = A.codProduto
-              LEFT JOIN ProdutoItem C
-                ON C.codProduto = B.codProduto
-               AND C.SeqItem = B.SeqItem
-             WHERE B.codCampus = %s
-               AND B.codUnidade = %s
-               AND B.codPredio = %s
-               AND B.codLaboratorio = %s
-               AND B.datMovto >= %s
-               AND B.idtTipoMovto in ('IM', 'IN', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
-             GROUP BY A.codProduto, A.nomProduto, A.perPureza, A.vlrDensidade, C.datValidade, B.seqItem
-             HAVING SUM(COALESCE(B.qtdEstoque, 0)) <> 0
-        """
+      query = """
+          WITH UltimoInventario AS (
+              SELECT codProduto,
+                     seqItem,
+                     MAX(datMovto) AS ultima_data_inventario,
+                     SUM(COALESCE(qtdEstoque, 0)) AS qtd_inventario
+                FROM MovtoEstoque
+               WHERE codCampus = %s
+                 AND codUnidade = %s
+                 AND codPredio = %s
+                 AND codLaboratorio = %s
+                 AND idtTipoMovto = 'IN'
+               GROUP BY codProduto, seqItem
+          ),
+          MovimentosPosteriores AS (
+              SELECT B.codProduto,
+                     B.seqItem,
+                     SUM(COALESCE(B.qtdEstoque, 0)) AS qtd_movimentos
+                FROM MovtoEstoque B
+                JOIN UltimoInventario U
+                  ON B.codProduto = U.codProduto
+                 AND B.seqItem = U.seqItem
+               WHERE B.codCampus = %s
+                 AND B.codUnidade = %s
+                 AND B.codPredio = %s
+                 AND B.codLaboratorio = %s
+                 AND B.datMovto > U.ultima_data_inventario
+                 AND B.idtTipoMovto IN ('IM', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
+               GROUP BY B.codProduto, B.seqItem
+          )
+          SELECT A.codProduto,
+                 A.nomProduto,
+                 A.perPureza,
+                 A.vlrDensidade,
+                 C.datValidade,
+                 U.seqItem,
+                 COALESCE(U.qtd_inventario, 0) + COALESCE(M.qtd_movimentos, 0) AS qtdEstoque
+            FROM Produto A
+            LEFT JOIN UltimoInventario U
+              ON U.codProduto = A.codProduto
+            LEFT JOIN MovimentosPosteriores M
+              ON M.codProduto = A.codProduto
+             AND M.seqItem = U.seqItem
+            LEFT JOIN ProdutoItem C
+              ON C.codProduto = A.codProduto
+             AND C.seqItem = U.seqItem
+           WHERE U.codProduto IS NOT NULL
+             AND U.seqItem IS NOT NULL
+      """
 
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio, data))
-        produtos = cursor.fetchall()
+      conn = get_connection()
+      cursor = conn.cursor()
+      cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio, codCampus, codUnidade, codPredio, codLaboratorio))
+      produtos = cursor.fetchall()
 
-        cursor.close()
-        conn.close()
+      cursor.close()
+      conn.close()
 
-        if produtos:
-            resultado = [
-                {
-                    "codProduto": p[0],
-                    "nomProduto": p[1],
-                    "perPureza": p[2],
-                    "vlrDensidade": p[3],
-                    "datValidade": p[4],
-                    "seqItem": p[5],
-                    "qtdEstoque": float(p[6]),  # Convertendo Decimal para float
-                    "qtdEstoqueInventario": 0
-                }
-                for p in produtos
-            ]
-            return jsonify(resultado)
-        else:
-            return jsonify({"message": "Nenhum produto encontrado"}), 404
+      if produtos:
+          resultado = [
+              {
+                  "codProduto": p[0],
+                  "nomProduto": p[1],
+                  "perPureza": p[2],
+                  "vlrDensidade": p[3],
+                  "datValidade": p[4],
+                  "seqItem": p[5],
+                  "qtdEstoque": float(p[6]),  # Convertendo Decimal para float
+              }
+              for p in produtos
+          ]
+          return jsonify(resultado)
+      else:
+          return jsonify({"message": "Nenhum produto encontrado"}), 404
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-####################
+  except Exception as e:
+      return jsonify({"error": str(e)}), 500
     
 #------------------------------------------------------------------------------
 # Se não houver item do produto no local de estocagem ele vai aparecer com qtdEstoque = 0
@@ -934,3 +957,99 @@ def obter_todos_laboratorios():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/atualizarQuantidadeProdutosLaboratorio", methods=["POST"])
+def atualizar_quantidade_produtos_laboratorio():
+ data = request.get_json()
+
+ # Verifica se os dados necessários estão presentes
+ if not data or "produtos" not in data or "codCampus" not in data or "codUnidade" not in data or "codPredio" not in data or "codLaboratorio" not in data:
+     return jsonify({"error": "JSON inválido. Deve conter 'produtos', 'codCampus', 'codUnidade', 'codPredio' e 'codLaboratorio'."}), 400
+
+ produtos = data["produtos"]  # Lista de produtos com codProduto, seqItem e qtdEstoque
+ codCampus = data["codCampus"]
+ codUnidade = data["codUnidade"]
+ codPredio = data["codPredio"]
+ codLaboratorio = data["codLaboratorio"]
+
+ try:
+     conn = get_connection()
+     cursor = conn.cursor()
+
+     # Define a data do movimento como a data atual e o dia seguinte
+     datMovto = datetime.now().date()  # Data de hoje
+     datInventario = datMovto + timedelta(days=1)  # Data do inventário (amanhã)
+
+     for produto in produtos:
+         codProduto = produto["codProduto"]
+         seqItem = produto["seqItem"]
+         qtdNova = produto["qtdEstoque"]  # Nova quantidade fornecida pelo usuário
+
+         # Valida se já houve movimentações AE ou AC no dia atual
+         cursor.execute("""
+             SELECT COUNT(*)
+               FROM MovtoEstoque
+              WHERE codProduto = %s AND seqItem = %s AND codCampus = %s AND codUnidade = %s 
+                AND codPredio = %s AND codLaboratorio = %s
+                AND datMovto = %s
+                AND idtTipoMovto IN ('AE', 'AC')
+         """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto))
+
+         movimentacoes_hoje = cursor.fetchone()[0]
+
+         if movimentacoes_hoje > 0:
+             return jsonify({"error": f"Já houve movimentações AE ou AC no dia de hoje para o produto {codProduto}, item {seqItem}."}), 400
+
+         # Busca a última movimentação "IN" e soma todas as movimentações subsequentes
+         cursor.execute("""
+             SELECT COALESCE(MAX(datMovto), '1900-01-01') AS ultima_data_inventario,
+                    COALESCE(SUM(CASE WHEN idtTipoMovto = 'IN' THEN qtdEstoque ELSE 0 END), 0) AS qtd_inventario,
+                    COALESCE(SUM(CASE WHEN idtTipoMovto != 'IN' THEN qtdEstoque ELSE 0 END), 0) AS qtd_movimentos
+               FROM MovtoEstoque
+              WHERE codProduto = %s AND seqItem = %s AND codCampus = %s AND codUnidade = %s 
+                AND codPredio = %s AND codLaboratorio = %s
+         """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio))
+
+         resultado = cursor.fetchone()
+         ultima_data_inventario = resultado[0]
+         qtd_inventario = resultado[1]  # Quantidade registrada na última movimentação "IN"
+         qtd_movimentos = resultado[2]  # Soma das movimentações subsequentes
+
+         # Calcula a quantidade atual com base na última movimentação "IN" e nas movimentações subsequentes
+         qtdAtual = qtd_inventario + qtd_movimentos
+
+         # Calcula a diferença entre a nova quantidade e a quantidade atual
+         diferenca = qtdNova - qtdAtual
+
+         # Determina o tipo de ajuste com base na diferença
+         if diferenca > 0:
+             idtTipoMovto_ajuste = "AE"  # Ajuste Entrada
+         elif diferenca < 0:
+             idtTipoMovto_ajuste = "AC"  # Ajuste Consumo
+         else:
+             # Se não houver diferença, não é necessário criar ajustes
+             continue
+
+         # Insere o movimento de ajuste (AE ou AC) com a data de hoje
+         cursor.execute("""
+             INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                       codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+         """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto_ajuste, diferenca, "Ajuste de estoque"))
+
+         # Insere o movimento de inventário (IN) para o dia seguinte
+         cursor.execute("""
+             INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                       codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+         """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datInventario, "IN", qtdNova, "Atualização de inventário"))
+
+     conn.commit()
+     cursor.close()
+     conn.close()
+
+     return jsonify({"message": "Movimentações de estoque criadas com sucesso"}), 200
+
+ except Exception as e:
+     return jsonify({"error": str(e)}), 500

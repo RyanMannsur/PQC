@@ -139,3 +139,25 @@ export const adicionarProduto = async (codProduto, produto) => {
       return []; // Retorna uma lista vazia em caso de erro
     }
     };
+
+    export const atualizarQuantidadeProdutosLaboratorio = async (
+      codCampus,
+      codUnidade,
+      codPredio,
+      codLaboratorio,
+      produtos
+      ) => {
+      try {
+        const response = await api.post("/atualizarQuantidadeProdutosLaboratorio", {
+          codCampus,
+          codUnidade,
+          codPredio,
+          codLaboratorio,
+          produtos,
+        });
+        return response.data;
+      } catch (error) {
+        console.error("Erro ao atualizar quantidade de produtos no laboratório:", error);
+        return { error: "Erro ao atualizar quantidade de produtos no laboratório" };
+      }
+      };
