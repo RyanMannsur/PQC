@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Modal from "../../components/Modal"; // Importa o componente Modal
 import * as C from "./styles";
 import { useLocal } from "../../contexts/local";
 import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
@@ -12,15 +13,17 @@ const Inventario = () => {
   const { labId } = useLocal();
   const [produtos, setProdutos] = useState([]);
   const [erro, setErro] = useState("");
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState(""); // Mensagem a ser exibida no modal
   const navigate = useNavigate();
-  
+
   const dataInicial = "1900-01-01";
-  
+
   useEffect(() => {
     const fetchProdutos = async () => {
       if (labId) {
         const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-  
+
         try {
           const produtosResponse = await obterEstoqueLocalEstocagem(
             codCampus,
@@ -29,7 +32,7 @@ const Inventario = () => {
             codLaboratorio,
             dataInicial
           );
-  
+
           const produtosNegativos = produtosResponse.filter(
             (produto) => produto.qtdEstoque < 0
           );
@@ -38,9 +41,9 @@ const Inventario = () => {
             setProdutos([]);
             return;
           }
-  
+
           const produtosAgrupados = agruparProdutos(produtosResponse);
-  
+
           setProdutos(produtosAgrupados);
           setErro("");
         } catch (error) {
@@ -50,14 +53,13 @@ const Inventario = () => {
         }
       }
     };
-  
+
     fetchProdutos();
   }, [labId]);
-  
-  // Função para agrupar produtos e seus itens
+
   const agruparProdutos = (produtosResponse) => {
     const agrupados = {};
-  
+
     produtosResponse.forEach((produto) => {
       const {
         codProduto,
@@ -68,7 +70,7 @@ const Inventario = () => {
         seqItem,
         qtdEstoque,
       } = produto;
-  
+
       if (!agrupados[codProduto]) {
         agrupados[codProduto] = {
           codProduto,
@@ -78,19 +80,19 @@ const Inventario = () => {
           itens: [],
         };
       }
-  
+
       agrupados[codProduto].itens.push({
         seqItem,
         datValidade: formatarData(datValidade),
-        nomEmbalagem: "Padrão", // Valor padrão para embalagem
+        nomEmbalagem: "Padrão", 
         qtdAtual: qtdEstoque,
-        qtdNova: qtdEstoque, // Inicialmente igual à quantidade atual
+        qtdNova: qtdEstoque, 
       });
     });
-  
-    return Object.values(agrupados); // Retorna como array
+
+    return Object.values(agrupados);
   };
-  
+
   const handleQuantityChange = (codProduto, seqItem, newQuantity) => {
     setProdutos((prevProdutos) =>
       prevProdutos.map((produto) =>
@@ -107,12 +109,12 @@ const Inventario = () => {
       )
     );
   };
-  
+
   const enviarAtualizacao = async () => {
     if (!labId) return;
-  
+
     const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-  
+
     const payload = {
       codCampus,
       codUnidade,
@@ -122,11 +124,11 @@ const Inventario = () => {
         produto.itens.map((item) => ({
           codProduto: produto.codProduto,
           seqItem: item.seqItem,
-          qtdEstoque: parseFloat(item.qtdNova), // Nova quantidade que o usuário editou
+          qtdEstoque: parseFloat(item.qtdNova), 
         }))
       ),
     };
-  
+
     try {
       const result = await atualizarQuantidadeProdutosLaboratorio(
         payload.codCampus,
@@ -135,18 +137,29 @@ const Inventario = () => {
         payload.codLaboratorio,
         payload.produtos
       );
-  
+
       if (result.error) {
-        alert(`Erro: ${result.error}`);
+        // Mensagem de erro no modal
+        setModalMessage("Houve um erro ao atualizar. Tente novamente amanhã, pois já foi feita uma atualização hoje.");
+        setModalOpen(true);
       } else {
-        alert("Movimentações de estoque criadas com sucesso!");
+        // Mensagem de sucesso no modal
+        setModalMessage("Movimentações de estoque criadas com sucesso!");
+        setModalOpen(true);
       }
     } catch (err) {
       console.error("Erro ao enviar atualização:", err);
-      alert("Erro ao enviar atualização.");
+      // Mensagem de erro no modal
+      setModalMessage("Houve um erro ao atualizar. Tente novamente amanhã, pois já foi feita uma atualização hoje.");
+      setModalOpen(true);
     }
   };
-  
+
+  const closeModal = () => {
+    setModalOpen(false);
+    window.location.reload(); // Atualiza a página ao fechar o modal
+  };
+
   return (
     <C.Container>
       <h1>Inventário</h1>
@@ -166,8 +179,15 @@ const Inventario = () => {
           onClick={enviarAtualizacao}
         />
       </C.ButtonGroup>
+      <Modal
+        title="Aviso"
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      >
+        <p>{modalMessage}</p>
+      </Modal>
     </C.Container>
   );
-  };
-  
-  export default Inventario;
+};
+
+export default Inventario;

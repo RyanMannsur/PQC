@@ -4,7 +4,6 @@ import Signin from "../pages/Signin";
 import SelecionarLocal from "../pages/SelecionarLocal";
 import Home from "../pages/Home";
 import Inventario from "../pages/Inventario";
-import InventarioDetalhes from "../pages/Inventario/updateInventario";
 import TransferirProduto from "../pages/Transferencia/tranferirProduto";
 import CreateProdutos from "../pages/Inventario/createProduto";
 import PrivateRoute from "./private";
@@ -53,16 +52,6 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <Inventario />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/inventario/:codProduto/:seqItem"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <InventarioDetalhes />
               </AppLayout>
             </PrivateRoute>
           }

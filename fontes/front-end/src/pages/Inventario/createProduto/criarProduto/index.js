@@ -7,41 +7,35 @@ import * as C from "./styles";
 import { adicionarProduto } from "../../../../services/produto/service";
 
 const CadastrarProduto = () => {
-  const { id } = useParams(); // `id` será usado como codProduto
+  const { id } = useParams(); 
   const navigate = useNavigate();
   const [quantidade, setQuantidade] = useState("");
   const [motivo, setMotivo] = useState("");
-  const [justificativa, setJustificativa] = useState(""); // Ajustado para ser o texto da justificativa
+  const [justificativa, setJustificativa] = useState(""); 
   const [dataValidade, setDataValidade] = useState("");
-  const [codigoEmbalagem, setCodigoEmbalagem] = useState(""); // Campo para código da embalagem
+  const [codigoEmbalagem, setCodigoEmbalagem] = useState(""); 
   const [mensagem, setMensagem] = useState("");
-  const labInfo = JSON.parse(localStorage.getItem("labId")); // Obter informações do laboratório local
+  const labInfo = JSON.parse(localStorage.getItem("labId")); 
 
   // Opções do motivo
   const motivosOptions = [
     { value: "EC", label: "Compra" },
     { value: "ED", label: "Doação" },
-    { value: "IN", label: "Inventário" },
   ];
 
-  // Função de envio
   const handleSubmit = async () => {
-    // Verificar se todos os campos obrigatórios foram preenchidos
     if (!quantidade || !motivo || !justificativa || !dataValidade || !codigoEmbalagem) {
       setMensagem("Por favor, preencha todos os campos.");
       return;
     }
 
-    // Obter data atual
     const hoje = new Date().toISOString().split("T")[0];
-
-    // Montar o payload
     const payload = {
       qtdEstoque: quantidade,
       idtTipoMovto: motivo,
-      codEmbalagem: codigoEmbalagem, // Usar o código da embalagem
+      codEmbalagem: codigoEmbalagem,
       datMovto: hoje,
-      txtJustificativa: justificativa, // Texto da justificativa
+      txtJustificativa: justificativa,
       datValidade: dataValidade,
       codCampus: labInfo.codCampus,
       codUnidade: labInfo.codUnidade,
@@ -52,10 +46,9 @@ const CadastrarProduto = () => {
     console.log("Payload enviado:", payload);
 
     try {
-      // Chamar o serviço para enviar o produto
-      const response = await adicionarProduto(id, payload); // `id` como codProduto
+      const response = await adicionarProduto(id, payload); 
       console.log("Produto adicionado com sucesso:", response);
-      navigate("/cadastrar-produto"); // Redirecionar após sucesso
+      navigate("/cadastrar-produto");
     } catch (error) {
       console.error("Erro ao adicionar o produto:", error);
       setMensagem("Erro ao adicionar o produto. Tente novamente.");
@@ -66,7 +59,6 @@ const CadastrarProduto = () => {
     <C.Container>
       <h1>Cadastrar Produto</h1>
       <C.Content>
-        {/* Input para Quantidade */}
         <C.Row>
           <Input
             type="number"
@@ -77,7 +69,6 @@ const CadastrarProduto = () => {
           />
         </C.Row>
 
-        {/* Select para Motivo (sem label) */}
         <C.Row>
           <Select
             options={motivosOptions}
@@ -87,7 +78,6 @@ const CadastrarProduto = () => {
           />
         </C.Row>
 
-        {/* Input para Código da Embalagem */}
         <C.Row>
           <Input
             type="text"
@@ -98,7 +88,6 @@ const CadastrarProduto = () => {
           />
         </C.Row>
 
-        {/* Input para Texto de Justificativa */}
         <C.Row>
           <Input
             type="text"
@@ -109,7 +98,6 @@ const CadastrarProduto = () => {
           />
         </C.Row>
 
-        {/* Input para Data de Validade */}
         <C.Row>
           <Input
             type="date"
@@ -120,10 +108,8 @@ const CadastrarProduto = () => {
           />
         </C.Row>
 
-        {/* Mensagem de erro */}
         {mensagem && <C.labelError>{mensagem}</C.labelError>}
 
-        {/* Botão para Enviar */}
         <Button
           Text="Confirmar"
           onClick={handleSubmit}

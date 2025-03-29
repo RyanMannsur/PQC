@@ -208,98 +208,129 @@ def verifica_local_estocagem_Ja_implantado(codCampus, codUnidade, codPredio, cod
         cursor.close()
         conn.close()
 
-##################################################################
 @produto_bp.route("/obterEstoqueLocalEstocagem/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaboratorio):
-  try:
-      # Obtém a data a partir dos parâmetros de consulta, se fornecida
-      data = request.args.get("data")
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
 
-      # Usa a data do último inventário se nenhuma data for fornecida
-      if not data:
-          data = datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio)
-      else:
-          # Converte a data fornecida para o formato apropriado se necessário
-          data = datetime.strptime(data, '%Y-%m-%d').date()
+        # Primeira consulta: Obtém os dados de inventário
+        query_ultimo_inventario = """
+            SELECT 
+                ME.codProduto,
+                ME.seqItem,
+                MAX(ME.idMovtoEstoque) AS idMovtoEstoque,
+                P.nomProduto,
+                P.perPureza,
+                P.vlrDensidade,
+                PI.datValidade,
+                COALESCE(MAX(CASE WHEN ME.idtTipoMovto = 'IN' THEN ME.qtdEstoque END), NULL) AS qtd_inventario
+            FROM MovtoEstoque ME
+            JOIN Produto P ON ME.codProduto = P.codProduto
+            LEFT JOIN ProdutoItem PI ON ME.codProduto = PI.codProduto AND ME.seqItem = PI.seqItem
+            WHERE 
+                ME.codCampus = %s
+                AND ME.codUnidade = %s
+                AND ME.codPredio = %s
+                AND ME.codLaboratorio = %s
+            GROUP BY ME.codProduto, ME.seqItem, P.nomProduto, P.perPureza, P.vlrDensidade, PI.datValidade
+        """
+        cursor.execute(query_ultimo_inventario, (codCampus, codUnidade, codPredio, codLaboratorio))
+        inventario = cursor.fetchall()
 
-      query = """
-          WITH UltimoInventario AS (
-              SELECT codProduto,
-                     seqItem,
-                     MAX(datMovto) AS ultima_data_inventario,
-                     SUM(COALESCE(qtdEstoque, 0)) AS qtd_inventario
-                FROM MovtoEstoque
-               WHERE codCampus = %s
-                 AND codUnidade = %s
-                 AND codPredio = %s
-                 AND codLaboratorio = %s
-                 AND idtTipoMovto = 'IN'
-               GROUP BY codProduto, seqItem
-          ),
-          MovimentosPosteriores AS (
-              SELECT B.codProduto,
-                     B.seqItem,
-                     SUM(COALESCE(B.qtdEstoque, 0)) AS qtd_movimentos
-                FROM MovtoEstoque B
-                JOIN UltimoInventario U
-                  ON B.codProduto = U.codProduto
-                 AND B.seqItem = U.seqItem
-               WHERE B.codCampus = %s
-                 AND B.codUnidade = %s
-                 AND B.codPredio = %s
-                 AND B.codLaboratorio = %s
-                 AND B.datMovto > U.ultima_data_inventario
-                 AND B.idtTipoMovto IN ('IM', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
-               GROUP BY B.codProduto, B.seqItem
-          )
-          SELECT A.codProduto,
-                 A.nomProduto,
-                 A.perPureza,
-                 A.vlrDensidade,
-                 C.datValidade,
-                 U.seqItem,
-                 COALESCE(U.qtd_inventario, 0) + COALESCE(M.qtd_movimentos, 0) AS qtdEstoque
-            FROM Produto A
-            LEFT JOIN UltimoInventario U
-              ON U.codProduto = A.codProduto
-            LEFT JOIN MovimentosPosteriores M
-              ON M.codProduto = A.codProduto
-             AND M.seqItem = U.seqItem
-            LEFT JOIN ProdutoItem C
-              ON C.codProduto = A.codProduto
-             AND C.seqItem = U.seqItem
-           WHERE U.codProduto IS NOT NULL
-             AND U.seqItem IS NOT NULL
-      """
+        resultados = []
 
-      conn = get_connection()
-      cursor = conn.cursor()
-      cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio, codCampus, codUnidade, codPredio, codLaboratorio))
-      produtos = cursor.fetchall()
+        # Segunda consulta: Obtém todas as movimentações relevantes
+        query_movimentos = """
+            SELECT 
+                SUM(COALESCE(ME.qtdEstoque, 0)) AS qtd_movimentos
+            FROM MovtoEstoque ME
+            WHERE 
+                ME.codCampus = %s
+                AND ME.codUnidade = %s
+                AND ME.codPredio = %s
+                AND ME.codLaboratorio = %s
+                AND ME.codProduto = %s
+                AND ME.seqItem = %s
+                AND (%s IS NULL OR ME.idMovtoEstoque > %s)
+        """
 
-      cursor.close()
-      conn.close()
+        for item in inventario:
+            codProduto = item[0]
+            seqItem = item[1]
+            idMovtoEstoque = item[2]
+            nomProduto = item[3]
+            perPureza = item[4]
+            vlrDensidade = item[5]
+            datValidade = item[6]
+            qtd_inventario = item[7]  # Pode ser None se não houver movimentação IN
 
-      if produtos:
-          resultado = [
-              {
-                  "codProduto": p[0],
-                  "nomProduto": p[1],
-                  "perPureza": p[2],
-                  "vlrDensidade": p[3],
-                  "datValidade": p[4],
-                  "seqItem": p[5],
-                  "qtdEstoque": float(p[6]),  # Convertendo Decimal para float
-              }
-              for p in produtos
-          ]
-          return jsonify(resultado)
-      else:
-          return jsonify({"message": "Nenhum produto encontrado"}), 404
+            # Se não houver `IN`, considera todas as movimentações para o produto e seqItem
+            if qtd_inventario is None:
+                # Busca todas as movimentações para este par codProduto + seqItem
+                cursor.execute(
+                    query_movimentos,
+                    (
+                        codCampus,
+                        codUnidade,
+                        codPredio,
+                        codLaboratorio,
+                        codProduto,
+                        seqItem,
+                        None,  # Não há IN, então consideramos todas as movimentações
+                        0,     # Placeholder para o segundo parâmetro do filtro
+                    ),
+                )
+            else:
+                # Considera apenas movimentações posteriores ao último IN
+                cursor.execute(
+                    query_movimentos,
+                    (
+                        codCampus,
+                        codUnidade,
+                        codPredio,
+                        codLaboratorio,
+                        codProduto,
+                        seqItem,
+                        idMovtoEstoque,
+                        idMovtoEstoque,
+                    ),
+                )
 
-  except Exception as e:
-      return jsonify({"error": str(e)}), 500
-    
+            movimentos = cursor.fetchone()
+
+            qtd_movimentos = movimentos[0] if movimentos and movimentos[0] is not None else 0
+
+            if qtd_inventario is None:
+                # Caso não exista IN, considera apenas as movimentações
+                qtd_final = qtd_movimentos
+            else:
+                # Caso exista IN, soma o inventário com as movimentações posteriores
+                qtd_final = qtd_inventario + qtd_movimentos
+
+            # Adiciona o resultado final desta combinação ao resultado
+            resultados.append({
+                "codProduto": codProduto,
+                "nomProduto": nomProduto,
+                "perPureza": perPureza,
+                "vlrDensidade": vlrDensidade,
+                "datValidade": datValidade,
+                "seqItem": seqItem,
+                "qtdEstoque": float(qtd_final)  # Converte para float para evitar problemas de formatação
+            })
+
+        cursor.close()
+        conn.close()
+
+        # Retorna os resultados no formato JSON
+        if resultados:
+            return jsonify(resultados)
+        else:
+            return jsonify({"message": "Nenhum produto encontrado"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 #------------------------------------------------------------------------------
 # Se não houver item do produto no local de estocagem ele vai aparecer com qtdEstoque = 0
 # Assim será inserido desde que o valor de estoque informado for diferente de zero

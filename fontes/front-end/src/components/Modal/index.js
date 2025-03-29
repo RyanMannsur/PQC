@@ -1,22 +1,22 @@
-import * as S from "./styles"; // Importar os estilos
+import React from "react";
+import * as C from "./styles";
 
-
-const Modal = ({ children, isOpen, onClose }) => {
-  const handleClose = () => {
-    onClose();
-  };
+const Modal = ({ title, children, isOpen, onClose }) => {
+  if (!isOpen) return null;
 
   return (
-    <>
-      {isOpen && (
-        <S.Overlay onClick={handleClose}>
-          <S.Container onClick={(e) => e.stopPropagation()}>
-            {children}
-            <S.Button onClick={handleClose}>Fechar</S.Button>
-          </S.Container>
-        </S.Overlay>
-      )}
-    </>
+    <C.Overlay>
+      <C.ModalContainer>
+        <C.ModalHeader>
+          <h2>{title}</h2>
+          <C.CloseButton onClick={onClose}>&times;</C.CloseButton>
+        </C.ModalHeader>
+        <C.ModalContent>{children}</C.ModalContent>
+        <C.ModalFooter>
+          <C.Button onClick={onClose}>OK</C.Button>
+        </C.ModalFooter>
+      </C.ModalContainer>
+    </C.Overlay>
   );
 };
 
