@@ -29,7 +29,7 @@ const CreateProdutos = () => {
       { key: "densidade", label: "Densidade", type: "string" },
       {
         key: "acoes",
-        label: "Ações",
+        label: "Adicionar",
         type: "button",
       },
     ];

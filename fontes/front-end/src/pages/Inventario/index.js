@@ -14,7 +14,7 @@ const Inventario = () => {
   const [produtos, setProdutos] = useState([]);
   const [erro, setErro] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState(""); // Mensagem a ser exibida no modal
+  const [modalMessage, setModalMessage] = useState(""); 
   const navigate = useNavigate();
 
   const dataInicial = "1900-01-01";
@@ -60,35 +60,37 @@ const Inventario = () => {
   const agruparProdutos = (produtosResponse) => {
     const agrupados = {};
 
-    produtosResponse.forEach((produto) => {
-      const {
-        codProduto,
-        nomProduto,
-        perPureza,
-        vlrDensidade,
-        datValidade,
-        seqItem,
-        qtdEstoque,
-      } = produto;
-
-      if (!agrupados[codProduto]) {
-        agrupados[codProduto] = {
+    produtosResponse
+      .filter((produto) => produto.qtdEstoque > 0) 
+      .forEach((produto) => {
+        const {
           codProduto,
           nomProduto,
           perPureza,
           vlrDensidade,
-          itens: [],
-        };
-      }
+          datValidade,
+          seqItem,
+          qtdEstoque,
+        } = produto;
 
-      agrupados[codProduto].itens.push({
-        seqItem,
-        datValidade: formatarData(datValidade),
-        nomEmbalagem: "Padrão", 
-        qtdAtual: qtdEstoque,
-        qtdNova: qtdEstoque, 
+        if (!agrupados[codProduto]) {
+          agrupados[codProduto] = {
+            codProduto,
+            nomProduto,
+            perPureza,
+            vlrDensidade,
+            itens: [],
+          };
+        }
+
+        agrupados[codProduto].itens.push({
+          seqItem,
+          datValidade: formatarData(datValidade),
+          nomEmbalagem: "Padrão", 
+          qtdAtual: qtdEstoque,
+          qtdNova: qtdEstoque, 
+        });
       });
-    });
 
     return Object.values(agrupados);
   };

@@ -97,7 +97,8 @@ const TransferirProduto = () => {
         codCampus,
         codUnidade,
         codPredio,
-        codLaboratorio
+        codLaboratorio,
+        "TS"
       );
 
       // Transferência de entrada (TE)
@@ -108,7 +109,8 @@ const TransferirProduto = () => {
         codCampusDestino,
         codUnidadeDestino,
         codPredioDestino,
-        codLaboratorioDestino
+        codLaboratorioDestino,
+        "TE"
       );
 
       setMensagem("Transferência realizada com sucesso.");

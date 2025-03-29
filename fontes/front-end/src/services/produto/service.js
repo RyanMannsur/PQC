@@ -73,7 +73,8 @@ export const atualizarInventario = async (
   codCampus,
   codUnidade,
   codPredio,
-  codLaboratorio
+  codLaboratorio,
+  idtTipoMovto,
 ) => {
   try {
     const response = await api.post("/atualizarInventarioBySequencia", {
@@ -84,6 +85,7 @@ export const atualizarInventario = async (
       codUnidade,
       codPredio,
       codLaboratorio,
+      idtTipoMovto,
     });
     return response.data;
   } catch (error) {

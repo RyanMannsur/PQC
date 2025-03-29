@@ -794,8 +794,10 @@ def atualizar_inventario_by_sequencia():
     data = request.get_json()
 
     # Verifica se os dados necessários estão presentes
-    if not data or "codProduto" not in data or "seqItem" not in data or "qtdEstoque" not in data:
-        return jsonify({"error": "JSON inválido. Deve conter 'codProduto', 'seqItem' e 'qtdEstoque'."}), 400
+    required_fields = ["codProduto", "seqItem", "qtdEstoque", "codCampus", "codUnidade", "codPredio", "codLaboratorio", "idtTipoMovto"]
+    missing_fields = [field for field in required_fields if field not in data]
+    if missing_fields:
+        return jsonify({"error": f"JSON inválido. Campos obrigatórios ausentes: {', '.join(missing_fields)}"}), 400
 
     codProduto = data["codProduto"]
     seqItem = data["seqItem"]
@@ -804,6 +806,8 @@ def atualizar_inventario_by_sequencia():
     codUnidade = data["codUnidade"]
     codPredio = data["codPredio"]
     codLaboratorio = data["codLaboratorio"]
+    idtTipoMovto = data["idtTipoMovto"]  # Agora é dinâmico e recebido pelo JSON
+    txtJustificativa = data.get("txtJustificativa", "Atualização de inventário")  # Texto padrão caso não seja enviado
 
     try:
         conn = get_connection()
@@ -812,11 +816,7 @@ def atualizar_inventario_by_sequencia():
         # Define a data do movimento como a data atual
         datMovto = datetime.now()
 
-        # Dados fixos (simulados para este exemplo)
-        idtTipoMovto = "IN"
-        txtJustificativa = "Atualização de inventário"
-
-        # Inserir no MovtoEstoque sem a cláusula ON CONFLICT
+        # Inserir no MovtoEstoque com o tipo de movimentação dinâmico
         cursor.execute("""
             INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
                                       codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
@@ -847,55 +847,114 @@ def buscar_produtos():
         conn = get_connection()
         cursor = conn.cursor()
 
-        query = """
-            SELECT A.codProduto,
-                   A.nomProduto,
-                   A.perPureza,
-                   A.vlrDensidade,
-                   C.datValidade,
-                   B.seqItem,
-                   SUM(COALESCE(B.qtdEstoque, 0)) AS qtdEstoque
-              FROM Produto A
-              LEFT JOIN MovtoEstoque B
-                ON B.codProduto = A.codProduto
-              LEFT JOIN ProdutoItem C
-                ON C.codProduto = B.codProduto
-               AND C.SeqItem = B.SeqItem
-             WHERE B.codCampus = %s
-               AND B.codUnidade = %s
-               AND B.codPredio = %s
-               AND B.codLaboratorio = %s
-               AND (%s = '' OR A.nomProduto ILIKE %s)
-               AND (%s = '' OR A.perPureza::text ILIKE %s)
-               AND (%s = '' OR A.vlrDensidade::text ILIKE %s)
-               AND B.idtTipoMovto in ('IM', 'IN', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
-             GROUP BY A.codProduto, A.nomProduto, A.perPureza, A.vlrDensidade, C.datValidade, B.seqItem
+        # Primeira consulta: Obtém os dados de inventário com filtros opcionais
+        query_ultimo_inventario = """
+            SELECT 
+                ME.codProduto,
+                ME.seqItem,
+                MAX(ME.idMovtoEstoque) AS idMovtoEstoque,
+                P.nomProduto,
+                P.perPureza,
+                P.vlrDensidade,
+                PI.datValidade,
+                COALESCE(MAX(CASE WHEN ME.idtTipoMovto = 'IN' THEN ME.qtdEstoque END), NULL) AS qtd_inventario
+            FROM MovtoEstoque ME
+            JOIN Produto P ON ME.codProduto = P.codProduto
+            LEFT JOIN ProdutoItem PI ON ME.codProduto = PI.codProduto AND ME.seqItem = PI.seqItem
+            WHERE 
+                ME.codCampus = %s
+                AND ME.codUnidade = %s
+                AND ME.codPredio = %s
+                AND ME.codLaboratorio = %s
+                AND (%s = '' OR P.nomProduto ILIKE %s)
+                AND (%s = '' OR P.perPureza::text ILIKE %s)
+                AND (%s = '' OR P.vlrDensidade::text ILIKE %s)
+            GROUP BY ME.codProduto, ME.seqItem, P.nomProduto, P.perPureza, P.vlrDensidade, PI.datValidade
         """
-        cursor.execute(query, (
+        cursor.execute(query_ultimo_inventario, (
             codCampus, codUnidade, codPredio, codLaboratorio,
-            nomeProduto, f'%{nomeProduto}%', 
-            pureza, f'%{pureza}%', 
+            nomeProduto, f'%{nomeProduto}%',
+            pureza, f'%{pureza}%',
             densidade, f'%{densidade}%'
         ))
-        produtos = cursor.fetchall()
+        inventario = cursor.fetchall()
+
+        resultados = []
+
+        # Segunda consulta: Obtém todas as movimentações relevantes com base na lógica do último `IN`
+        query_movimentos = """
+            SELECT 
+                SUM(COALESCE(ME.qtdEstoque, 0)) AS qtd_movimentos
+            FROM MovtoEstoque ME
+            WHERE 
+                ME.codCampus = %s
+                AND ME.codUnidade = %s
+                AND ME.codPredio = %s
+                AND ME.codLaboratorio = %s
+                AND ME.codProduto = %s
+                AND ME.seqItem = %s
+                AND (%s IS NULL OR ME.idMovtoEstoque > %s)
+        """
+
+        for item in inventario:
+            codProduto = item[0]
+            seqItem = item[1]
+            idMovtoEstoque = item[2]
+            nomProduto = item[3]
+            perPureza = item[4]
+            vlrDensidade = item[5]
+            datValidade = item[6]
+            qtd_inventario = item[7]  # Pode ser None se não houver movimentação IN
+
+            # Se não houver `IN`, considera todas as movimentações para o produto e seqItem
+            if qtd_inventario is None:
+                cursor.execute(
+                    query_movimentos,
+                    (
+                        codCampus, codUnidade, codPredio, codLaboratorio,
+                        codProduto, seqItem,
+                        None,  # Não há IN, então consideramos todas as movimentações
+                        0      # Placeholder para o segundo parâmetro
+                    ),
+                )
+            else:
+                cursor.execute(
+                    query_movimentos,
+                    (
+                        codCampus, codUnidade, codPredio, codLaboratorio,
+                        codProduto, seqItem,
+                        idMovtoEstoque, idMovtoEstoque
+                    ),
+                )
+
+            movimentos = cursor.fetchone()
+            qtd_movimentos = movimentos[0] if movimentos and movimentos[0] is not None else 0
+
+            # Determina o valor final do estoque
+            if qtd_inventario is None:
+                qtd_final = qtd_movimentos
+            else:
+                qtd_final = qtd_inventario + qtd_movimentos
+
+            # Adiciona os resultados
+            resultados.append({
+                "codProduto": codProduto,
+                "nomProduto": nomProduto,
+                "perPureza": perPureza,
+                "vlrDensidade": vlrDensidade,
+                "datValidade": datValidade,
+                "seqItem": seqItem,
+                "qtdEstoque": float(qtd_final)
+            })
 
         cursor.close()
         conn.close()
 
-        resultado = [
-            {
-                "codProduto": p[0],
-                "nomProduto": p[1],
-                "perPureza": p[2],
-                "vlrDensidade": p[3],
-                "datValidade": p[4],
-                "seqItem": p[5],
-                "qtdEstoque": float(p[6])  # Convertendo Decimal para float
-            }
-            for p in produtos
-        ]
-
-        return jsonify(resultado)
+        # Retorna os resultados
+        if resultados:
+            return jsonify(resultados)
+        else:
+            return jsonify({"message": "Nenhum produto encontrado"}), 404
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
