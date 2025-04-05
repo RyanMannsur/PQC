@@ -8,6 +8,8 @@ from flask import jsonify
 import psycopg2
 produto_bp = Blueprint("produto_bp", __name__)
 from datetime import datetime, timedelta  # Importando timedelta
+import sys
+print("Debugging informações...", file=sys.stdout)
 
 # funcoes privadas
 def ultimo_dia_do_mes(mes, ano):
@@ -210,126 +212,116 @@ def verifica_local_estocagem_Ja_implantado(codCampus, codUnidade, codPredio, cod
 
 @produto_bp.route("/obterEstoqueLocalEstocagem/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaboratorio):
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
+  try:
+      conn = get_connection()
+      cursor = conn.cursor()
 
-        # Primeira consulta: Obtém os dados de inventário
-        query_ultimo_inventario = """
-            SELECT 
-                ME.codProduto,
-                ME.seqItem,
-                MAX(ME.idMovtoEstoque) AS idMovtoEstoque,
-                P.nomProduto,
-                P.perPureza,
-                P.vlrDensidade,
-                PI.datValidade,
-                COALESCE(MAX(CASE WHEN ME.idtTipoMovto = 'IN' THEN ME.qtdEstoque END), NULL) AS qtd_inventario
-            FROM MovtoEstoque ME
-            JOIN Produto P ON ME.codProduto = P.codProduto
-            LEFT JOIN ProdutoItem PI ON ME.codProduto = PI.codProduto AND ME.seqItem = PI.seqItem
-            WHERE 
-                ME.codCampus = %s
-                AND ME.codUnidade = %s
-                AND ME.codPredio = %s
-                AND ME.codLaboratorio = %s
-            GROUP BY ME.codProduto, ME.seqItem, P.nomProduto, P.perPureza, P.vlrDensidade, PI.datValidade
-        """
-        cursor.execute(query_ultimo_inventario, (codCampus, codUnidade, codPredio, codLaboratorio))
-        inventario = cursor.fetchall()
+      print(f"Consultando estoque para: Campus={codCampus}, Unidade={codUnidade}, Prédio={codPredio}, Laboratório={codLaboratorio}")
 
-        resultados = []
+      # Etapa 1: Consulta do inventário inicial com movimentação 'IN' mais recente
+      query_inventario_inicial = """
+          SELECT 
+              PI.codProduto,
+              PI.seqItem,
+              P.nomProduto,
+              P.perPureza,
+              P.vlrDensidade,
+              PI.datValidade,
+              COALESCE((
+                  SELECT ME.qtdEstoque
+                  FROM MovtoEstoque ME
+                  WHERE ME.codProduto = PI.codProduto
+                    AND ME.seqItem = PI.seqItem
+                    AND ME.codCampus = %s
+                    AND ME.codUnidade = %s
+                    AND ME.codPredio = %s
+                    AND ME.codLaboratorio = %s
+                    AND ME.idtTipoMovto = 'IN'
+                  ORDER BY ME.idMovtoEstoque DESC
+                  LIMIT 1
+              ), 0) AS qtd_inventario,
+              COALESCE((
+                  SELECT ME.idMovtoEstoque
+                  FROM MovtoEstoque ME
+                  WHERE ME.codProduto = PI.codProduto
+                    AND ME.seqItem = PI.seqItem
+                    AND ME.codCampus = %s
+                    AND ME.codUnidade = %s
+                    AND ME.codPredio = %s
+                    AND ME.codLaboratorio = %s
+                    AND ME.idtTipoMovto = 'IN'
+                  ORDER BY ME.idMovtoEstoque DESC
+                  LIMIT 1
+              ), 0) AS ultimo_id_movto
+          FROM ProdutoItem PI
+          JOIN Produto P ON PI.codProduto = P.codProduto;
+      """
 
-        # Segunda consulta: Obtém todas as movimentações relevantes
-        query_movimentos = """
-            SELECT 
-                SUM(COALESCE(ME.qtdEstoque, 0)) AS qtd_movimentos
-            FROM MovtoEstoque ME
-            WHERE 
-                ME.codCampus = %s
-                AND ME.codUnidade = %s
-                AND ME.codPredio = %s
-                AND ME.codLaboratorio = %s
-                AND ME.codProduto = %s
+      # Executa a consulta com os parâmetros fornecidos
+      cursor.execute(query_inventario_inicial, (codCampus, codUnidade, codPredio, codLaboratorio, codCampus, codUnidade, codPredio, codLaboratorio))
+      inventario_inicial = cursor.fetchall()
+
+      resultados = []
+
+      # Etapa 2: Soma todas as movimentações subsequentes ao último 'IN'
+      for item in inventario_inicial:
+          codProduto = item[0]
+          seqItem = item[1]
+          nomProduto = item[2]
+          perPureza = item[3]
+          vlrDensidade = item[4]
+          datValidade = item[5]
+          qtd_inventario = item[6]  # Quantidade inicial do último 'IN'
+          ultimo_id_movto = item[7]  # ID da última movimentação 'IN'
+
+          print(f"Produto={codProduto}, SeqItem={seqItem}, Quantidade Inicial={qtd_inventario}, Último Movto 'IN'={ultimo_id_movto}")
+
+          # Consulta todas as movimentações subsequentes ao último 'IN'
+          query_movimentos_subsequentes = """
+              SELECT 
+                  ME.codProduto,
+                  ME.seqItem,
+                  SUM(ME.qtdEstoque) AS qtd_movimentos
+              FROM MovtoEstoque ME
+              WHERE ME.codProduto = %s
                 AND ME.seqItem = %s
-                AND (%s IS NULL OR ME.idMovtoEstoque > %s)
-        """
+                AND ME.codCampus = %s
+                AND ME.codUnidade = %s
+                AND ME.codPredio = %s
+                AND ME.codLaboratorio = %s
+                AND ME.idMovtoEstoque > %s
+              GROUP BY ME.codProduto, ME.seqItem;
+          """
+          cursor.execute(query_movimentos_subsequentes, 
+                         (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, ultimo_id_movto))
+          movimentacoes = cursor.fetchone()
 
-        for item in inventario:
-            codProduto = item[0]
-            seqItem = item[1]
-            idMovtoEstoque = item[2]
-            nomProduto = item[3]
-            perPureza = item[4]
-            vlrDensidade = item[5]
-            datValidade = item[6]
-            qtd_inventario = item[7]  # Pode ser None se não houver movimentação IN
+          # Soma todas as movimentações subsequentes
+          qtd_movimentos = movimentacoes[2] if movimentacoes else 0
+          qtd_final = qtd_inventario + qtd_movimentos
 
-            # Se não houver `IN`, considera todas as movimentações para o produto e seqItem
-            if qtd_inventario is None:
-                # Busca todas as movimentações para este par codProduto + seqItem
-                cursor.execute(
-                    query_movimentos,
-                    (
-                        codCampus,
-                        codUnidade,
-                        codPredio,
-                        codLaboratorio,
-                        codProduto,
-                        seqItem,
-                        None,  # Não há IN, então consideramos todas as movimentações
-                        0,     # Placeholder para o segundo parâmetro do filtro
-                    ),
-                )
-            else:
-                # Considera apenas movimentações posteriores ao último IN
-                cursor.execute(
-                    query_movimentos,
-                    (
-                        codCampus,
-                        codUnidade,
-                        codPredio,
-                        codLaboratorio,
-                        codProduto,
-                        seqItem,
-                        idMovtoEstoque,
-                        idMovtoEstoque,
-                    ),
-                )
+          print(f"Produto={codProduto}, SeqItem={seqItem}, Estoque Final={qtd_final}")
 
-            movimentos = cursor.fetchone()
+          # Adiciona ao resultado
+          resultados.append({
+              "codProduto": codProduto,
+              "nomProduto": nomProduto,
+              "perPureza": perPureza,
+              "vlrDensidade": vlrDensidade,
+              "datValidade": datValidade,
+              "seqItem": seqItem,
+              "qtdEstoque": float(qtd_final)
+          })
 
-            qtd_movimentos = movimentos[0] if movimentos and movimentos[0] is not None else 0
+      cursor.close()
+      conn.close()
 
-            if qtd_inventario is None:
-                # Caso não exista IN, considera apenas as movimentações
-                qtd_final = qtd_movimentos
-            else:
-                # Caso exista IN, soma o inventário com as movimentações posteriores
-                qtd_final = qtd_inventario + qtd_movimentos
+      # Retorna os resultados ordenados por codProduto e seqItem
+      return jsonify(sorted(resultados, key=lambda x: (x['codProduto'], x['seqItem'])))
 
-            # Adiciona o resultado final desta combinação ao resultado
-            resultados.append({
-                "codProduto": codProduto,
-                "nomProduto": nomProduto,
-                "perPureza": perPureza,
-                "vlrDensidade": vlrDensidade,
-                "datValidade": datValidade,
-                "seqItem": seqItem,
-                "qtdEstoque": float(qtd_final)  # Converte para float para evitar problemas de formatação
-            })
-
-        cursor.close()
-        conn.close()
-
-        # Retorna os resultados no formato JSON
-        if resultados:
-            return jsonify(resultados)
-        else:
-            return jsonify({"message": "Nenhum produto encontrado"}), 404
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+  except Exception as e:
+      print("Erro ao obter estoque:", str(e))
+      return jsonify({"erro": str(e)}), 500
 
 #------------------------------------------------------------------------------
 # Se não houver item do produto no local de estocagem ele vai aparecer com qtdEstoque = 0
@@ -738,56 +730,114 @@ def obter_local_estocagem_por_id(codCampus, codUnidade, codPredio, codLaboratori
 
 @produto_bp.route("/ObterProdutoBYCodigoAndSequencia/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>/<int:codProduto>/<int:seqItem>", methods=["GET"])
 def obter_produto_por_codigo_e_sequencia(codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem):
-    try:
-        query = """
-            SELECT A.codProduto,
-                   A.nomProduto,
-                   A.perPureza,
-                   A.vlrDensidade,
-                   C.datValidade,
-                   B.seqItem,
-                   SUM(COALESCE(B.qtdEstoque, 0)) AS qtdEstoque
-              FROM Produto A
-              LEFT JOIN MovtoEstoque B
-                ON B.codProduto = A.codProduto
-              LEFT JOIN ProdutoItem C
-                ON C.codProduto = B.codProduto
-               AND C.SeqItem = B.SeqItem
-             WHERE B.codCampus = %s
-               AND B.codUnidade = %s
-               AND B.codPredio = %s
-               AND B.codLaboratorio = %s
-               AND B.codProduto = %s
-               AND B.seqItem = %s
-               AND B.idtTipoMovto in ('IM', 'IN', 'TE', 'TS', 'EC', 'ED', 'AC', 'AE')
-             GROUP BY A.codProduto, A.nomProduto, A.perPureza, A.vlrDensidade, C.datValidade, B.seqItem
-            """
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem))
-        produto = cursor.fetchone()
+ try:
+     conn = get_connection()
+     cursor = conn.cursor()
 
-        cursor.close()
-        conn.close()
+     print(f"Consultando produto: Campus={codCampus}, Unidade={codUnidade}, Prédio={codPredio}, Laboratório={codLaboratorio}, Produto={codProduto}, SeqItem={seqItem}")
 
-        # Convertendo resultado para JSON
-        if produto:
-            resultado = {
-                "codProduto": produto[0],
-                "nomProduto": produto[1],
-                "perPureza": produto[2],
-                "vlrDensidade": produto[3],
-                "datValidade": produto[4],
-                "seqItem": produto[5],
-                "qtdEstoque": float(produto[6])  # Convertendo Decimal para float
-            }
-            return jsonify(resultado)
-        else:
-            return jsonify({"message": "Produto não encontrado"}), 404
+     # Passo 1: Busca o último `IN` para o produto e sequência especificados
+     query_ultimo_inventario = """
+         SELECT 
+             COALESCE((
+                 SELECT ME.qtdEstoque
+                 FROM MovtoEstoque ME
+                 WHERE ME.codProduto = %s
+                   AND ME.seqItem = %s
+                   AND ME.codCampus = %s
+                   AND ME.codUnidade = %s
+                   AND ME.codPredio = %s
+                   AND ME.codLaboratorio = %s
+                   AND ME.idtTipoMovto = 'IN'
+                 ORDER BY ME.idMovtoEstoque DESC
+                 LIMIT 1
+             ), 0) AS qtd_inventario,
+             COALESCE((
+                 SELECT ME.idMovtoEstoque
+                 FROM MovtoEstoque ME
+                 WHERE ME.codProduto = %s
+                   AND ME.seqItem = %s
+                   AND ME.codCampus = %s
+                   AND ME.codUnidade = %s
+                   AND ME.codPredio = %s
+                   AND ME.codLaboratorio = %s
+                   AND ME.idtTipoMovto = 'IN'
+                 ORDER BY ME.idMovtoEstoque DESC
+                 LIMIT 1
+             ), 0) AS ultimo_id_movto
+     """
+     cursor.execute(query_ultimo_inventario, (
+         codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,
+         codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio
+     ))
+     inventario = cursor.fetchone()
+     qtd_inventario = inventario[0] if inventario else 0
+     ultimo_id_movto = inventario[1] if inventario else 0
+     print(f"Último IN encontrado: ID={ultimo_id_movto}, Quantidade IN={qtd_inventario}")
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+     # Passo 2: Soma todas as movimentações posteriores ao último `IN`
+     query_movimentos = """
+         SELECT 
+             SUM(COALESCE(ME.qtdEstoque, 0)) AS qtd_movimentos
+         FROM MovtoEstoque ME
+         WHERE 
+             ME.codProduto = %s
+             AND ME.seqItem = %s
+             AND ME.codCampus = %s
+             AND ME.codUnidade = %s
+             AND ME.codPredio = %s
+             AND ME.codLaboratorio = %s
+             AND ME.idMovtoEstoque > %s
+     """
+     cursor.execute(query_movimentos, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, ultimo_id_movto))
+     movimentacoes = cursor.fetchone()
+     qtd_movimentos = movimentacoes[0] if movimentacoes and movimentacoes[0] is not None else 0
+     print(f"Soma das movimentações após o IN: {qtd_movimentos}")
 
+     # Passo 3: Calcula o estoque final
+     qtd_final = qtd_inventario + qtd_movimentos
+     print(f"Estoque final calculado: {qtd_final}")
+
+     # Passo 4: Busca informações adicionais sobre o produto
+     query_produto = """
+         SELECT 
+             P.codProduto,
+             P.nomProduto,
+             P.perPureza,
+             P.vlrDensidade,
+             PI.datValidade,
+             %s AS seqItem
+         FROM Produto P
+         LEFT JOIN ProdutoItem PI
+             ON PI.codProduto = P.codProduto AND PI.seqItem = %s
+         WHERE P.codProduto = %s
+     """
+     cursor.execute(query_produto, (seqItem, seqItem, codProduto))
+     produto_info = cursor.fetchone()
+     print(f"Informações adicionais do produto: {produto_info}")
+
+     cursor.close()
+     conn.close()
+
+     # Monta o resultado final
+     if produto_info:
+         resultado = {
+             "codProduto": produto_info[0],
+             "nomProduto": produto_info[1],
+             "perPureza": produto_info[2],
+             "vlrDensidade": produto_info[3],
+             "datValidade": produto_info[4],
+             "seqItem": produto_info[5],
+             "qtdEstoque": float(qtd_final)  # Convertendo Decimal para float
+         }
+         return jsonify(resultado)
+     else:
+         return jsonify({"message": "Produto não encontrado"}), 404
+
+ except Exception as e:
+     print("Erro durante a execução:", e)
+     return jsonify({"error": str(e)}), 500
+     
 
 @produto_bp.route("/atualizarInventarioBySequencia", methods=["POST"])
 def atualizar_inventario_by_sequencia():
@@ -835,129 +885,144 @@ def atualizar_inventario_by_sequencia():
 
 @produto_bp.route("/buscarProdutos", methods=["GET"])
 def buscar_produtos():
-    codCampus = request.args.get("codCampus")
-    codUnidade = request.args.get("codUnidade")
-    codPredio = request.args.get("codPredio")
-    codLaboratorio = request.args.get("codLaboratorio")
-    nomeProduto = request.args.get("nomeProduto", "")
-    pureza = request.args.get("pureza", "")
-    densidade = request.args.get("densidade", "")
+ codCampus = request.args.get("codCampus")
+ codUnidade = request.args.get("codUnidade")
+ codPredio = request.args.get("codPredio")
+ codLaboratorio = request.args.get("codLaboratorio")
+ nomeProduto = request.args.get("nomeProduto", "")
+ pureza = request.args.get("pureza", "")
+ densidade = request.args.get("densidade", "")
 
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
+ try:
+     conn = get_connection()
+     cursor = conn.cursor()
 
-        # Primeira consulta: Obtém os dados de inventário com filtros opcionais
-        query_ultimo_inventario = """
-            SELECT 
-                ME.codProduto,
-                ME.seqItem,
-                MAX(ME.idMovtoEstoque) AS idMovtoEstoque,
-                P.nomProduto,
-                P.perPureza,
-                P.vlrDensidade,
-                PI.datValidade,
-                COALESCE(MAX(CASE WHEN ME.idtTipoMovto = 'IN' THEN ME.qtdEstoque END), NULL) AS qtd_inventario
-            FROM MovtoEstoque ME
-            JOIN Produto P ON ME.codProduto = P.codProduto
-            LEFT JOIN ProdutoItem PI ON ME.codProduto = PI.codProduto AND ME.seqItem = PI.seqItem
-            WHERE 
-                ME.codCampus = %s
-                AND ME.codUnidade = %s
-                AND ME.codPredio = %s
-                AND ME.codLaboratorio = %s
-                AND (%s = '' OR P.nomProduto ILIKE %s)
-                AND (%s = '' OR P.perPureza::text ILIKE %s)
-                AND (%s = '' OR P.vlrDensidade::text ILIKE %s)
-            GROUP BY ME.codProduto, ME.seqItem, P.nomProduto, P.perPureza, P.vlrDensidade, PI.datValidade
-        """
-        cursor.execute(query_ultimo_inventario, (
-            codCampus, codUnidade, codPredio, codLaboratorio,
-            nomeProduto, f'%{nomeProduto}%',
-            pureza, f'%{pureza}%',
-            densidade, f'%{densidade}%'
-        ))
-        inventario = cursor.fetchall()
+     print(f"Consultando inventário para local: Campus={codCampus}, Unidade={codUnidade}, Prédio={codPredio}, Laboratório={codLaboratorio}")
+     print(f"Filtros adicionais aplicados: nomeProduto={nomeProduto}, pureza={pureza}, densidade={densidade}")
 
-        resultados = []
+     # Primeira consulta: Obtém os dados de inventário com filtros opcionais
+     query_ultimo_inventario = """
+         SELECT 
+             PI.codProduto,
+             PI.seqItem,
+             P.nomProduto,
+             P.perPureza,
+             P.vlrDensidade,
+             PI.datValidade,
+             COALESCE((
+                 SELECT ME.qtdEstoque
+                 FROM MovtoEstoque ME
+                 WHERE ME.codProduto = PI.codProduto
+                   AND ME.seqItem = PI.seqItem
+                   AND ME.codCampus = %s
+                   AND ME.codUnidade = %s
+                   AND ME.codPredio = %s
+                   AND ME.codLaboratorio = %s
+                   AND ME.idtTipoMovto = 'IN'
+                 ORDER BY ME.idMovtoEstoque DESC
+                 LIMIT 1
+             ), 0) AS qtd_inventario,
+             COALESCE((
+                 SELECT ME.idMovtoEstoque
+                 FROM MovtoEstoque ME
+                 WHERE ME.codProduto = PI.codProduto
+                   AND ME.seqItem = PI.seqItem
+                   AND ME.codCampus = %s
+                   AND ME.codUnidade = %s
+                   AND ME.codPredio = %s
+                   AND ME.codLaboratorio = %s
+                   AND ME.idtTipoMovto = 'IN'
+                 ORDER BY ME.idMovtoEstoque DESC
+                 LIMIT 1
+             ), 0) AS ultimo_id_movto
+         FROM ProdutoItem PI
+         JOIN Produto P ON PI.codProduto = P.codProduto
+         WHERE 
+             (%s = '' OR P.nomProduto ILIKE %s)
+             AND (%s = '' OR P.perPureza::text ILIKE %s)
+             AND (%s = '' OR P.vlrDensidade::text ILIKE %s)
+         ORDER BY PI.codProduto, PI.seqItem;
+     """
 
-        # Segunda consulta: Obtém todas as movimentações relevantes com base na lógica do último `IN`
-        query_movimentos = """
-            SELECT 
-                SUM(COALESCE(ME.qtdEstoque, 0)) AS qtd_movimentos
-            FROM MovtoEstoque ME
-            WHERE 
-                ME.codCampus = %s
-                AND ME.codUnidade = %s
-                AND ME.codPredio = %s
-                AND ME.codLaboratorio = %s
-                AND ME.codProduto = %s
-                AND ME.seqItem = %s
-                AND (%s IS NULL OR ME.idMovtoEstoque > %s)
-        """
+     # Executa a consulta com os parâmetros fornecidos
+     cursor.execute(query_ultimo_inventario, (
+         codCampus, codUnidade, codPredio, codLaboratorio,
+         codCampus, codUnidade, codPredio, codLaboratorio,
+         nomeProduto, f'%{nomeProduto}%',
+         pureza, f'%{pureza}%',
+         densidade, f'%{densidade}%'
+     ))
+     inventario = cursor.fetchall()
+     print("Resultado da consulta de inventário (último IN):", inventario)
 
-        for item in inventario:
-            codProduto = item[0]
-            seqItem = item[1]
-            idMovtoEstoque = item[2]
-            nomProduto = item[3]
-            perPureza = item[4]
-            vlrDensidade = item[5]
-            datValidade = item[6]
-            qtd_inventario = item[7]  # Pode ser None se não houver movimentação IN
+     resultados = []
 
-            # Se não houver `IN`, considera todas as movimentações para o produto e seqItem
-            if qtd_inventario is None:
-                cursor.execute(
-                    query_movimentos,
-                    (
-                        codCampus, codUnidade, codPredio, codLaboratorio,
-                        codProduto, seqItem,
-                        None,  # Não há IN, então consideramos todas as movimentações
-                        0      # Placeholder para o segundo parâmetro
-                    ),
-                )
-            else:
-                cursor.execute(
-                    query_movimentos,
-                    (
-                        codCampus, codUnidade, codPredio, codLaboratorio,
-                        codProduto, seqItem,
-                        idMovtoEstoque, idMovtoEstoque
-                    ),
-                )
+     # Segunda consulta: Obtém todas as movimentações relevantes com base na lógica do último `IN`
+     query_movimentos = """
+         SELECT 
+             SUM(ME.qtdEstoque) AS qtd_movimentos
+         FROM MovtoEstoque ME
+         WHERE 
+             ME.codCampus = %s
+             AND ME.codUnidade = %s
+             AND ME.codPredio = %s
+             AND ME.codLaboratorio = %s
+             AND ME.codProduto = %s
+             AND ME.seqItem = %s
+             AND ME.idMovtoEstoque > %s
+     """
 
-            movimentos = cursor.fetchone()
-            qtd_movimentos = movimentos[0] if movimentos and movimentos[0] is not None else 0
+     for item in inventario:
+         codProduto = item[0]
+         seqItem = item[1]
+         nomProduto = item[2]
+         perPureza = item[3]
+         vlrDensidade = item[4]
+         datValidade = item[5]
+         qtd_inventario = item[6]  # Valor inicial do inventário
+         ultimo_id_movto = item[7]  # Último ID do tipo `IN`
 
-            # Determina o valor final do estoque
-            if qtd_inventario is None:
-                qtd_final = qtd_movimentos
-            else:
-                qtd_final = qtd_inventario + qtd_movimentos
+         print(f"Processando Produto={codProduto}, SeqItem={seqItem}, Último IN={ultimo_id_movto}, Quantidade IN={qtd_inventario}")
 
-            # Adiciona os resultados
-            resultados.append({
-                "codProduto": codProduto,
-                "nomProduto": nomProduto,
-                "perPureza": perPureza,
-                "vlrDensidade": vlrDensidade,
-                "datValidade": datValidade,
-                "seqItem": seqItem,
-                "qtdEstoque": float(qtd_final)
-            })
+         # Consulta movimentações relevantes para este produto
+         cursor.execute(
+             query_movimentos,
+             (codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem, ultimo_id_movto),
+         )
+         movimentacoes = cursor.fetchone()
 
-        cursor.close()
-        conn.close()
+         # Soma todas as movimentações subsequentes
+         qtd_movimentos = movimentacoes[0] if movimentacoes and movimentacoes[0] is not None else 0
+         print(f"Soma das movimentações para Produto={codProduto}, SeqItem={seqItem}: {qtd_movimentos}")
 
-        # Retorna os resultados
-        if resultados:
-            return jsonify(resultados)
-        else:
-            return jsonify({"message": "Nenhum produto encontrado"}), 404
+         # Calcula o estoque final
+         qtd_final = qtd_inventario + qtd_movimentos
+         print(f"Estoque final para Produto={codProduto}, SeqItem={seqItem}: Quantidade Final={qtd_final}")
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+         # Adiciona ao resultado
+         resultados.append({
+             "codProduto": codProduto,
+             "nomProduto": nomProduto,
+             "perPureza": perPureza,
+             "vlrDensidade": vlrDensidade,
+             "datValidade": datValidade,
+             "seqItem": seqItem,
+             "qtdEstoque": float(qtd_final)
+         })
+
+     cursor.close()
+     conn.close()
+
+     # Retorna os resultados
+     print("Resultado final a ser retornado:", resultados)
+     if resultados:
+         return jsonify(resultados)
+     else:
+         return jsonify({"message": "Nenhum produto encontrado"}), 404
+
+ except Exception as e:
+     print("Erro durante a execução:", e)
+     return jsonify({"error": str(e)}), 500
 
 
 @produto_bp.route("/adicionar_produto/<codProduto>", methods=["POST"])

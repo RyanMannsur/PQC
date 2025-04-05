@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Modal from "../../components/Modal"; // Importa o componente Modal
+import Modal from "../../components/Modal"; 
 import * as C from "./styles";
 import { useLocal } from "../../contexts/local";
 import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
@@ -141,17 +141,14 @@ const Inventario = () => {
       );
 
       if (result.error) {
-        // Mensagem de erro no modal
         setModalMessage("Houve um erro ao atualizar. Tente novamente amanhã, pois já foi feita uma atualização hoje.");
         setModalOpen(true);
       } else {
-        // Mensagem de sucesso no modal
         setModalMessage("Movimentações de estoque criadas com sucesso!");
         setModalOpen(true);
       }
     } catch (err) {
       console.error("Erro ao enviar atualização:", err);
-      // Mensagem de erro no modal
       setModalMessage("Houve um erro ao atualizar. Tente novamente amanhã, pois já foi feita uma atualização hoje.");
       setModalOpen(true);
     }
@@ -159,7 +156,7 @@ const Inventario = () => {
 
   const closeModal = () => {
     setModalOpen(false);
-    window.location.reload(); // Atualiza a página ao fechar o modal
+    window.location.reload(); 
   };
 
   return (

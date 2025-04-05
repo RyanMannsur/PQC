@@ -9,20 +9,18 @@ const Home = () => {
 
   useEffect(() => {
     const fetchLabDetails = async () => {
-      if (labId) {
-        const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-        const lab = await getEstoqueLocalEstocagem(
-          codCampus,
-          codUnidade,
-          codPredio,
-          codLaboratorio
-        );
-        setLabDetails(lab);
-      }
+      const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
+      const lab = await getEstoqueLocalEstocagem(
+        codCampus,
+        codUnidade,
+        codPredio,
+        codLaboratorio
+      );
+      setLabDetails(lab);
     };
 
     fetchLabDetails();
-  });
+  }, [labId]);
 
   if (!labDetails) {
     return <C.Label>Carregando informações...</C.Label>;
