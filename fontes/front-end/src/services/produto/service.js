@@ -163,3 +163,24 @@ export const adicionarProduto = async (codProduto, produto) => {
         return { error: "Erro ao atualizar quantidade de produtos no laboratório" };
       }
       };
+
+
+      export const obterProdutoPorId = async (codProduto) => {
+        try {
+          const response = await api.get(`/api/produtos/obterProdutoPorId/${codProduto}`);
+          return response.data;
+        } catch (error) {
+          console.error(`Erro ao obter produto por ID (${codProduto}):`, error);
+          return null; // Retorna null em caso de erro
+        }
+        };
+
+        export const obterProdutoPeloCodigo = async (codProduto) => {
+          try {
+            const response = await api.get(`/obterProdutoPeloCodigo/${codProduto}`);
+            return response.data;
+          } catch (error) {
+            console.error(`Erro ao obter produto pelo código (${codProduto}):`, error);
+            return null; // Retorna null em caso de erro
+          }
+          };

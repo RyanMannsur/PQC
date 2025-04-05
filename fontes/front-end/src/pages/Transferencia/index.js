@@ -1,117 +1,141 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Adicionado useLocation para capturar o estado passado pelo navigate
 import * as C from "./styles";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import ItemList from "../../components/ItemList";
+import Tooltip from "../../components/Tooltip"; // Importa o Tooltip
 import { buscarProdutos } from "../../services/produto/service";
 import { formatarData } from "../../helpers/dataHelper";
 
 const Transferencias = () => {
-  const navigate = useNavigate();
-  const [produto, setProduto] = useState("");
-  const [pureza, setPureza] = useState("");
-  const [densidade, setDensidade] = useState("");
-  const [produtos, setProdutos] = useState([]);
-  const [localData, setLocalData] = useState(null);
+const navigate = useNavigate();
+const location = useLocation(); // Captura o estado passado pelo navigate
+const [produto, setProduto] = useState("");
+const [pureza, setPureza] = useState("");
+const [densidade, setDensidade] = useState("");
+const [produtos, setProdutos] = useState([]);
+const [localData, setLocalData] = useState(null);
+const [isTooltipVisible, setIsTooltipVisible] = useState(false); // Estado para controlar o Tooltip
+const [tooltipMessage, setTooltipMessage] = useState(""); // Mensagem do Tooltip
 
-  useEffect(() => {
-    const localStorageData = JSON.parse(localStorage.getItem("labId"));
-    setLocalData(localStorageData);
-  }, []);
+useEffect(() => {
+  const localStorageData = JSON.parse(localStorage.getItem("labId"));
+  setLocalData(localStorageData);
 
-  const handlePesquisar = async () => {
-    if (localData) {
-      const { codCampus, codUnidade, codPredio, codLaboratorio } = localData;
-      const produtosResponse = await buscarProdutos(
-        codCampus,
-        codUnidade,
-        codPredio,
-        codLaboratorio,
-        produto,
-        pureza,
-        densidade
-      );
-      setProdutos(produtosResponse);
-    } else {
-      console.error("Dados de local não encontrados no local storage.");
-    }
-  };
+  // Verifica se há uma mensagem de sucesso passada pelo state
+  if (location.state?.successMessage) {
+    setTooltipMessage(location.state.successMessage);
+    setIsTooltipVisible(true);
 
-  const handleActionClick = (id, key) => {
-    console.log("id", id);
-    console.log("key", key);
-    if (key === "acoes") {
-      const [codProduto, seqItem] = id.split("-");
-      navigate(`/transferir/${codProduto}/${seqItem}`);
-    }
-  };
+    // Remove o tooltip após 3 segundos
+    const timer = setTimeout(() => {
+      setIsTooltipVisible(false);
+    }, 3000);
 
-  const columns = [
-    { key: "codigo", label: "Código", type: "string" },
-    { key: "nome", label: "Nome", type: "string" },
-    { key: "quantidade", label: "Quantidade", type: "string" },
-    { key: "validade", label: "Data de Validade", type: "string" },
-    { key: "pureza", label: "Pureza", type: "string" },
-    { key: "densidade", label: "Densidade", type: "string" },
-    {
-      key: "acoes",
-      label: "Transferir",
-      type: "button",
-    },
-  ];
+    return () => clearTimeout(timer); // Limpa o timer caso o componente seja desmontado
+  }
+}, [location.state]);
 
-  const data = produtos.filter((produto) => produto.qtdEstoque > 0).map((produto) => ({
-    id: `${produto.codProduto}-${produto.seqItem}`,
-    codigo: produto.codProduto,
-    nome: produto.nomProduto,
-    quantidade: produto.qtdEstoque,
-    validade: formatarData(produto.datValidade),
-    pureza: produto.perPureza,
-    densidade: produto.vlrDensidade,
-    seqItem: produto.seqItem,
-  }));
+const handlePesquisar = async () => {
+  if (localData) {
+    const { codCampus, codUnidade, codPredio, codLaboratorio } = localData;
+    const produtosResponse = await buscarProdutos(
+      codCampus,
+      codUnidade,
+      codPredio,
+      codLaboratorio,
+      produto,
+      pureza,
+      densidade
+    );
+    setProdutos(produtosResponse);
+  } else {
+    console.error("Dados de local não encontrados no local storage.");
+  }
+};
 
-  return (
-    <C.Container>
-      <h1>Transferências</h1>
+const handleActionClick = (id, key) => {
+  console.log("id", id);
+  console.log("key", key);
+  if (key === "acoes") {
+    const [codProduto, seqItem] = id.split("-");
+    navigate(`/transferir/${codProduto}/${seqItem}`);
+  }
+};
 
-      <C.FilterContainer>
-        <Input
-          type="text"
-          placeholder="Digite o produto"
-          value={produto}
-          label="Produto"
-          onChange={(e) => setProduto(e.target.value)}
-        />
-        <Input
-          type="text"
-          placeholder="Digite a pureza"
-          value={pureza}
-          label="Pureza"
-          onChange={(e) => setPureza(e.target.value)}
-        />
-        <Input
-          type="text"
-          placeholder="Digite a densidade"
-          value={densidade}
-          label="Densidade"
-          onChange={(e) => setDensidade(e.target.value)}
-        />
-        <Button Text="Pesquisar" onClick={handlePesquisar} />
-      </C.FilterContainer>
+const columns = [
+  { key: "codigo", label: "Código", type: "string" },
+  { key: "nome", label: "Nome", type: "string" },
+  { key: "quantidade", label: "Quantidade", type: "string" },
+  { key: "validade", label: "Data de Validade", type: "string" },
+  { key: "pureza", label: "Pureza", type: "string" },
+  { key: "densidade", label: "Densidade", type: "string" },
+  {
+    key: "acoes",
+    label: "Transferir",
+    type: "button",
+  },
+];
 
-      {produtos.length > 0 ? (
-        <ItemList
-          columns={columns}
-          data={data}
-          onActionClick={handleActionClick}
-        />
-      ) : (
-        <p>Nenhum produto encontrado.</p>
-      )}
-    </C.Container>
-  );
+const data = produtos.filter((produto) => produto.qtdEstoque > 0).map((produto) => ({
+  id: `${produto.codProduto}-${produto.seqItem}`,
+  codigo: produto.codProduto,
+  nome: produto.nomProduto,
+  quantidade: produto.qtdEstoque,
+  validade: formatarData(produto.datValidade),
+  pureza: produto.perPureza,
+  densidade: produto.vlrDensidade,
+  seqItem: produto.seqItem,
+}));
+
+return (
+  <C.Container>
+    <h1>Transferências</h1>
+
+    <C.FilterContainer>
+      <Input
+        type="text"
+        placeholder="Digite o produto"
+        value={produto}
+        label="Produto"
+        onChange={(e) => setProduto(e.target.value)}
+      />
+      <Input
+        type="text"
+        placeholder="Digite a pureza"
+        value={pureza}
+        label="Pureza"
+        onChange={(e) => setPureza(e.target.value)}
+      />
+      <Input
+        type="text"
+        placeholder="Digite a densidade"
+        value={densidade}
+        label="Densidade"
+        onChange={(e) => setDensidade(e.target.value)}
+      />
+      <Button Text="Pesquisar" onClick={handlePesquisar} />
+    </C.FilterContainer>
+
+    {produtos.length > 0 ? (
+      <ItemList
+        columns={columns}
+        data={data}
+        onActionClick={handleActionClick}
+      />
+    ) : (
+      <p>Nenhum produto encontrado.</p>
+    )}
+
+    {/* Tooltip */}
+    <Tooltip
+      message={tooltipMessage}
+      isVisible={isTooltipVisible}
+      onClose={() => setIsTooltipVisible(false)}
+    />
+  </C.Container>
+);
 };
 
 export default Transferencias;

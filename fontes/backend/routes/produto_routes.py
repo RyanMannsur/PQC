@@ -1208,3 +1208,43 @@ def atualizar_quantidade_produtos_laboratorio():
 
  except Exception as e:
      return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/obterProdutoPeloCodigo/<int:codProduto>", methods=["GET"])
+def obter_produto_pelo_codigo(codProduto):
+  try:
+      conn = get_connection()
+      cursor = conn.cursor()
+
+      # Consulta SQL para buscar o produto pelo codProduto
+      query = """
+          SELECT 
+              codProduto,
+              nomProduto,
+              nomLista,
+              perPureza,
+              vlrDensidade
+          FROM Produto
+          WHERE codProduto = %s;
+      """
+      cursor.execute(query, (codProduto,))
+      produto = cursor.fetchone()
+
+      cursor.close()
+      conn.close()
+
+      # Verifica se o produto foi encontrado
+      if produto:
+          return jsonify({
+              "codProduto": produto[0],
+              "nomProduto": produto[1],
+              "nomLista": produto[2],
+              "perPureza": float(produto[3]) if produto[3] is not None else None,
+              "vlrDensidade": float(produto[4]) if produto[4] is not None else None
+          }), 200
+      else:
+          return jsonify({"message": f"Produto com código {codProduto} não encontrado."}), 404
+
+  except Exception as e:
+      print("Erro ao buscar produto:", str(e))
+      return jsonify({"error": str(e)}), 500
