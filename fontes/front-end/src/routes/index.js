@@ -12,6 +12,7 @@ import AppLayout from "../layout/App";
 import PublicoLayout from "../layout/publico";
 import Traferencia from "../pages/Transferencia";
 import CadastrarProduto from "../pages/Inventario/createProduto/criarProduto";
+import Implantacao from "../pages/implantacao";
 
 const RoutesApp = () => {
   return (
@@ -93,6 +94,16 @@ const RoutesApp = () => {
               <AppLayout>
                 <CadastrarProduto />
               </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/implantacao"
+          element={
+            <PrivateRoute>
+              <AppNotSidebar>
+                <Implantacao />
+              </AppNotSidebar>
             </PrivateRoute>
           }
         />

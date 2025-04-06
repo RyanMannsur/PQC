@@ -34,8 +34,8 @@ return (
   <Header
     withSidebar={true}
     showSignoutIcon={true}
-    usuario={usuario} // Passa o usuário como prop para o Header
-    labName={labName} // Passa o nome do laboratório como prop para o Header
+    usuario={usuario}
+    labName={labName}
   >
     {children}
   </Header>
