@@ -66,7 +66,7 @@ const handleSubmit = async () => {
     console.log("Produto adicionado com sucesso:", response);
 
     // Redireciona para a página de produtos com o estado de sucesso
-    navigate("/cadastrar-produto", { state: { successMessage: "Produto cadastrado com sucesso!" } });
+    navigate("/cadastrar-produto", { state: { successMessage: "Produto adicionado com sucesso!" } });
   } catch (error) {
     console.error("Erro ao adicionar o produto:", error);
     setMensagem("Erro ao adicionar o produto. Tente novamente.");
@@ -75,7 +75,7 @@ const handleSubmit = async () => {
 
 return (
   <C.Container>
-    <h1>Cadastrar Produto</h1>
+    <h1>Adicionar Produto</h1>
 
     {/* Nome do produto */}
     {produto && <h2>{produto.nomProduto}</h2>}
