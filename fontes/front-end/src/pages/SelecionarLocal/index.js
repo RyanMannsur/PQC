@@ -7,17 +7,17 @@ import { LocalContext } from "../../contexts/local";
 import { getLabs } from "../../services/laboratorio/service";
 
 const SelecionarLocal = () => {
-const { setLabId } = useContext(LocalContext); // Obtém o método para atualizar o contexto
+const { setLabId } = useContext(LocalContext); 
 const navigate = useNavigate();
 
-const [lab, setLab] = useState(null); // Estado local para o laboratório selecionado
-const [error, setError] = useState(""); // Estado para mensagens de erro
-const [labOptions, setLabOptions] = useState([]); // Opções disponíveis para seleção
+const [lab, setLab] = useState(null); 
+const [error, setError] = useState(""); 
+const [labOptions, setLabOptions] = useState([]);
 
 useEffect(() => {
   const fetchLabs = async () => {
     try {
-      const labs = await getLabs(); // Busca os laboratórios da API
+      const labs = await getLabs(); 
       if (labs && Array.isArray(labs)) {
         setLabOptions(
           labs.map((lab, index) => ({
@@ -30,7 +30,6 @@ useEffect(() => {
           }))
         );
 
-        // Se houver apenas um laboratório, seleciona automaticamente
         if (labs.length === 1) {
           const selectedLab = labs[0];
           setLab({
@@ -62,7 +61,6 @@ const handleSelect = () => {
     return;
   }
 
-  // Atualiza o contexto e o localStorage
   setLabId({
     codCampus: lab.codCampus,
     codUnidade: lab.codUnidade,
@@ -70,7 +68,6 @@ const handleSelect = () => {
     codLaboratorio: lab.codLaboratorio,
   });
 
-  // Navega para a próxima página
   navigate("/home");
 };
 

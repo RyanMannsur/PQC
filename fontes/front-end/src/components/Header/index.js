@@ -9,7 +9,7 @@ const navigate = useNavigate();
 
 const handleSignout = () => {
   if (onSignout) {
-    onSignout(); // Chama a função de signout passada como prop
+    onSignout(); 
   }
   navigate("/");
 };

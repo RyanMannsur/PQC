@@ -51,12 +51,12 @@ export const obterProduto = async (
   codLaboratorio,
   codProduto,
   seqItem,
-  data = null // Parâmetro de data opcional
+  data = null
 ) => {
   try {
     let url = `/ObterProdutoBYCodigoAndSequencia/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}/${codProduto}/${seqItem}`;
     if (data) {
-      url += `?data=${data}`; // Adiciona a data à URL se fornecida
+      url += `?data=${data}`;
     }
     const response = await api.get(url);
     return response.data;
@@ -74,7 +74,7 @@ export const atualizarInventario = async (
   codUnidade,
   codPredio,
   codLaboratorio,
-  idtTipoMovto,
+  idtTipoMovto
 ) => {
   try {
     const response = await api.post("/atualizarInventarioBySequencia", {
@@ -128,59 +128,63 @@ export const adicionarProduto = async (codProduto, produto) => {
     return response.data;
   } catch (error) {
     console.error("Erro ao adicionar produto:", error);
-    throw error; // Propagar o erro para ser tratado no componente
+    throw error;
   }
 };
 
-  export const obterProdutos = async () => {
-    try {
-      const response = await api.get("/produtos");
-      return response.data;
-    } catch (error) {
-      console.error("Erro ao obter produtos:", error);
-      return []; // Retorna uma lista vazia em caso de erro
-    }
-    };
+export const obterProdutos = async () => {
+  try {
+    const response = await api.get("/produtos");
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao obter produtos:", error);
+    return [];
+  }
+};
 
-    export const atualizarQuantidadeProdutosLaboratorio = async (
+export const atualizarQuantidadeProdutosLaboratorio = async (
+  codCampus,
+  codUnidade,
+  codPredio,
+  codLaboratorio,
+  produtos
+) => {
+  try {
+    const response = await api.post("/atualizarQuantidadeProdutosLaboratorio", {
       codCampus,
       codUnidade,
       codPredio,
       codLaboratorio,
-      produtos
-      ) => {
-      try {
-        const response = await api.post("/atualizarQuantidadeProdutosLaboratorio", {
-          codCampus,
-          codUnidade,
-          codPredio,
-          codLaboratorio,
-          produtos,
-        });
-        return response.data;
-      } catch (error) {
-        console.error("Erro ao atualizar quantidade de produtos no laboratório:", error);
-        return { error: "Erro ao atualizar quantidade de produtos no laboratório" };
-      }
-      };
+      produtos,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erro ao atualizar quantidade de produtos no laboratório:",
+      error
+    );
+    return { error: "Erro ao atualizar quantidade de produtos no laboratório" };
+  }
+};
 
+export const obterProdutoPorId = async (codProduto) => {
+  try {
+    const response = await api.get(
+      `/api/produtos/obterProdutoPorId/${codProduto}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao obter produto por ID (${codProduto}):`, error);
+    return null;
+  }
+};
 
-      export const obterProdutoPorId = async (codProduto) => {
-        try {
-          const response = await api.get(`/api/produtos/obterProdutoPorId/${codProduto}`);
-          return response.data;
-        } catch (error) {
-          console.error(`Erro ao obter produto por ID (${codProduto}):`, error);
-          return null; // Retorna null em caso de erro
-        }
-        };
-
-        export const obterProdutoPeloCodigo = async (codProduto) => {
-          try {
-            const response = await api.get(`/obterProdutoPeloCodigo/${codProduto}`);
-            return response.data;
-          } catch (error) {
-            console.error(`Erro ao obter produto pelo código (${codProduto}):`, error);
-            return null; // Retorna null em caso de erro
-          }
-          };
+export const obterProdutoPeloCodigo = async (codProduto) => {
+  try {
+    const response = await api.get(`/obterProdutoPeloCodigo/${codProduto}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao obter produto pelo código (${codProduto}):`, error);
+    return null;
+  }
+};

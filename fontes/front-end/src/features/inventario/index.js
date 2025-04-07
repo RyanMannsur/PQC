@@ -19,10 +19,8 @@ return (
     <tbody>
       {data.map((produto) => (
         <React.Fragment key={produto.codProduto}>
-          {/* Renderiza os itens do produto */}
           {produto.itens.map((item, index) => (
             <tr key={`${produto.codProduto}-${item.seqItem}`}>
-              {/* Renderiza as informações do produto apenas na primeira linha */}
               {index === 0 && (
                 
                 <>
@@ -31,7 +29,6 @@ return (
                   <C.Td rowSpan={produto.itens.length}>{produto.vlrDensidade}</C.Td>
                 </>
               )}
-              {/* Renderiza as informações do item */}
               <C.Td>{item.datValidade}</C.Td>
               <C.Td>{item.seqItem}</C.Td>
               <C.Td>{item.nomEmbalagem}</C.Td>

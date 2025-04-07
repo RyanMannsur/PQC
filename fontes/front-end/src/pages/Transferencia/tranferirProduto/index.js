@@ -89,7 +89,6 @@ const handleTransferir = async () => {
   } = novoLab;
 
   try {
-    // Transferência de saída (TS)
     await atualizarInventario(
       codProduto,
       seqItem,
@@ -100,8 +99,6 @@ const handleTransferir = async () => {
       codLaboratorio,
       "TS"
     );
-
-    // Transferência de entrada (TE)
     await atualizarInventario(
       codProduto,
       seqItem,
@@ -113,9 +110,8 @@ const handleTransferir = async () => {
       "TE"
     );
 
-    setMensagem(""); // Limpa mensagens de erro
+    setMensagem(""); 
 
-    // Redireciona para a página de transferências com o estado de sucesso
     navigate("/transferencias", { state: { successMessage: "Transferência realizada com sucesso!" } });
   } catch (error) {
     setMensagem("Erro ao realizar transferência.");
@@ -147,7 +143,6 @@ return (
   <C.Container>
     <h1>Transferir Produto</h1>
 
-    {/* Exibe o nome do produto */}
     {produto.nomProduto && <h2>{produto.nomProduto}</h2>}
 
     {data.length > 0 ? (

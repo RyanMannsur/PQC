@@ -7,28 +7,28 @@ import * as C from "./styles";
 import { adicionarProduto, obterProdutoPeloCodigo } from "../../../../services/produto/service";
 
 const CadastrarProduto = () => {
-const { id } = useParams(); // ID do produto
+const { id } = useParams(); 
 const navigate = useNavigate();
-const [produto, setProduto] = useState(null); // Detalhes do produto
+const [produto, setProduto] = useState(null); 
 const [quantidade, setQuantidade] = useState("");
 const [motivo, setMotivo] = useState("");
 const [justificativa, setJustificativa] = useState("");
 const [dataValidade, setDataValidade] = useState("");
 const [codigoEmbalagem, setCodigoEmbalagem] = useState("");
 const [mensagem, setMensagem] = useState("");
-const labInfo = JSON.parse(localStorage.getItem("labId")); // Dados do laboratório
+const labInfo = JSON.parse(localStorage.getItem("labId")); 
 
-// Opções do motivo
+
 const motivosOptions = [
   { value: "EC", label: "Compra" },
   { value: "ED", label: "Doação" },
 ];
 
-// Busca os detalhes do produto pelo código
+
 useEffect(() => {
   const fetchProduto = async () => {
     try {
-      const produtoResponse = await obterProdutoPeloCodigo(id); // Chama o serviço para buscar o produto pelo código
+      const produtoResponse = await obterProdutoPeloCodigo(id); 
       setProduto(produtoResponse);
     } catch (error) {
       console.error("Erro ao buscar o produto:", error);
@@ -62,10 +62,9 @@ const handleSubmit = async () => {
   console.log("Payload enviado:", payload);
 
   try {
-    const response = await adicionarProduto(id, payload); // Envia o payload para o backend
+    const response = await adicionarProduto(id, payload); 
     console.log("Produto adicionado com sucesso:", response);
 
-    // Redireciona para a página de produtos com o estado de sucesso
     navigate("/cadastrar-produto", { state: { successMessage: "Produto adicionado com sucesso!" } });
   } catch (error) {
     console.error("Erro ao adicionar o produto:", error);
@@ -77,7 +76,6 @@ return (
   <C.Container>
     <h1>Adicionar Produto</h1>
 
-    {/* Nome do produto */}
     {produto && <h2>{produto.nomProduto}</h2>}
 
     <C.Content>

@@ -4,19 +4,19 @@ import { obterProdutos } from "../../services/produto/service";
 import * as C from "./styles";
 
 const Implantacao = () => {
-const [produtos, setProdutos] = useState([]); // Estado para armazenar os produtos
-const [implantacoes, setImplantacoes] = useState({}); // Estado para armazenar os dados de implantação
-const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
+const [produtos, setProdutos] = useState([]); 
+const [implantacoes, setImplantacoes] = useState({}); 
+const [loading, setLoading] = useState(true);
 
 useEffect(() => {
   const fetchProdutos = async () => {
     try {
-      const produtosResponse = await obterProdutos(); // Consulta os produtos
+      const produtosResponse = await obterProdutos(); 
       setProdutos(produtosResponse);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
     } finally {
-      setLoading(false); // Finaliza o carregamento
+      setLoading(false);
     }
   };
 
@@ -24,12 +24,12 @@ useEffect(() => {
 }, []);
 
 const handleChange = (updatedImplantacoes) => {
-  setImplantacoes(updatedImplantacoes); // Atualiza o estado com os dados da lista
+  setImplantacoes(updatedImplantacoes); 
 };
 
 const handleConfirm = () => {
   console.log("Implantações confirmadas:", implantacoes);
-  // Aqui você pode enviar os dados para a API ou realizar outra ação
+  
 };
 
 if (loading) {

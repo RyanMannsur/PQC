@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import * as C from "./styles";
 
 const ImplantacaoList = ({ data, onChange }) => {
-const [implantacoes, setImplantacoes] = useState({}); // Estado local para gerenciar os produtos adicionados
-
+const [implantacoes, setImplantacoes] = useState({});
 const handleAddItem = (codProduto) => {
   setImplantacoes((prev) => ({
     ...prev,
     [codProduto]: [
       ...(prev[codProduto] || []),
-      { qtd: 0, validade: "" }, // Adiciona um novo item vazio
+      { qtd: 0, validade: "" }, 
     ],
   }));
 };
@@ -17,7 +16,7 @@ const handleAddItem = (codProduto) => {
 const handleRemoveItem = (codProduto, index) => {
   setImplantacoes((prev) => ({
     ...prev,
-    [codProduto]: prev[codProduto].filter((_, i) => i !== index), // Remove o item pelo índice
+    [codProduto]: prev[codProduto].filter((_, i) => i !== index), 
   }));
 };
 
@@ -39,7 +38,6 @@ const handleValidityChange = (codProduto, index, value) => {
   }));
 };
 
-// Chama a função `onChange` sempre que houver alterações
 useEffect(() => {
   onChange(implantacoes);
 }, [implantacoes, onChange]);
@@ -59,10 +57,10 @@ return (
       {data.map((produto) => (
         <React.Fragment key={produto[0]}>
           <C.ProductRow>
-            <C.Td>{produto[1]}</C.Td> {/* Nome do produto */}
-            <C.Td>{produto[2]}</C.Td> {/* Lista */}
-            <C.Td>{produto[3]}</C.Td> {/* Pureza */}
-            <C.Td>{produto[4]}</C.Td> {/* Densidade */}
+            <C.Td>{produto[1]}</C.Td>
+            <C.Td>{produto[2]}</C.Td> 
+            <C.Td>{produto[3]}</C.Td> 
+            <C.Td>{produto[4]}</C.Td> 
             <C.Td>
               <C.Button onClick={() => handleAddItem(produto[0])}>
                 +
@@ -70,7 +68,6 @@ return (
             </C.Td>
           </C.ProductRow>
 
-          {/* Sublista para itens adicionados */}
           {implantacoes[produto[0]]?.map((item, index) => (
             <C.ItemRow key={`${produto[0]}-${index}`}>
               <C.SublistTd colSpan={3}>

@@ -8,7 +8,7 @@ useEffect(() => {
       onClose();
     }, duration);
 
-    return () => clearTimeout(timer); // Limpa o timer caso o componente seja desmontado
+    return () => clearTimeout(timer); 
   }
 }, [isVisible, onClose, duration]);
 

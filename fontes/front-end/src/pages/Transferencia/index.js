@@ -1,39 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Adicionado useLocation para capturar o estado passado pelo navigate
+import { useNavigate, useLocation } from "react-router-dom";
 import * as C from "./styles";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import ItemList from "../../components/ItemList";
-import Tooltip from "../../components/Tooltip"; // Importa o Tooltip
+import Tooltip from "../../components/Tooltip"; 
 import { buscarProdutos } from "../../services/produto/service";
 import { formatarData } from "../../helpers/dataHelper";
 
 const Transferencias = () => {
 const navigate = useNavigate();
-const location = useLocation(); // Captura o estado passado pelo navigate
+const location = useLocation(); 
 const [produto, setProduto] = useState("");
 const [pureza, setPureza] = useState("");
 const [densidade, setDensidade] = useState("");
 const [produtos, setProdutos] = useState([]);
 const [localData, setLocalData] = useState(null);
-const [isTooltipVisible, setIsTooltipVisible] = useState(false); // Estado para controlar o Tooltip
-const [tooltipMessage, setTooltipMessage] = useState(""); // Mensagem do Tooltip
+const [isTooltipVisible, setIsTooltipVisible] = useState(false); 
+const [tooltipMessage, setTooltipMessage] = useState(""); 
 
 useEffect(() => {
   const localStorageData = JSON.parse(localStorage.getItem("labId"));
   setLocalData(localStorageData);
 
-  // Verifica se há uma mensagem de sucesso passada pelo state
   if (location.state?.successMessage) {
     setTooltipMessage(location.state.successMessage);
     setIsTooltipVisible(true);
 
-    // Remove o tooltip após 3 segundos
     const timer = setTimeout(() => {
       setIsTooltipVisible(false);
     }, 3000);
 
-    return () => clearTimeout(timer); // Limpa o timer caso o componente seja desmontado
+    return () => clearTimeout(timer); 
   }
 }, [location.state]);
 
@@ -128,7 +126,6 @@ return (
       <p>Nenhum produto encontrado.</p>
     )}
 
-    {/* Tooltip */}
     <Tooltip
       message={tooltipMessage}
       isVisible={isTooltipVisible}

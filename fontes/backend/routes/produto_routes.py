@@ -7,14 +7,14 @@ import calendar
 from flask import jsonify
 import psycopg2
 produto_bp = Blueprint("produto_bp", __name__)
-from datetime import datetime, timedelta  # Importando timedelta
+from datetime import datetime, timedelta 
 import sys
 print("Debugging informações...", file=sys.stdout)
 
 # funcoes privadas
 def ultimo_dia_do_mes(mes, ano):
     ultimo_dia = calendar.monthrange(ano, mes)[1]
-    return f"{ano}-{mes:02d}-{ultimo_dia:02d}"  # Formato: YYYY-MM-DD
+    return f"{ano}-{mes:02d}-{ultimo_dia:02d}" 
 
 def datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio):
     try:
@@ -32,7 +32,7 @@ def datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio):
                AND datMovto <= NOW() 
         """
         cursor.execute(query, (codCampus, codUnidade, codPredio, codLaboratorio))
-        max_data = cursor.fetchone()[0]  # Pega a data máxima
+        max_data = cursor.fetchone()[0] 
 
         cursor.close()
         conn.close()
@@ -45,13 +45,13 @@ def datUltInventario(codCampus, codUnidade, codPredio, codLaboratorio):
 
 def get_connection():
  """Função para obter a conexão com o banco de dados."""
- # Obter a URL do banco de dados a partir das variáveis de ambiente
+
  DATABASE_URL = os.getenv("DATABASE_URL")
  
  if not DATABASE_URL:
      raise Exception("A variável de ambiente DATABASE_URL não está definida.")
 
- # Conectar ao banco de dados usando a URL fornecida
+
  return psycopg2.connect(DATABASE_URL)
 
 # Rota para listar todos os produtos
@@ -210,6 +210,8 @@ def verifica_local_estocagem_Ja_implantado(codCampus, codUnidade, codPredio, cod
         cursor.close()
         conn.close()
 
+
+#Rota para obter os produtos de um local
 @produto_bp.route("/obterEstoqueLocalEstocagem/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaboratorio):
   try:
@@ -1025,6 +1027,7 @@ def buscar_produtos():
      return jsonify({"error": str(e)}), 500
 
 
+#Rota para adiconar 1 produto no laboratorio
 @produto_bp.route("/adicionar_produto/<codProduto>", methods=["POST"])
 def adicionar_produto(codProduto):
     data = request.get_json()
@@ -1081,6 +1084,7 @@ def adicionar_produto(codProduto):
         print(f"Erro durante a execução: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+#Rota para obter todos laboratorio
 @produto_bp.route("/obterTodosLaboratorios", methods=["GET"])
 def obter_todos_laboratorios():
     try:
@@ -1114,6 +1118,7 @@ def obter_todos_laboratorios():
         return jsonify({"error": str(e)}), 500
 
 
+#Rota para atualizar um inventario
 @produto_bp.route("/atualizarQuantidadeProdutosLaboratorio", methods=["POST"])
 def atualizar_quantidade_produtos_laboratorio():
  data = request.get_json()
@@ -1210,6 +1215,7 @@ def atualizar_quantidade_produtos_laboratorio():
      return jsonify({"error": str(e)}), 500
 
 
+#Rota para obter produto pelo codigo
 @produto_bp.route("/obterProdutoPeloCodigo/<int:codProduto>", methods=["GET"])
 def obter_produto_pelo_codigo(codProduto):
   try:

@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import * as C from "./styles";
 import ItemList from "../../../components/ItemList";
 import { obterProdutos } from "../../../services/produto/service";
-import { useNavigate, useLocation } from "react-router-dom"; // Importa useLocation para capturar o estado
-
+import { useNavigate, useLocation } from "react-router-dom"; 
 const CreateProdutos = () => {
 const [produtos, setProdutos] = useState([]);
 const navigate = useNavigate();
-const location = useLocation(); // Captura o estado passado pelo navigate
-const [isTooltipVisible, setIsTooltipVisible] = useState(false); // Estado para controlar o Tooltip
-const [tooltipMessage, setTooltipMessage] = useState(""); // Mensagem do Tooltip
+const location = useLocation(); 
+const [isTooltipVisible, setIsTooltipVisible] = useState(false); 
+const [tooltipMessage, setTooltipMessage] = useState(""); 
 
 useEffect(() => {
   const fetchProdutos = async () => {
@@ -20,18 +19,16 @@ useEffect(() => {
   fetchProdutos();
 }, []);
 
-// Exibe o Tooltip se houver uma mensagem de sucesso no estado
 useEffect(() => {
   if (location.state?.successMessage) {
     setTooltipMessage(location.state.successMessage);
     setIsTooltipVisible(true);
 
-    // Remove o Tooltip após 3 segundos
     const timer = setTimeout(() => {
       setIsTooltipVisible(false);
     }, 3000);
 
-    return () => clearTimeout(timer); // Limpa o timer caso o componente seja desmontado
+    return () => clearTimeout(timer); 
   }
 }, [location.state]);
 
@@ -66,7 +63,6 @@ return (
   <C.Container>
     <h1>Cadastrar Produtos</h1>
 
-    {/* Tooltip */}
     {isTooltipVisible && (
       <div style={{ position: "fixed", bottom: "20px", right: "20px", backgroundColor: "#333", color: "#fff", padding: "10px 20px", borderRadius: "8px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
         {tooltipMessage}

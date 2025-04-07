@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
-import { AuthContext } from "../contexts/auth"; // Importa o contexto de autenticação
-import { useLocal } from "../contexts/local"; // Importa o hook de autenticação local
+import { AuthContext } from "../contexts/auth"; 
+import { useLocal } from "../contexts/local"; 
 import { getEstoqueLocalEstocagem } from "../services/laboratorio/service";
 
 const AppNotSidebar = ({ children }) => {
 const { usuario } = useContext(AuthContext); 
-const { labId } = useLocal(); // Obtém o ID do laboratório do contexto local
-const [labName, setLabName] = useState(null); // Estado para armazenar o nome do laboratório
+const { labId } = useLocal();
+const [labName, setLabName] = useState(null); 
 
 useEffect(() => {
   const fetchLabDetails = async () => {
@@ -20,7 +20,7 @@ useEffect(() => {
           codPredio,
           codLaboratorio
         );
-        setLabName(labDetails.nomLocal); // Armazena o nome do laboratório
+        setLabName(labDetails.nomLocal);
       } catch (error) {
         console.error("Erro ao buscar detalhes do laboratório:", error);
       }
