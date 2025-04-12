@@ -25,17 +25,32 @@ useEffect(() => {
   setLabId(localStorageData);
 
   const fetchLabs = async () => {
-    const labsResponse = await obterTodosLaboratorios();
-    setLabs(
-      labsResponse.map((lab) => ({
-        value: lab.codLaboratorio,
-        label: lab.nomLocal,
-        codCampus: lab.codCampus,
-        codUnidade: lab.codUnidade,
-        codPredio: lab.codPredio,
-        codLaboratorio: lab.codLaboratorio,
-      }))
-    );
+    try {
+      const labsResponse = await obterTodosLaboratorios();
+
+      const filteredLabs = labsResponse.filter(
+        (lab) =>
+          !(
+            lab.codCampus === localStorageData.codCampus &&
+            lab.codUnidade === localStorageData.codUnidade &&
+            lab.codPredio === localStorageData.codPredio &&
+            lab.codLaboratorio === localStorageData.codLaboratorio
+          )
+      );
+
+      setLabs(
+        filteredLabs.map((lab) => ({
+          value: lab.codLaboratorio,
+          label: lab.nomLocal,
+          codCampus: lab.codCampus,
+          codUnidade: lab.codUnidade,
+          codPredio: lab.codPredio,
+          codLaboratorio: lab.codLaboratorio,
+        }))
+      );
+    } catch (error) {
+      console.error("Erro ao buscar laboratórios:", error);
+    }
   };
 
   fetchLabs();
@@ -112,7 +127,9 @@ const handleTransferir = async () => {
 
     setMensagem(""); 
 
-    navigate("/transferencias", { state: { successMessage: "Transferência realizada com sucesso!" } });
+    navigate("/transferencias", {
+      state: { successMessage: "Transferência realizada com sucesso!" },
+    });
   } catch (error) {
     setMensagem("Erro ao realizar transferência.");
   }
