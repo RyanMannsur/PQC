@@ -28,16 +28,16 @@ tr:hover {
 
 export const Button = styled.button`
 background-color: #007bff;
-color: white;
-padding: 8px 12px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-transition: background 0.3s;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
 
-&:hover {
-  background-color: #0056b3;
-}
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 export const Input = styled.input`
@@ -61,24 +61,24 @@ font-weight: bold;
 `;
 
 export const ProductRow = styled.tr`
-background-color: #e8f4fc; /* Destaque para linha principal do produto */
+background-color: #e8f4fc; 
 font-weight: bold;
 
 &:hover {
-  background-color: #d0e8f2; /* Alteração de cor ao passar o mouse */
+  background-color: #d0e8f2; 
 }
 `;
 
 export const ItemRow = styled.tr`
-background-color: #ffffff; /* Fundo branco para sublinhas */
-font-size: 14px; /* Tamanho menor para itens */
+background-color: #ffffff;
+font-size: 14px;
 
 &:nth-child(even) {
-  background-color: #f9f9f9; /* Alternância de cores */
+  background-color: #f9f9f9;
 }
 
 &:hover {
-  background-color: #f1f1f1; /* Alteração de cor ao passar o mouse */
+  background-color: #f1f1f1;
 }
 `;
 
@@ -86,5 +86,5 @@ export const SublistTd = styled.td`
 padding: 12px;
 border: 1px solid #ddd;
 text-align: left;
-background-color: #f9f9f9; /* Fundo mais claro para sublinhas */
+background-color: #f9f9f9; 
 `;

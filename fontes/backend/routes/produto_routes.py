@@ -1139,7 +1139,7 @@ def atualizar_quantidade_produtos_laboratorio():
 
      # Define a data do movimento como a data atual e o dia seguinte
      datMovto = datetime.now().date()  # Data de hoje
-     datInventario = datMovto + timedelta(days=1)  # Data do inventário (amanhã)
+     datInventario = datetime.now().date()
 
      for produto in produtos:
          codProduto = produto["codProduto"]
@@ -1254,3 +1254,69 @@ def obter_produto_pelo_codigo(codProduto):
   except Exception as e:
       print("Erro ao buscar produto:", str(e))
       return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/implantarItensLaboratorio", methods=["POST"])
+def implantar_itens_laboratorio():
+ data = request.get_json()
+
+ # Verifica se os dados necessários estão presentes
+ if not data or "produtos" not in data or "codCampus" not in data or "codUnidade" not in data or "codPredio" not in data or "codLaboratorio" not in data:
+     return jsonify({"error": "JSON inválido. Deve conter 'produtos', 'codCampus', 'codUnidade', 'codPredio' e 'codLaboratorio'."}), 400
+
+ produtos = data["produtos"]  # Lista de produtos com codProduto e seus itens
+ codCampus = data["codCampus"]
+ codUnidade = data["codUnidade"]
+ codPredio = data["codPredio"]
+ codLaboratorio = data["codLaboratorio"]
+
+ try:
+     conn = get_connection()
+     cursor = conn.cursor()
+
+     # Define a data do movimento como a data atual
+     datMovto = datetime.now().date()
+
+     for produto in produtos:
+         codProduto = produto["codProduto"]
+         items = produto["items"]  # Lista de itens associados ao produto
+
+         # Busca o maior seqItem já existente para o produto
+         cursor.execute("""
+             SELECT COALESCE(MAX(seqItem), 0)
+               FROM ProdutoItem
+              WHERE codProduto = %s
+         """, (codProduto,))
+         ultimo_seq_item = cursor.fetchone()[0]
+
+         for item in items:
+             qtd = item["qtd"]
+             datValidade = item["datavalidade"]
+             codEmbalagem = item["embalagem"]
+
+             # Incrementa o seqItem para o novo item
+             seqItem = ultimo_seq_item + 1
+             ultimo_seq_item = seqItem
+
+             # Insere o novo ProdutoItem
+             cursor.execute("""
+                 INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+                 VALUES (%s, %s, NULL, %s, %s)
+             """, (codProduto, seqItem, datValidade, codEmbalagem))
+
+             # Gera a movimentação do tipo "IM" (Implantação)
+             cursor.execute("""
+                 INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                           codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+             """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, "IM", qtd, "Implantação inicial de itens"))
+
+     conn.commit()
+     cursor.close()
+     conn.close()
+
+     return jsonify({"message": "Itens implantados com sucesso"}), 200
+
+ except Exception as e:
+     return jsonify({"error": str(e)}), 500
+     

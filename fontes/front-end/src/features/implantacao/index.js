@@ -71,20 +71,22 @@ return (
           {implantacoes[produto[0]]?.map((item, index) => (
             <C.ItemRow key={`${produto[0]}-${index}`}>
               <C.SublistTd colSpan={3}>
+                Quantidade
                 <C.Input
                   type="number"
                   placeholder="Quantidade"
-                  value={item.qtd}
+                  label="Quantidade"
                   onChange={(e) =>
                     handleQuantityChange(produto[0], index, e.target.value)
                   }
                 />
               </C.SublistTd>
               <C.SublistTd>
+                Data de Validade
                 <C.Input
                   type="date"
+                  label="Validade"
                   placeholder="Validade"
-                  value={item.validade}
                   onChange={(e) =>
                     handleValidityChange(produto[0], index, e.target.value)
                   }

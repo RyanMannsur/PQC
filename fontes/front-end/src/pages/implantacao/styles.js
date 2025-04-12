@@ -21,7 +21,7 @@ margin-top: 50px;
 `;
 
 export const ConfirmButton = styled.button`
-background-color: #28a745;
+background-color: #007bff;
 color: white;
 padding: 10px 20px;
 border: none;
@@ -32,6 +32,6 @@ margin-top: 20px;
 transition: background 0.3s;
 
 &:hover {
-  background-color: #218838;
+  background-color: #0056b3;
 }
 `;

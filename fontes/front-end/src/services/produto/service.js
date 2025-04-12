@@ -188,3 +188,13 @@ export const obterProdutoPeloCodigo = async (codProduto) => {
     return null;
   }
 };
+
+export const implantarItensLaboratorio = async (dadosLaboratorio) => {
+  try {
+    const response = await api.post("/implantarItensLaboratorio", dadosLaboratorio);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao implantar itens no laboratório:", error);
+    return null;
+  }
+  };
