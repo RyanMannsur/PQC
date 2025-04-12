@@ -1319,4 +1319,116 @@ def implantar_itens_laboratorio():
 
  except Exception as e:
      return jsonify({"error": str(e)}), 500
+
+
+
+@produto_bp.route("/cadastrarProdutos", methods=["POST"])
+def cadastrar_produtos():
+ data = request.get_json()
+
+ # Validação dos dados recebidos
+ if not data or "tipoCadastro" not in data or "codCampus" not in data or "codUnidade" not in data or "codPredio" not in data or "codLaboratorio" not in data or "produtos" not in data:
+     return jsonify({"error": "JSON inválido. Deve conter 'tipoCadastro', 'codCampus', 'codUnidade', 'codPredio', 'codLaboratorio' e 'produtos'."}), 400
+
+ tipo_cadastro = data["tipoCadastro"] 
+ codCampus = data["codCampus"]
+ codUnidade = data["codUnidade"]
+ codPredio = data["codPredio"]
+ codLaboratorio = data["codLaboratorio"]
+ produtos = data["produtos"]  
+
+ try:
+     conn = get_connection()
+     cursor = conn.cursor()
+
      
+     datMovto = datetime.now().date()
+
+     for produto in produtos:
+         codProduto = produto["codProduto"]
+         items = produto["items"]  
+
+         
+         cursor.execute("""
+             SELECT COALESCE(MAX(seqItem), 0)
+               FROM ProdutoItem
+              WHERE codProduto = %s
+         """, (codProduto,))
+         ultimo_seq_item = cursor.fetchone()[0]
+
+         for item in items:
+             qtd = item["qtd"]
+             datValidade = item["validade"]
+             codEmbalagem = item["embalagem"]
+
+             
+             seqItem = ultimo_seq_item + 1
+             ultimo_seq_item = seqItem
+
+             cursor.execute("""
+                 INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+                 VALUES (%s, %s, NULL, %s, %s)
+             """, (codProduto, seqItem, datValidade, codEmbalagem))
+
+             cursor.execute("""
+                 INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                           codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+             """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, tipo_cadastro, qtd, "Cadastro de produto"))
+
+     conn.commit()
+     cursor.close()
+     conn.close()
+
+     return jsonify({"message": "Produtos cadastrados com sucesso!"}), 200
+
+ except Exception as e:
+     return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/produtosImplantadosPorLaboratorio", methods=["GET"])
+def produtos_implantados_por_laboratorio():
+  codCampus = request.args.get("codCampus")
+  codUnidade = request.args.get("codUnidade")
+  codPredio = request.args.get("codPredio")
+  codLaboratorio = request.args.get("codLaboratorio")
+
+  if not codCampus or not codUnidade or not codPredio or not codLaboratorio:
+      return jsonify({"error": "Parâmetros inválidos. Deve conter 'codCampus', 'codUnidade', 'codPredio' e 'codLaboratorio'."}), 400
+
+  try:
+      conn = get_connection()
+      cursor = conn.cursor()
+
+      # Executa a consulta SQL
+      cursor.execute("""
+          SELECT DISTINCT p.codProduto, p.nomProduto, p.nomLista, p.perPureza, p.vlrDensidade
+          FROM Produto p
+          JOIN MovtoEstoque m ON p.codProduto = m.codProduto
+          WHERE m.codCampus = %s
+            AND m.codUnidade = %s
+            AND m.codPredio = %s
+            AND m.codLaboratorio = %s;
+      """, (codCampus, codUnidade, codPredio, codLaboratorio))
+
+      produtos = cursor.fetchall()
+
+      # Formata os resultados como uma lista de dicionários
+      resultado = [
+          {
+              "codProduto": row[0],
+              "nomProduto": row[1],
+              "nomLista": row[2],
+              "perPureza": row[3],
+              "vlrDensidade": row[4]
+          }
+          for row in produtos
+      ]
+
+      cursor.close()
+      conn.close()
+
+      return jsonify(resultado), 200
+
+  except Exception as e:
+      return jsonify({"error": str(e)}), 500

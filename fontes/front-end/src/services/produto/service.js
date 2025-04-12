@@ -198,3 +198,25 @@ export const implantarItensLaboratorio = async (dadosLaboratorio) => {
     return null;
   }
   };
+
+  export const cadastrarProdutos = async (dadosCadastro) => {
+    try {
+      const response = await api.post("/cadastrarProdutos", dadosCadastro);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao cadastrar produtos:", error);
+      throw error;
+    }
+    };
+
+    export const obterProdutosImplantadosPorLaboratorio = async (codCampus, codUnidade, codPredio, codLaboratorio) => {
+      try {
+        const response = await api.get("/produtosImplantadosPorLaboratorio", {
+          params: { codCampus, codUnidade, codPredio, codLaboratorio },
+        });
+        return response.data; 
+      } catch (error) {
+        console.error("Erro ao buscar produtos por laboratório:", error);
+        throw error; 
+      }
+      };

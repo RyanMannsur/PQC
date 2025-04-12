@@ -53,8 +53,6 @@ button {
 }
 `;
 
-// Estilos para o componente CadastrarProdutos
-
 export const ButtonGroup = styled.div`
 display: flex;
 justify-content: center;
@@ -88,4 +86,50 @@ export const ButtonContainer = styled.div`
 display: flex;
 justify-content: center;
 margin-top: 20px;
+`;
+
+export const SelectContainer = styled.div`
+margin-bottom: 20px;
+
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: #4caf50;
+  }
+}
+`;
+
+export const ConfirmButton = styled.button`
+background-color: #007bff;
+color: white;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+margin-top: 20px;
+transition: background 0.3s;
+
+&:hover {
+  background-color: #0056b3;
+}
+`;
+
+export const Loading = styled.div`
+font-size: 18px;
+color: #666;
+text-align: center;
+margin-top: 50px;
 `;
