@@ -63,7 +63,6 @@ const handleActionClick = (id, key) => {
 };
 
 const columns = [
-  { key: "codigo", label: "Código", type: "string" },
   { key: "nome", label: "Nome", type: "string" },
   { key: "quantidade", label: "Quantidade", type: "string" },
   { key: "validade", label: "Data de Validade", type: "string" },

@@ -11,7 +11,6 @@ return (
         <C.Th>Densidade</C.Th>
         <C.Th>Validade</C.Th>
         <C.Th>Item</C.Th>
-        <C.Th>Embalagem</C.Th>
         <C.Th>Quantidade Atual</C.Th>
         <C.Th>Nova Quantidade</C.Th>
       </tr>
@@ -31,7 +30,6 @@ return (
               )}
               <C.Td>{item.datValidade}</C.Td>
               <C.Td>{item.seqItem}</C.Td>
-              <C.Td>{item.nomEmbalagem}</C.Td>
               <C.Td>{item.qtdAtual}</C.Td>
               <C.Td>
                 <C.Input

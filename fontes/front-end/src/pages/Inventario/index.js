@@ -86,7 +86,6 @@ const Inventario = () => {
         agrupados[codProduto].itens.push({
           seqItem,
           datValidade: formatarData(datValidade),
-          nomEmbalagem: "Padrão", 
           qtdAtual: qtdEstoque,
           qtdNova: qtdEstoque, 
         });
