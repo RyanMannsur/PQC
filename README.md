@@ -45,7 +45,7 @@ Testando a Conexão com o Banco de Dados
  Execute o comando abaixo para se conectar ao banco de dados:
 
  ```bash
-   psql -h localhost -U postgres -d PQC
+   docker exec -it bd-postgres psql -U postgres -d PQC
 ```
 -- Liste as tabelas para verificar se o banco de dados foi criado corretamente:
 \dt
