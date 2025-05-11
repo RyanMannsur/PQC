@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import * as C from "./styles";
 
 const RelatorioProdutos = ({ data }) => {
-const [produtosVisiveis, setProdutosVisiveis] = useState({}); // Estado para controlar quais produtos estão expandidos
+const [produtosVisiveis, setProdutosVisiveis] = useState({}); 
 
 const toggleMovimentacoes = (codProduto) => {
   setProdutosVisiveis((prevState) => ({
     ...prevState,
-    [codProduto]: !prevState[codProduto], // Alterna entre mostrar e esconder
+    [codProduto]: !prevState[codProduto], 
   }));
 };
 
@@ -23,7 +23,6 @@ return (
     <tbody>
       {data.map((produto) => (
         <React.Fragment key={produto.produto.codProduto}>
-          {/* Linha principal do produto */}
           <C.ProductRow>
             <C.Td>{produto.produto.nomProduto}</C.Td>
             <C.Td>{produto.qtdGeralAtual}</C.Td>
@@ -36,10 +35,8 @@ return (
             </C.Td>
           </C.ProductRow>
 
-          {/* Sublista de movimentações */}
           {produtosVisiveis[produto.produto.codProduto] && (
             <>
-              {/* Cabeçalho da sublista */}
               <C.SublistHeader>
                 <C.SublistTh>Código do Item</C.SublistTh>
                 <C.SublistTh>Tipo de Movimentação</C.SublistTh>
@@ -49,7 +46,6 @@ return (
                 <C.SublistTh>Laboratório</C.SublistTh>
               </C.SublistHeader>
 
-              {/* Linhas da sublista */}
               {produto.movimentacoes.map((movto, index) => (
                 <C.ItemRow key={`${produto.produto.codProduto}-${index}`}>
                   <C.SublistTd>{movto.seqItem}</C.SublistTd>

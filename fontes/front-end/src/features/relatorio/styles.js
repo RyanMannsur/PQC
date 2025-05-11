@@ -53,29 +53,29 @@ font-weight: bold;
 `;
 
 export const ProductRow = styled.tr`
-background-color: #e8f4fc; /* Destaque para linha principal do produto */
+background-color: #e8f4fc; 
 font-weight: bold;
 
 &:hover {
-  background-color: #d0e8f2; /* Alteração de cor ao passar o mouse */
+  background-color: #d0e8f2; 
 }
 `;
 
 export const ItemRow = styled.tr`
-background-color: #ffffff; /* Fundo branco para sublinhas */
-font-size: 14px; /* Tamanho menor para itens */
+background-color: #ffffff; 
+font-size: 14px; 
 
 &:nth-child(even) {
-  background-color: #f9f9f9; /* Alternância de cores */
+  background-color: #f9f9f9; 
 }
 
 &:hover {
-  background-color: #f1f1f1; /* Alteração de cor ao passar o mouse */
+  background-color: #f1f1f1; 
 }
 `;
 
 export const SublistHeader = styled.tr`
-background-color: #f4f4f4; /* Fundo claro para o cabeçalho da sublista */
+background-color: #f4f4f4; 
 font-weight: bold;
 `;
 
@@ -94,18 +94,18 @@ font-size: 14px;
 background-color: #ffffff;
 
 &:nth-child(even) {
-  background-color: #f9f9f9; /* Alternância de cores */
+  background-color: #f9f9f9;
 }
 `;
 
 export const QuantityCell = styled.td`
 font-weight: bold;
-color: #007bff; /* Cor de destaque para a quantidade geral atual */
+color: #007bff; 
 text-align: center;
 `;
 
 export const MovtoHeader = styled.th`
-background-color: #e8f4fc; /* Fundo diferenciado para colunas de movimentação */
+background-color: #e8f4fc; 
 font-weight: bold;
 text-align: center;
 `;

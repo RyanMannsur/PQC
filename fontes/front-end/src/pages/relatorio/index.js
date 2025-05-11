@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import * as C from "./styles";
-import RelatorioProdutos from "../../features/relatorio"; // Importa a feature da tabela
-import { obterRelatorioProdutos } from "../../services/produto/service"; // Importa o serviço para obter o relatório
-
+import RelatorioProdutos from "../../features/relatorio"; 
+import { obterRelatorioProdutos } from "../../services/produto/service"; 
 const Relatorio = () => {
 const [produtos, setProdutos] = useState([]);
 const [erro, setErro] = useState("");
@@ -11,7 +10,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
   const fetchRelatorio = async () => {
     try {
-      const relatorioResponse = await obterRelatorioProdutos(); // Chama o serviço
+      const relatorioResponse = await obterRelatorioProdutos(); 
       setProdutos(relatorioResponse);
       setErro("");
     } catch (error) {
