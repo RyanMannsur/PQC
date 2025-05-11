@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
-import ImplantacaoList from "../../../features/implantacao";
-import Modal from "../../../components/Modal"; 
-import Select from "../../../components/InputSelect"; 
-import { obterProdutosImplantadosPorLaboratorio, cadastrarProdutos } from "../../../services/produto/service"; 
-import { useLocal } from "../../../contexts/local";
-import { getEstoqueLocalEstocagem } from "../../../services/laboratorio/service";
+import ImplantacaoList from "../../features/implantacao";
+import Modal from "../../components/Modal"; 
+import Select from "../../components/InputSelect"; 
+import { obterProdutosImplantadosPorLaboratorio, cadastrarProdutos } from "../../services/produto/service"; 
+import { useLocal } from "../../contexts/local";
+import { getEstoqueLocalEstocagem } from "../../services/laboratorio/service";
 import * as C from "./styles";
 
 const CreateProdutos = () => {

@@ -5,7 +5,7 @@ import SelecionarLocal from "../pages/SelecionarLocal";
 import Home from "../pages/Home";
 import Inventario from "../pages/Inventario";
 import TransferirProduto from "../pages/Transferencia/tranferirProduto";
-import CreateProdutos from "../pages/Inventario/createProduto";
+import CreateProdutos from "../pages/createProduto";
 import PrivateRoute from "./private";
 import AppNotSidebar from "../layout/AppNotSidebar";
 import AppLayout from "../layout/App";

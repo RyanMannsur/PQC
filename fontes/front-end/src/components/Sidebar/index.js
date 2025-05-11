@@ -1,4 +1,3 @@
-import React from "react";
 import {
 Drawer,
 List,
@@ -6,7 +5,7 @@ ListItem,
 ListItemText,
 ListItemIcon,
 } from "@mui/material";
-import { Home, Settings, Inventory, SwapHoriz, AddBox } from "@mui/icons-material";
+import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
@@ -57,6 +56,13 @@ return (
           <Inventory />
         </ListItemIcon>
         <ListItemText primary="Inventário" />
+      </ListItem>
+
+      <ListItem button component={Link} to="/cadastrar-produto">
+        <ListItemIcon>
+          <PostAdd />
+        </ListItemIcon>
+        <ListItemText primary="Adicionar Produtos" />
       </ListItem>
 
       <ListItem button component={Link} to="/transferencias">
