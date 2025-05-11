@@ -1,0 +1,55 @@
+import React, { useState } from "react";
+import * as C from "./styles";
+
+const RelatorioProdutos = ({ data }) => {
+const [produtosVisiveis, setProdutosVisiveis] = useState({}); // Estado para controlar quais produtos estão expandidos
+
+const toggleMovimentacoes = (codProduto) => {
+  setProdutosVisiveis((prevState) => ({
+    ...prevState,
+    [codProduto]: !prevState[codProduto], // Alterna entre mostrar e esconder
+  }));
+};
+
+return (
+  <C.Table>
+    <thead>
+      <tr>
+        <C.Th>Produto</C.Th>
+        <C.Th>Quantidade Geral Atual</C.Th>
+        <C.Th>Ações</C.Th>
+      </tr>
+    </thead>
+    <tbody>
+      {data.map((produto) => (
+        <React.Fragment key={produto.produto.codProduto}>
+          {/* Linha principal do produto */}
+          <C.ProductRow>
+            <C.Td>{produto.produto.nomProduto}</C.Td>
+            <C.Td>{produto.qtdGeralAtual}</C.Td>
+            <C.Td>
+              <C.Button onClick={() => toggleMovimentacoes(produto.produto.codProduto)}>
+                {produtosVisiveis[produto.produto.codProduto]
+                  ? "Esconder Movimentações"
+                  : "Mostrar Movimentações"}
+              </C.Button>
+            </C.Td>
+          </C.ProductRow>
+
+          {produtosVisiveis[produto.produto.codProduto] &&
+            produto.movimentacoes.map((movto, index) => (
+              <C.ItemRow key={`${produto.produto.codProduto}-${index}`}>
+                <C.SublistTd>{movto.idtTipoMovto}</C.SublistTd>
+                <C.SublistTd>{movto.datMovto}</C.SublistTd>
+                <C.SublistTd>{movto.qtdEstoque}</C.SublistTd>
+                <C.SublistTd>{movto.txtJustificativa || "-"}</C.SublistTd>
+              </C.ItemRow>
+            ))}
+        </React.Fragment>
+      ))}
+    </tbody>
+  </C.Table>
+);
+};
+
+export default RelatorioProdutos;

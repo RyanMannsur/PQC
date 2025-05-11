@@ -5,7 +5,7 @@ ListItem,
 ListItemText,
 ListItemIcon,
 } from "@mui/material";
-import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd } from "@mui/icons-material";
+import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd, Assessment } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
@@ -78,6 +78,14 @@ return (
         </ListItemIcon>
         <ListItemText primary="Implantação" />
       </ListItem>
+
+      <ListItem button component={Link} to="/relatorio">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Relatório" />
+      </ListItem>
+
     </List>
   </Drawer>
 );
