@@ -66,7 +66,7 @@ return (
         <ListItemText primary="Transferências" />
       </ListItem>
 
-      <ListItem button component={Link} to="/implantacao">
+      <ListItem button component={Link} to="/implantar/novos-produtos">
         <ListItemIcon>
           <AddBox />
         </ListItemIcon>

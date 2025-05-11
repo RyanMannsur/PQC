@@ -96,7 +96,18 @@ const RoutesApp = () => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/implantar/novos-produtos"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Implantacao />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
       </Routes>
+      
     </Router>
   );
 };
