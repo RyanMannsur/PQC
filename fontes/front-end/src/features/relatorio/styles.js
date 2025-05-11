@@ -40,23 +40,6 @@ transition: background 0.3s;
 }
 `;
 
-export const Input = styled.input`
-width: 100%;
-padding: 8px;
-border: 1px solid #ccc;
-border-radius: 5px;
-font-size: 16px;
-`;
-
-export const Select = styled.select`
-width: 100%;
-padding: 8px;
-border: 1px solid #ccc;
-border-radius: 5px;
-font-size: 16px;
-background-color: white;
-`;
-
 export const Td = styled.td`
 padding: 12px;
 border: 1px solid #ddd;
@@ -91,11 +74,28 @@ font-size: 14px; /* Tamanho menor para itens */
 }
 `;
 
-export const SublistTd = styled.td`
-padding: 12px;
+export const SublistHeader = styled.tr`
+background-color: #f4f4f4; /* Fundo claro para o cabeçalho da sublista */
+font-weight: bold;
+`;
+
+export const SublistTh = styled.th`
+padding: 8px;
 border: 1px solid #ddd;
 text-align: left;
-background-color: #f9f9f9; /* Fundo mais claro para sublinhas */
+font-size: 14px;
+`;
+
+export const SublistTd = styled.td`
+padding: 8px;
+border: 1px solid #ddd;
+text-align: left;
+font-size: 14px;
+background-color: #ffffff;
+
+&:nth-child(even) {
+  background-color: #f9f9f9; /* Alternância de cores */
+}
 `;
 
 export const QuantityCell = styled.td`

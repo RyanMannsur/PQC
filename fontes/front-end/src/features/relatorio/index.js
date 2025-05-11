@@ -36,15 +36,32 @@ return (
             </C.Td>
           </C.ProductRow>
 
-          {produtosVisiveis[produto.produto.codProduto] &&
-            produto.movimentacoes.map((movto, index) => (
-              <C.ItemRow key={`${produto.produto.codProduto}-${index}`}>
-                <C.SublistTd>{movto.idtTipoMovto}</C.SublistTd>
-                <C.SublistTd>{movto.datMovto}</C.SublistTd>
-                <C.SublistTd>{movto.qtdEstoque}</C.SublistTd>
-                <C.SublistTd>{movto.txtJustificativa || "-"}</C.SublistTd>
-              </C.ItemRow>
-            ))}
+          {/* Sublista de movimentações */}
+          {produtosVisiveis[produto.produto.codProduto] && (
+            <>
+              {/* Cabeçalho da sublista */}
+              <C.SublistHeader>
+                <C.SublistTh>Código do Item</C.SublistTh>
+                <C.SublistTh>Tipo de Movimentação</C.SublistTh>
+                <C.SublistTh>Data</C.SublistTh>
+                <C.SublistTh>Quantidade</C.SublistTh>
+                <C.SublistTh>Justificativa</C.SublistTh>
+                <C.SublistTh>Laboratório</C.SublistTh>
+              </C.SublistHeader>
+
+              {/* Linhas da sublista */}
+              {produto.movimentacoes.map((movto, index) => (
+                <C.ItemRow key={`${produto.produto.codProduto}-${index}`}>
+                  <C.SublistTd>{movto.seqItem}</C.SublistTd>
+                  <C.SublistTd>{movto.idtTipoMovto}</C.SublistTd>
+                  <C.SublistTd>{movto.datMovto}</C.SublistTd>
+                  <C.SublistTd>{movto.qtdEstoque}</C.SublistTd>
+                  <C.SublistTd>{movto.txtJustificativa || "-"}</C.SublistTd>
+                  <C.SublistTd>{movto.nomLocal}</C.SublistTd>
+                </C.ItemRow>
+              ))}
+            </>
+          )}
         </React.Fragment>
       ))}
     </tbody>
