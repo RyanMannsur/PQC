@@ -31,3 +31,11 @@ justify-content: center;
 gap: 10px;
 margin-top: 30px;
 `;
+
+export const FiltersContainer = styled.div`
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+margin-bottom: 20px;
+`;

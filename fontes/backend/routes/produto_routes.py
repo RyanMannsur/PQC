@@ -1469,7 +1469,7 @@ def relatorio_produtos():
                    AND m.codPredio = le.codPredio
                    AND m.codLaboratorio = le.codLaboratorio
                   WHERE m.codProduto = %s
-                    AND m.datMovto BETWEEN %s AND %s
+                    AND m.datMovto > %s AND m.datMovto <= (%s::date + INTERVAL '1 day')
                   ORDER BY m.seqItem ASC, m.datMovto ASC;
               """, (codProduto, data_inicial, data_final))
           else:
