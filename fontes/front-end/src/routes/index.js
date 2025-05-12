@@ -5,13 +5,14 @@ import SelecionarLocal from "../pages/SelecionarLocal";
 import Home from "../pages/Home";
 import Inventario from "../pages/Inventario";
 import TransferirProduto from "../pages/Transferencia/tranferirProduto";
-import CreateProdutos from "../pages/Inventario/createProduto";
+import CreateProdutos from "../pages/createProduto";
 import PrivateRoute from "./private";
 import AppNotSidebar from "../layout/AppNotSidebar";
 import AppLayout from "../layout/App";
 import PublicoLayout from "../layout/publico";
 import Traferencia from "../pages/Transferencia";
 import Implantacao from "../pages/implantacao";
+import Relatorio from "../pages/relatorio";
 
 const RoutesApp = () => {
   return (
@@ -96,7 +97,29 @@ const RoutesApp = () => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/implantar/novos-produtos"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Implantacao />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/relatorio"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Relatorio />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
       </Routes>
+      
     </Router>
   );
 };

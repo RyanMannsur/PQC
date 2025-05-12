@@ -1,4 +1,3 @@
-import React from "react";
 import {
 Drawer,
 List,
@@ -6,7 +5,7 @@ ListItem,
 ListItemText,
 ListItemIcon,
 } from "@mui/material";
-import { Home, Settings, Inventory, SwapHoriz, AddBox } from "@mui/icons-material";
+import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd, Assessment } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
@@ -59,6 +58,13 @@ return (
         <ListItemText primary="Inventário" />
       </ListItem>
 
+      <ListItem button component={Link} to="/cadastrar-produto">
+        <ListItemIcon>
+          <PostAdd />
+        </ListItemIcon>
+        <ListItemText primary="Adicionar Produtos" />
+      </ListItem>
+
       <ListItem button component={Link} to="/transferencias">
         <ListItemIcon>
           <SwapHoriz />
@@ -66,12 +72,20 @@ return (
         <ListItemText primary="Transferências" />
       </ListItem>
 
-      <ListItem button component={Link} to="/implantacao">
+      <ListItem button component={Link} to="/implantar/novos-produtos">
         <ListItemIcon>
           <AddBox />
         </ListItemIcon>
         <ListItemText primary="Implantação" />
       </ListItem>
+
+      <ListItem button component={Link} to="/relatorio">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Relatório" />
+      </ListItem>
+
     </List>
   </Drawer>
 );

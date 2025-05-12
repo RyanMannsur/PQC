@@ -220,3 +220,18 @@ export const implantarItensLaboratorio = async (dadosLaboratorio) => {
         throw error; 
       }
       };
+
+export const obterRelatorioProdutos = async (dataInicial, dataFinal) => {
+try {
+  const params = {};
+  if (dataInicial) params.dataInicial = dataInicial;
+  if (dataFinal) params.dataFinal = dataFinal;
+
+  
+  const response = await api.get("/relatorioProdutos", { params });
+  return response.data;
+} catch (error) {
+  console.error("Erro ao obter relatório de produtos:", error);
+  throw error; 
+}
+};

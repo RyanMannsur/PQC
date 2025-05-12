@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../../components/Modal"; 
 import * as C from "./styles";
 import { useLocal } from "../../contexts/local";
 import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
 import InventarioList from "../../features/inventario";
-import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 import { formatarData } from "../../helpers/dataHelper";
 import { atualizarQuantidadeProdutosLaboratorio } from "../../services/produto/service";
@@ -15,7 +14,6 @@ const Inventario = () => {
   const [erro, setErro] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState(""); 
-  const navigate = useNavigate();
 
   const dataInicial = "1900-01-01";
 
@@ -168,10 +166,6 @@ const Inventario = () => {
         <p>Nenhum produto encontrado no inventário.</p>
       )}
       <C.ButtonGroup>
-        <Button
-          Text="Adicionar Produto"
-          onClick={() => navigate("/cadastrar-produto")}
-        />
         <Button
           Text="Confirmar Atualização"
           onClick={enviarAtualizacao}

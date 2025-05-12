@@ -1432,3 +1432,99 @@ def produtos_implantados_por_laboratorio():
 
   except Exception as e:
       return jsonify({"error": str(e)}), 500
+
+
+@produto_bp.route("/relatorioProdutos", methods=["GET"])
+def relatorio_produtos():
+  data_inicial = request.args.get("dataInicial")  # Opcional
+  data_final = request.args.get("dataFinal")      # Opcional
+
+  try:
+      conn = get_connection()
+      cursor = conn.cursor()
+
+      # Consulta para obter todos os produtos com movimentações
+      cursor.execute("""
+          SELECT DISTINCT p.codProduto, p.nomProduto, p.nomLista, p.perPureza, p.vlrDensidade
+          FROM Produto p
+          JOIN MovtoEstoque m ON p.codProduto = m.codProduto;
+      """)
+      produtos = cursor.fetchall()
+
+      resultado = []
+
+      for produto in produtos:
+          codProduto = produto[0]
+
+          # Consulta para obter as movimentações do produto
+          if data_inicial and data_final:
+              # Filtrar por data inicial e final, se fornecidas
+              cursor.execute("""
+                  SELECT m.seqItem, m.datMovto, m.idtTipoMovto, m.qtdEstoque, m.txtJustificativa,
+                         le.nomLocal, m.codLaboratorio
+                  FROM MovtoEstoque m
+                  JOIN LocalEstocagem le
+                    ON m.codCampus = le.codCampus
+                   AND m.codUnidade = le.codUnidade
+                   AND m.codPredio = le.codPredio
+                   AND m.codLaboratorio = le.codLaboratorio
+                  WHERE m.codProduto = %s
+                    AND m.datMovto BETWEEN %s AND %s
+                  ORDER BY m.seqItem ASC, m.datMovto ASC;
+              """, (codProduto, data_inicial, data_final))
+          else:
+              # Sem filtro de data
+              cursor.execute("""
+                  SELECT m.seqItem, m.datMovto, m.idtTipoMovto, m.qtdEstoque, m.txtJustificativa,
+                         le.nomLocal, m.codLaboratorio
+                  FROM MovtoEstoque m
+                  JOIN LocalEstocagem le
+                    ON m.codCampus = le.codCampus
+                   AND m.codUnidade = le.codUnidade
+                   AND m.codPredio = le.codPredio
+                   AND m.codLaboratorio = le.codLaboratorio
+                  WHERE m.codProduto = %s
+                  ORDER BY m.seqItem ASC, m.datMovto ASC;
+              """, (codProduto,))
+          
+          movimentacoes = cursor.fetchall()
+
+          # Consulta para calcular a quantidade geral atual do produto
+          cursor.execute("""
+              SELECT COALESCE(SUM(m.qtdEstoque), 0)
+              FROM MovtoEstoque m
+              WHERE m.codProduto = %s;
+          """, (codProduto,))
+          qtd_geral = cursor.fetchone()[0]
+
+          # Adicionar os dados do produto ao resultado
+          resultado.append({
+              "produto": {
+                  "codProduto": produto[0],
+                  "nomProduto": produto[1],
+                  "nomLista": produto[2],
+                  "perPureza": produto[3],
+                  "vlrDensidade": produto[4]
+              },
+              "movimentacoes": [
+                  {
+                      "seqItem": row[0],
+                      "datMovto": row[1].strftime("%Y-%m-%d"),
+                      "idtTipoMovto": row[2],
+                      "qtdEstoque": float(row[3]),
+                      "txtJustificativa": row[4],
+                      "nomLocal": row[5],  # Nome do laboratório
+                      "codLaboratorio": row[6]  # Código do laboratório
+                  }
+                  for row in movimentacoes
+              ],
+              "qtdGeralAtual": float(qtd_geral)
+          })
+
+      cursor.close()
+      conn.close()
+
+      return jsonify(resultado), 200
+
+  except Exception as e:
+      return jsonify({"error": str(e)}), 500
