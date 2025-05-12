@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import * as C from "./styles";
+import { formatarData } from "../../helpers/dataHelper";
 
 const RelatorioProdutos = ({ data }) => {
 const [produtosVisiveis, setProdutosVisiveis] = useState({}); 
@@ -50,7 +51,7 @@ return (
                 <C.ItemRow key={`${produto.produto.codProduto}-${index}`}>
                   <C.SublistTd>{movto.seqItem}</C.SublistTd>
                   <C.SublistTd>{movto.idtTipoMovto}</C.SublistTd>
-                  <C.SublistTd>{movto.datMovto}</C.SublistTd>
+                  <C.SublistTd>{formatarData(movto.datMovto)}</C.SublistTd>
                   <C.SublistTd>{movto.qtdEstoque}</C.SublistTd>
                   <C.SublistTd>{movto.txtJustificativa || "-"}</C.SublistTd>
                   <C.SublistTd>{movto.nomLocal}</C.SublistTd>
