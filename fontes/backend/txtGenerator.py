@@ -2,7 +2,13 @@ from datetime import datetime
 from routes.produto_routes import get_produtos
 from routes.produto_routes import obter_produto
 from app import app
-#####################################
+
+# Passo 0 - Executando o arquivo
+# Abra um novo terminal, execute os seguintes comandos:
+# docker exec -it backend sh
+# python txtGenerator.py
+
+
 # Passo 1 - Nome do arquivo e linha de identificação
 arquivoDeMapas = "[]" #não sei, 2 caracteres
 date = datetime.now()
