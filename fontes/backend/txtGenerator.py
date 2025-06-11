@@ -38,8 +38,17 @@ with app.app_context():
         file.write('DG\n') #Seção demonstrativo geral
         # TODO: identificar diferença entre produtos compostos e produtos controlados para fazer a 
         # distinção no documento. Por hora, assume-se que tudo é produto controlado(PR)
+        
         produtos = get_produtos().get_json()
         for produto in produtos:
-            produtoDetalhes = obter_produto(int(produto['id'])).get_json()
-            print(f'{produtoDetalhes}\n')
-    
+            file.write('PR[.........]') # TODO: adicionar no banco de dados o código do produto
+            perpureza = produto[3]
+            if perpureza is None:
+                perpureza = 0.0
+            vlrDensidade = produto[4]
+            if vlrDensidade is None:
+                vlrDensidade = 0.0
+            file.write(f'{produto[1]}{int(round(float(perpureza), 0)):03d}') # nomproduto e perpureza
+            file.write(f'{round(float(vlrDensidade), 2):05.2f}\n'.replace('.', ',')) # vlrdensidade
+            
+               
