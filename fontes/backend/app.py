@@ -10,4 +10,5 @@ app.register_blueprint(produto_bp, url_prefix="/api")
 
 if __name__ == "__main__":
  # Configurar o host como "0.0.0.0" para permitir acesso externo ao container
- app.run(host="0.0.0.0", port=5000, debug=True)
+ app.run(host="0.0.0.0", port=8088, debug=True)
+ 

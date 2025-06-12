@@ -4,6 +4,6 @@ WORKDIR /app
 
 RUN pip install Flask psycopg2-binary Flask-Cors
 
-EXPOSE 5000
+EXPOSE 8088
 
 CMD ["python", "app.py"]
