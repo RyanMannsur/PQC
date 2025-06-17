@@ -1470,7 +1470,7 @@ def relatorio_produtos():
                    AND m.codLaboratorio = le.codLaboratorio
                   WHERE m.codProduto = %s
                     AND m.datMovto > %s AND m.datMovto <= (%s::date + INTERVAL '1 day')
-                  ORDER BY m.seqItem ASC, m.datMovto ASC;
+                  ORDER BY m.datMovto DESC, m.seqItem DESC;
               """, (codProduto, data_inicial, data_final))
           else:
               # Sem filtro de data
@@ -1484,7 +1484,7 @@ def relatorio_produtos():
                    AND m.codPredio = le.codPredio
                    AND m.codLaboratorio = le.codLaboratorio
                   WHERE m.codProduto = %s
-                  ORDER BY m.seqItem ASC, m.datMovto ASC;
+                  ORDER BY m.datMovto DESC, m.seqItem DESC;
               """, (codProduto,))
           
           movimentacoes = cursor.fetchall()
@@ -1493,7 +1493,8 @@ def relatorio_produtos():
           cursor.execute("""
               SELECT COALESCE(SUM(m.qtdEstoque), 0)
               FROM MovtoEstoque m
-              WHERE m.codProduto = %s;
+              WHERE m.codProduto = %s
+              AND m.idtTipoMovto != 'IN';
           """, (codProduto,))
           qtd_geral = cursor.fetchone()[0]
 
