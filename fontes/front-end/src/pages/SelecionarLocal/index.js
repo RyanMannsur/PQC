@@ -17,32 +17,32 @@ const [labOptions, setLabOptions] = useState([]);
 useEffect(() => {
   const fetchLabs = async () => {
     try {
-      const labs = await getLabs(); 
+      const labs = await getLabs();
       if (labs && Array.isArray(labs)) {
         setLabOptions(
-          labs.map((lab, index) => ({
-            id: index.toString(),
-            nomLocal: lab[4],
-            codCampus: lab[0],
-            codUnidade: lab[1],
-            codPredio: lab[2],
-            codLaboratorio: lab[3],
+          labs.map((lab) => ({
+            id: `${lab.codCampus}-${lab.codUnidade}-${lab.codPredio}-${lab.codLaboratorio}`, 
+            nomLocal: lab.nomLocal,
+            codCampus: lab.codCampus,
+            codUnidade: lab.codUnidade,
+            codPredio: lab.codPredio,
+            codLaboratorio: lab.codLaboratorio,
           }))
         );
 
         if (labs.length === 1) {
           const selectedLab = labs[0];
           setLab({
-            codCampus: selectedLab[0],
-            codUnidade: selectedLab[1],
-            codPredio: selectedLab[2],
-            codLaboratorio: selectedLab[3],
+            codCampus: selectedLab.codCampus,
+            codUnidade: selectedLab.codUnidade,
+            codPredio: selectedLab.codPredio,
+            codLaboratorio: selectedLab.codLaboratorio,
           });
           setLabId({
-            codCampus: selectedLab[0],
-            codUnidade: selectedLab[1],
-            codPredio: selectedLab[2],
-            codLaboratorio: selectedLab[3],
+            codCampus: selectedLab.codCampus,
+            codUnidade: selectedLab.codUnidade,
+            codPredio: selectedLab.codPredio,
+            codLaboratorio: selectedLab.codLaboratorio,
           });
           navigate("/home");
         }

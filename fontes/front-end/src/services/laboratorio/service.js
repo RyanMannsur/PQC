@@ -9,15 +9,14 @@ export default api;
 
 export const getLabs = async () => {
   try {
-    const userDataJson = localStorage.getItem("user_data");
-    if (!userDataJson) {
+    const userTokenJson = localStorage.getItem("user_token");
+    if (!userTokenJson) {
       throw new Error("Usuário não autenticado.");
     }
 
-    const userData = JSON.parse(userDataJson);
-    const codSiape = userData.codSiape;
+    const userToken = localStorage.getItem("user_token");
 
-    const response = await api.get(`/obterLocaisEstoque/${codSiape}`);
+    const response = await api.get(`/obterLocaisEstoque/${userToken}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar locais de estoque:", error);
