@@ -6,20 +6,21 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/auth";
 
 const Signin = () => {
-  const { signin } = useContext(AuthContext);
-  const navigate = useNavigate();
+const { signin } = useContext(AuthContext); 
+const navigate = useNavigate();
 
-  const [cpf, setCpf] = useState("");
-  const [senha, setSenha] = useState("");
-  const [error, setError] = useState("");
+const [cpf, setCpf] = useState("");
+const [senha, setSenha] = useState("");
+const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    if (!cpf || !senha) {
-      setError("Preencha todos os campos");
-      return;
-    }
+const handleLogin = async () => {
+  if (!cpf || !senha) {
+    setError("Preencha todos os campos");
+    return;
+  }
 
-    const res = signin(cpf, senha);
+  try {
+    const res = await signin(cpf, senha);
 
     if (res) {
       setError(res);
@@ -27,32 +28,35 @@ const Signin = () => {
     }
 
     navigate("/selecionar-lab");
-  };
+  } catch (err) {
+    setError("Erro ao tentar fazer login. Tente novamente.");
+  }
+};
 
-  return (
-    <C.Container>
-      <C.Label>ENTRAR NO SISTEMA</C.Label>
-      <C.Content>
-        <Input
-          type="text"
-          placeholder="Digite seu CPF"
-          value={cpf}
-          label="Usuário:"
-          onChange={(e) => [setCpf(e.target.value), setError("")]}
-        />
-        <Input
-          type="password"
-          placeholder="Digite sua senha"
-          value={senha}
-          label="Senha:"
-          onChange={(e) => [setSenha(e.target.value), setError("")]}
-        />
-        <C.labelError>{error}</C.labelError>
-        <div>*Utilizar as mesmas credenciais do SIGAA</div>
-        <Button Text="Entrar" onClick={handleLogin} />
-      </C.Content>
-    </C.Container>
-  );
+return (
+  <C.Container>
+    <C.Label>ENTRAR NO SISTEMA</C.Label>
+    <C.Content>
+      <Input
+        type="text"
+        placeholder="Digite seu CPF"
+        value={cpf}
+        label="Usuário:"
+        onChange={(e) => [setCpf(e.target.value), setError("")]}
+      />
+      <Input
+        type="password"
+        placeholder="Digite sua senha"
+        value={senha}
+        label="Senha:"
+        onChange={(e) => [setSenha(e.target.value), setError("")]}
+      />
+      <C.labelError>{error}</C.labelError>
+      <div>*Utilizar as mesmas credenciais do SIGAA</div>
+      <Button Text="Entrar" onClick={handleLogin} />
+    </C.Content>
+  </C.Container>
+);
 };
 
 export default Signin;

@@ -66,6 +66,40 @@ def get_produtos():
     return jsonify(produtos)
 
 
+@produto_bp.route("/auth/signin", methods=["POST"])
+def signin():
+  data = request.get_json()
+  cpf = data.get("cpf")
+  senha = data.get("senha")
+
+  if not cpf or not senha:
+      return jsonify({"error": "CPF e senha são obrigatórios"}), 400
+
+  try:
+      conn = get_connection()
+      cursor = conn.cursor()
+
+      # Consultar o usuário pelo CPF e senha
+      cursor.execute("SELECT token FROM usuario WHERE cpf = %s AND senha = %s", (cpf, senha))
+      result = cursor.fetchone()
+
+      if not result:
+          return jsonify({"error": "Usuário não cadastrado ou senha incorreta"}), 401
+
+      token = result[0]
+
+      # Retornar o token do usuário
+      return jsonify({"token": token}), 200
+
+  except Exception as e:
+      print(f"Erro ao autenticar usuário: {e}")
+      return jsonify({"error": "Erro interno no servidor"}), 500
+
+  finally:
+      cursor.close()
+      conn.close()
+
+
 # Rota para obter um produto e quais são os seus repectivos orgaos de controle
 @produto_bp.route("/obterProdutoPorId/<int:codProduto>", methods=["GET"])
 def obter_produto(codProduto):
@@ -121,36 +155,52 @@ def obter_produto(codProduto):
     return jsonify(produto_dict)
 
 # Rota para obter os Locais de Estocagem que o Usuario é o responsavel
-@produto_bp.route("/obterLocaisEstoque/<int:codSiape>", methods=["GET"])
-def obter_Locais_Estoque(codSiape):
-    conn = get_connection()
-    cursor = conn.cursor()
+@produto_bp.route("/obterLocaisEstoque/<string:token>", methods=["GET"])
+def obter_locais_estoque(token):
+ conn = get_connection()
+ cursor = conn.cursor()
 
-    print(codSiape)
-    try:
-        cursor.execute("""
-            SELECT codCampus, 
-                   codUnidade,
-                   codPredio,
-                   codLaboratorio,
-                   nomLocal 
-              FROM LocalEstocagem        
-             WHERE codSiapeResponsavel = %s 
-             ORDER BY nomLocal           
-        """, (codSiape,))
-        locais = cursor.fetchall()
-        cursor.close()
-        conn.close()
+ try:
+     cursor.execute("""
+         SELECT L.codCampus, 
+                L.codUnidade,
+                L.codPredio,
+                L.codLaboratorio,
+                L.nomLocal
+           FROM LocalEstocagem L
+           JOIN UsuarioLocalEstocagem UL
+             ON L.codCampus = UL.codCampus
+            AND L.codUnidade = UL.codUnidade
+            AND L.codPredio = UL.codPredio
+            AND L.codLaboratorio = UL.codLaboratorio
+          WHERE UL.token = %s
+          ORDER BY L.nomLocal
+     """, (token,))
+     
+     locais = cursor.fetchall()
 
-        if locais:
-            return jsonify(locais)
-        return jsonify({"message": "Usuário não é responsável por nenhum Local de Estogem de Produtos Químicos Controlados"}), 404
+     if locais:
+         locais_dict = [
+             {
+                 "codCampus": local[0],
+                 "codUnidade": local[1],
+                 "codPredio": local[2],
+                 "codLaboratorio": local[3],
+                 "nomLocal": local[4]
+             }
+             for local in locais
+         ]
+         return jsonify(locais_dict), 200
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
+     return jsonify({"message": "Usuário não é responsável por nenhum Local de Estocagem de Produtos Químicos Controlados"}), 404
+
+ except Exception as e:
+     print(f"Erro ao buscar locais de estoque: {e}")
+     return jsonify({"error": str(e)}), 500
+
+ finally:
+     cursor.close()
+     conn.close()
 
 
 @produto_bp.route("/obterProdutosPorLaboratorio/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
