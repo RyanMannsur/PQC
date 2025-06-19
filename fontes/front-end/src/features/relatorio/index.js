@@ -53,7 +53,6 @@ return (
                   <C.SublistTd>{movto.idtTipoMovto}</C.SublistTd>
                   <C.SublistTd>{formatarData(movto.datMovto)}</C.SublistTd>
                   <C.SublistTd>{movto.qtdEstoque}</C.SublistTd>
-                  <C.SublistTd>{movto.txtJustificativa || "-"}</C.SublistTd>
                   <C.SublistTd>{movto.nomLocal}</C.SublistTd>
                 </C.ItemRow>
               ))}
