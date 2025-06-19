@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS usuario;
+
+CREATE TABLE usuario (
+ id SERIAL PRIMARY KEY,
+ cpf VARCHAR(14) NOT NULL UNIQUE, 
+ senha TEXT NOT NULL,             
+ token TEXT NOT NULL DEFAULT gen_random_uuid(),
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+);
