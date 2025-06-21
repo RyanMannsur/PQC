@@ -13,6 +13,7 @@ import PublicoLayout from "../layout/publico";
 import Traferencia from "../pages/Transferencia";
 import Implantacao from "../pages/implantacao";
 import Relatorio from "../pages/relatorio";
+import QrCodeTest from "../pages/qrcodeTest";
 
 const RoutesApp = () => {
   return (
@@ -118,6 +119,19 @@ const RoutesApp = () => {
             </PrivateRoute>
           }
         />
+
+        <Route
+          path="/qrcode/test"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <QrCodeTest />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+
       </Routes>
       
     </Router>
