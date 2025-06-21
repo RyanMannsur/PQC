@@ -1,15 +1,24 @@
-import React from "react";
-import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Typography, IconButton, useMediaQuery } from "@mui/material";
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/auth";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 
 const Header = ({ children, withSidebar, showSignoutIcon = true, labName, usuario, onSignout }) => {
 const navigate = useNavigate();
+const { signout } = useContext(AuthContext); 
+
+const isSmallScreen = useMediaQuery("(max-width: 980px)");
+
+const sidebarWidth = withSidebar ? (isSmallScreen ? 80 : 240) : 0;
 
 const handleSignout = () => {
   if (onSignout) {
-    onSignout(); 
+    signout(); 
+    onSignout();
+  } else if (signout) {
+    signout(); 
   }
   navigate("/");
 };
@@ -50,6 +59,7 @@ return (
         </div>
       </Toolbar>
     </AppBar>
+
     <div
       style={{
         display: "flex",
@@ -60,11 +70,13 @@ return (
       }}
     >
       {withSidebar && <Sidebar />}
+
       <div
         style={{
           flex: 1,
           overflow: "auto",
-          paddingLeft: withSidebar ? 240 : 0,
+          paddingLeft: sidebarWidth,
+          transition: "padding-left 0.3s",
         }}
       >
         {children}
