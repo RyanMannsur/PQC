@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as C from "./styles";
 import { formatarData } from "../../helpers/dataHelper";
+import { tipoMovtoMap } from "../../services/produto/types";
 
 const RelatorioProdutos = ({ data }) => {
 const [produtosVisiveis, setProdutosVisiveis] = useState({}); 
@@ -43,17 +44,15 @@ return (
                 <C.SublistTh>Tipo de Movimentação</C.SublistTh>
                 <C.SublistTh>Data</C.SublistTh>
                 <C.SublistTh>Quantidade</C.SublistTh>
-                <C.SublistTh>Justificativa</C.SublistTh>
                 <C.SublistTh>Laboratório</C.SublistTh>
               </C.SublistHeader>
 
               {produto.movimentacoes.map((movto, index) => (
                 <C.ItemRow key={`${produto.produto.codProduto}-${index}`}>
                   <C.SublistTd>{movto.seqItem}</C.SublistTd>
-                  <C.SublistTd>{movto.idtTipoMovto}</C.SublistTd>
+                  <C.SublistTd>{tipoMovtoMap[movto.idtTipoMovto]}</C.SublistTd>
                   <C.SublistTd>{formatarData(movto.datMovto)}</C.SublistTd>
                   <C.SublistTd>{movto.qtdEstoque}</C.SublistTd>
-                  <C.SublistTd>{movto.txtJustificativa || "-"}</C.SublistTd>
                   <C.SublistTd>{movto.nomLocal}</C.SublistTd>
                 </C.ItemRow>
               ))}
