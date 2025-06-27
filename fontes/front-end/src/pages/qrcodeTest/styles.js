@@ -22,10 +22,11 @@ p {
 
 export const FiltersContainer = styled.div`
 display: flex;
-align-items: flex-end;
+align-items: center;
 gap: 15px; 
 margin-bottom: 20px;
 justify-content: space-around;
+flex-direction: column;
 
 @media (max-width: 768px) {
   flex-direction: column;

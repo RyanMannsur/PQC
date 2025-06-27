@@ -3,12 +3,11 @@ import * as C from "./styles";
 import RelatorioProdutos from "../../features/relatorio";
 import { obterRelatorioProdutos } from "../../services/produto/service";
 
-
-
 const QrCodeTest = () => {
 
   const QRCode = require('qrcode')
-
+  let Code = "";
+  
   // Creating the data
   let data = {
     name: "Employee Name",
@@ -36,6 +35,7 @@ const QrCodeTest = () => {
 
     // Printing the code
     console.log(code)
+    Code = code
   })
 
 
@@ -43,11 +43,15 @@ const QrCodeTest = () => {
     <C.Container>
       <h1>QrCode Test</h1>
       <C.FiltersContainer>
-
+              <img src={Code} alt="Base64"/>
+              <br></br>
+              <input type="text "></input>
+              <br></br>
+              <button>GenerateQrCode</button>
+              <button>ReadQRCode</button>
       </C.FiltersContainer>
     </C.Container>
   );
 };
-
 
 export default QrCodeTest;
