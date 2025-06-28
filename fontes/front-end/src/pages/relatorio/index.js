@@ -14,7 +14,12 @@ const Relatorio = () => {
    setLoading(true);
    try {
      const relatorioResponse = await obterRelatorioProdutos(dataInicio, dataFim); 
-     setProdutos(relatorioResponse);
+     const produtosFiltrados = relatorioResponse.map((produto) => ({
+        ...produto, movimentacoes: produto.movimentacoes.filter(
+            (movto) => movto.idtTipoMovto !== "IN"
+          ),
+      }));
+     setProdutos(produtosFiltrados);
      setErro("");
    } catch (error) {
      console.error("Erro ao carregar o relatório:", error);
