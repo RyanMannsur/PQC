@@ -1,53 +1,54 @@
 import { useState } from "react";
 import * as C from "./styles";
-import RelatorioProdutos from "../../features/relatorio";
-import { obterRelatorioProdutos } from "../../services/produto/service";
+import { Update } from "@mui/icons-material";
 
 const QrCodeTest = () => {
 
   const QRCode = require('qrcode')
-  let Code = "";
-  
-  // Creating the data
-  let data = {
-    name: "Employee Name",
-    age: 27,
-    department: "Police",
-    id: "aisuoiqu3234738jdhf100223"
+  const [code, setQrcodeImage] = useState(0);
+  const [inputValue, setInputValue] = useState('')
+
+  function PrintQRCodeTerminal(stringdata){      
+    // Print the QR code to terminal
+    QRCode.toString(stringdata, { type: 'terminal' },
+      function (err, QRcode) {
+        if (err) return console.log("error occurred")
+        // Printing the generated code
+        console.log(QRcode)
+    })
   }
 
-  // Converting the data into String format
-  let stringdata = JSON.stringify(data)
-
-  // Print the QR code to terminal
-  QRCode.toString(stringdata, { type: 'terminal' },
-    function (err, QRcode) {
-
-      if (err) return console.log("error occurred")
-
-      // Printing the generated code
-      console.log(QRcode)
-    })
-
   // Converting the data into base64 
-  QRCode.toDataURL(stringdata, function (err, code) {
-    if (err) return console.log("error occurred")
+  function GenerateQRCodeImage(stringdata){
+      QRCode.toDataURL(stringdata,{ errorCorrectionLevel: 'H' },function (err, newCode) {
+      if (err) return console.log("error occurred")
+      // Printing the code
+      setQrcodeImage(newCode)
+    })
+  }
 
-    // Printing the code
-    console.log(code)
-    Code = code
-  })
-
-
+  function updateQrcode(){
+    console.log(inputValue);
+    // Converting the data into String format
+    let stringdata = JSON.stringify(inputValue)
+    GenerateQRCodeImage(stringdata)
+    
+    //PrintQRCodeTerminal(data)
+  }
   return (
     <C.Container>
       <h1>QrCode Test</h1>
       <C.FiltersContainer>
-              <img src={Code} alt="Base64"/>
+              <img src={code} alt="QrCode"/>
               <br></br>
-              <input type="text "></input>
+              <input 
+                  type="text" value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+              ></input>
               <br></br>
-              <button>GenerateQrCode</button>
+              <button
+                onClick={updateQrcode}
+              >Generate QrCode</button>
               <button>ReadQRCode</button>
       </C.FiltersContainer>
     </C.Container>
