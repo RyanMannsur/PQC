@@ -26,10 +26,13 @@ tr:hover {
 }
 `;
 
+
 export const Button = styled.button`
-background-color: #007bff;
+  display: block; 
+  margin-left: auto;
+  margin-right: auto;
   color: white;
-  padding: 8px 12px;
+  padding: 8px 8px;
   border: none;
   border-radius: 5px;
   cursor: pointer;

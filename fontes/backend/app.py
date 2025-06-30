@@ -1,9 +1,18 @@
 from flask import Flask
 from flask_cors import CORS
 from routes.produto_routes import produto_bp
+from Param import Param
+
+# buscando parametro em app.ini
+cfg = Param()
 
 app = Flask(__name__)
 CORS(app)
+
+app.config["DEBUG_MODE"] = cfg.getDebug()
+portaBackend = cfg.getPortaBackend()
+portaFrontend = cfg.getPortaFrontend()
+
 
 # Registrando as rotas
 app.register_blueprint(produto_bp, url_prefix="/api")

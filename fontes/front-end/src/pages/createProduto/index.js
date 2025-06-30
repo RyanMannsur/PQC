@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
 import Select from "../../components/InputSelect"; 
-import { obterProdutosImplantadosPorLaboratorio, cadastrarProdutos } from "../../services/produto/service"; 
+import { obterProdutosNaoImplantadosPorLocal, cadastrarProdutos, obterNomeLocalEstocagem } from "../../services/produto/service"; 
 import { useLocal } from "../../contexts/local";
-import { getEstoqueLocalEstocagem } from "../../services/laboratorio/service";
 import * as C from "./styles";
 
 const CreateProdutos = () => {
@@ -23,15 +22,15 @@ useEffect(() => {
     if (labId) {
       const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
       try {
-        const labDetails = await getEstoqueLocalEstocagem(
+        const labDetails = await obterNomeLocalEstocagem(
           codCampus,
           codUnidade,
           codPredio,
           codLaboratorio
         );
-        setLabName(labDetails.nomLocal);
+        setLabName(labDetails[0].nomLocal);
 
-        const produtosResponse = await obterProdutosImplantadosPorLaboratorio(
+        const produtosResponse = await obterProdutosNaoImplantadosPorLocal(
           codCampus,
           codUnidade,
           codPredio,

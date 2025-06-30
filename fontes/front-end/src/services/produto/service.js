@@ -1,11 +1,4 @@
-import axios from "axios";
-import { API_URL } from "../../config/config";
-
-const api = axios.create({
-  baseURL: API_URL,
-});
-
-export default api;
+import api from '../api'
 
 export const obterProdutosPorLaboratorio = async (
   codCampus,
@@ -99,7 +92,7 @@ export const buscarProdutos = async (
   codUnidade,
   codPredio,
   codLaboratorio,
-  nomeProduto,
+  nomProduto,
   pureza,
   densidade
 ) => {
@@ -110,7 +103,7 @@ export const buscarProdutos = async (
         codUnidade,
         codPredio,
         codLaboratorio,
-        nomeProduto,
+        nomProduto,
         pureza,
         densidade,
       },
@@ -138,6 +131,16 @@ export const obterProdutos = async () => {
     return response.data;
   } catch (error) {
     console.error("Erro ao obter produtos:", error);
+    return [];
+  }
+};
+
+export const obterNomeLocalEstocagem = async () => {
+  try {
+    const response = await api.get("/obterNomeLocalEstocagem");
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar nome do local de estocagem:", error);
     return [];
   }
 };
@@ -189,8 +192,10 @@ export const obterProdutoPeloCodigo = async (codProduto) => {
   }
 };
 
+
 export const implantarItensLaboratorio = async (dadosLaboratorio) => {
   try {
+    console.log(dadosLaboratorio)
     const response = await api.post("/implantarItensLaboratorio", dadosLaboratorio);
     return response.data;
   } catch (error) {
@@ -209,11 +214,19 @@ export const implantarItensLaboratorio = async (dadosLaboratorio) => {
     }
     };
 
-    export const obterProdutosImplantadosPorLaboratorio = async (codCampus, codUnidade, codPredio, codLaboratorio) => {
+    export const produto = async (dadosCadastro) => {
+    try {
+      const response = await api.post("/Produto", dadosCadastro);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao cadastrar produtos:", error);
+      throw error;
+    }
+    };
+
+    export const obterProdutosNaoImplantadosPorLocal = async (codCampus, codUnidade, codPredio, codLaboratorio) => {
       try {
-        const response = await api.get("/produtosImplantadosPorLaboratorio", {
-          params: { codCampus, codUnidade, codPredio, codLaboratorio },
-        });
+        const response = await api.get(`/obterProdutosNaoImplantadosPorLocal/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`);
         return response.data; 
       } catch (error) {
         console.error("Erro ao buscar produtos por laboratório:", error);
@@ -234,4 +247,58 @@ try {
   console.error("Erro ao obter relatório de produtos:", error);
   throw error; 
 }
+}
+
+export const getConsultaPQC = async (codSiape) => {
+  try {
+    const response = await api.get(`/consultaPQC/${codSiape}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar inventário:", error);
+    throw error;
+  }
 };
+
+const produtoService = {
+  listar: async () => {
+    try {
+      const response = await api.get('/produtos');
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao listar produtos:", error);
+      throw error;
+    }
+  },
+
+  cadastrar: async (produto) => {
+    try {
+      const response = await api.post('/produtos', produto);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao cadastrar produto:", error);
+      throw error;
+    }
+  },
+
+  atualizar: async (produto) => {
+    try {
+      const response = await api.put(`/produtos/${produto.codProduto}`, produto);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao atualizar produto:", error);
+      throw error;
+    }
+  },
+
+  excluir: async (codProduto) => {
+    try {
+      const response = await api.delete(`/produtos/${codProduto}`);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao excluir produto:", error);
+      throw error;
+    }
+  }
+};
+
+export default produtoService;

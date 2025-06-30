@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
-import { obterProdutos, implantarItensLaboratorio } from "../../services/produto/service";
+import { obterProdutosNaoImplantadosPorLocal, implantarItensLaboratorio, obterNomeLocalEstocagem } from "../../services/produto/service";
 import { useLocal } from "../../contexts/local";
-import { getEstoqueLocalEstocagem } from "../../services/laboratorio/service";
 import * as C from "./styles";
 
 const Implantacao = () => {
@@ -18,16 +17,17 @@ const navigate = useNavigate();
 
 useEffect(() => {
   const fetchLabDetails = async () => {
+    console.log("LabId carregado:", labId);
     if (labId) {
       const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
       try {
-        const labDetails = await getEstoqueLocalEstocagem(
+        const labDetails = await obterNomeLocalEstocagem(
           codCampus,
           codUnidade,
           codPredio,
           codLaboratorio
         );
-        setLabName(labDetails.nomLocal);
+        setLabName(labDetails[0].nomLocal);
       } catch (error) {
         console.error("Erro ao buscar detalhes do laboratório:", error);
       }
@@ -35,8 +35,9 @@ useEffect(() => {
   };
 
   const fetchProdutos = async () => {
+    const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
     try {
-      const produtosResponse = await obterProdutos();
+      const produtosResponse = await obterProdutosNaoImplantadosPorLocal(codCampus, codUnidade, codPredio, codLaboratorio,);
       setProdutos(produtosResponse);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
@@ -69,9 +70,10 @@ const handleConfirm = async () => {
     produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
       codProduto: parseInt(codProduto),
       items: items.map((item) => ({
-        qtd: parseFloat(item.qtd),
-        datavalidade: item.validade,
-        embalagem: item.embalagem || "A",
+        codEmbalagem: item.codEmbalagem,
+        qtdEstoque: parseFloat(item.qtdEstoque),
+        datValidade: item.datValidade,
+        txtJustificativa: item.txtJustificativa,
       })),
     })),
   };

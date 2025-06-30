@@ -1,11 +1,4 @@
-import axios from "axios";
-import { API_URL } from "../../config/config";
-
-const api = axios.create({
-  baseURL: API_URL,
-});
-
-export default api;
+import api from '../api'
 
 export const getLabs = async () => {
   try {
@@ -31,7 +24,7 @@ export const setLabId = (lab) => {
   localStorage.setItem("labId", JSON.stringify(labId));
 };
 
-export const getEstoqueLocalEstocagem = async (
+export const getProdutosImplantar = async (
   codCampus,
   codUnidade,
   codPredio,
@@ -39,7 +32,7 @@ export const getEstoqueLocalEstocagem = async (
 ) => {
   try {
     const response = await api.get(
-      `/obterLocalEstocagemPorId/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
+      `/obterProdutosNaoImplantadosNoLocal${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
     );
     return response.data;
   } catch (error) {
@@ -57,3 +50,7 @@ export const obterTodosLaboratorios = async () => {
     return [];
   }
 };
+
+
+
+

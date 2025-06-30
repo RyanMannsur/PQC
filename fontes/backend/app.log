@@ -1,0 +1,108 @@
+2025-06-29 17:28:00,429 - INFO - 127.0.0.1 - - [29/Jun/2025 17:28:00] "GET /api/produtos HTTP/1.1" 200 -
+2025-06-29 17:36:10,328 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\cwp.py', reloading
+2025-06-29 17:36:10,392 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\Scripts\\spyder-script.py', reloading
+2025-06-29 20:04:38,701 - INFO - 127.0.0.1 - - [29/Jun/2025 20:04:38] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:04:38,748 - INFO - 127.0.0.1 - - [29/Jun/2025 20:04:38] "GET /api/produtos HTTP/1.1" 200 -
+2025-06-29 20:04:38,971 - INFO - 127.0.0.1 - - [29/Jun/2025 20:04:38] "GET /api/produtos HTTP/1.1" 200 -
+2025-06-29 20:04:49,361 - INFO - 127.0.0.1 - - [29/Jun/2025 20:04:49] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:05:49,094 - INFO - 127.0.0.1 - - [29/Jun/2025 20:05:49] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-06-29 20:05:53,352 - INFO - 127.0.0.1 - - [29/Jun/2025 20:05:53] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-06-29 20:05:53,634 - INFO - 127.0.0.1 - - [29/Jun/2025 20:05:53] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 20:05:53,637 - INFO - 127.0.0.1 - - [29/Jun/2025 20:05:53] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:08:53,036 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
+2025-06-29 20:08:53,037 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
+2025-06-29 20:17:15,250 - INFO - 127.0.0.1 - - [29/Jun/2025 20:17:15] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 20:21:20,918 - INFO - 127.0.0.1 - - [29/Jun/2025 20:21:20] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 20:22:36,131 - INFO - 127.0.0.1 - - [29/Jun/2025 20:22:36] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 20:23:48,385 - INFO - 127.0.0.1 - - [29/Jun/2025 20:23:48] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1" 200 -
+2025-06-29 20:24:02,302 - INFO - 127.0.0.1 - - [29/Jun/2025 20:24:02] "[31m[1mGET /api/obterProdutosNaoImplantadosPorLocal HTTP/1.1[0m" 415 -
+2025-06-29 20:24:02,612 - INFO - 127.0.0.1 - - [29/Jun/2025 20:24:02] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:29:57,621 - INFO - 127.0.0.1 - - [29/Jun/2025 20:29:57] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:29:57,621 - INFO - 127.0.0.1 - - [29/Jun/2025 20:29:57] "[33mGET /api/obterProdutosNaoImplantadosPorLocal/undefined/undefined/undefined/undefined HTTP/1.1[0m" 404 -
+2025-06-29 20:32:24,610 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
+2025-06-29 20:32:24,625 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
+2025-06-29 20:32:42,507 - INFO - 127.0.0.1 - - [29/Jun/2025 20:32:42] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 20:32:43,507 - INFO - 127.0.0.1 - - [29/Jun/2025 20:32:43] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:32:43,883 - INFO - 127.0.0.1 - - [29/Jun/2025 20:32:43] "GET /api/obterProdutosNaoImplantadosPorLocal/undefined/undefined/undefined/undefined HTTP/1.1" 200 -
+2025-06-29 20:33:41,836 - INFO - 127.0.0.1 - - [29/Jun/2025 20:33:41] "OPTIONS /api/implantarItensLaboratorio HTTP/1.1" 200 -
+2025-06-29 20:33:42,161 - INFO - 127.0.0.1 - - [29/Jun/2025 20:33:42] "[35m[1mPOST /api/implantarItensLaboratorio HTTP/1.1[0m" 500 -
+2025-06-29 20:37:16,201 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\Lib\\datetime.py', reloading
+2025-06-29 20:37:16,203 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\Lib\\_pydatetime.py', reloading
+2025-06-29 20:40:29,806 - INFO - 127.0.0.1 - - [29/Jun/2025 20:40:29] "[35m[1mPOST /api/implantarItensLaboratorio HTTP/1.1[0m" 500 -
+2025-06-29 20:43:42,959 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
+2025-06-29 20:43:42,962 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
+2025-06-29 20:43:57,635 - INFO - 127.0.0.1 - - [29/Jun/2025 20:43:57] "POST /api/implantarItensLaboratorio HTTP/1.1" 200 -
+2025-06-29 20:44:00,297 - INFO - 127.0.0.1 - - [29/Jun/2025 20:44:00] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:44:04,931 - INFO - 127.0.0.1 - - [29/Jun/2025 20:44:04] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:44:04,988 - INFO - 127.0.0.1 - - [29/Jun/2025 20:44:04] "GET /api/obterProdutosNaoImplantadosPorLocal/undefined/undefined/undefined/undefined HTTP/1.1" 200 -
+2025-06-29 20:45:46,368 - INFO - 127.0.0.1 - - [29/Jun/2025 20:45:46] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:45:46,373 - INFO - 127.0.0.1 - - [29/Jun/2025 20:45:46] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 20:45:46,440 - INFO - 127.0.0.1 - - [29/Jun/2025 20:45:46] "GET /api/obterProdutosNaoImplantadosPorLocal/undefined/undefined/undefined/undefined HTTP/1.1" 200 -
+2025-06-29 20:45:48,971 - INFO - 127.0.0.1 - - [29/Jun/2025 20:45:48] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1" 200 -
+2025-06-29 20:45:58,170 - INFO - 127.0.0.1 - - [29/Jun/2025 20:45:58] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:45:58,233 - INFO - 127.0.0.1 - - [29/Jun/2025 20:45:58] "GET /api/obterProdutosNaoImplantadosPorLocal/undefined/undefined/undefined/undefined HTTP/1.1" 200 -
+2025-06-29 20:52:54,811 - INFO - 127.0.0.1 - - [29/Jun/2025 20:52:54] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:52:54,864 - INFO - 127.0.0.1 - - [29/Jun/2025 20:52:54] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 20:52:57,813 - INFO - 127.0.0.1 - - [29/Jun/2025 20:52:57] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:52:58,124 - INFO - 127.0.0.1 - - [29/Jun/2025 20:52:58] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 20:52:58,173 - INFO - 127.0.0.1 - - [29/Jun/2025 20:52:58] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 20:53:19,576 - INFO - 127.0.0.1 - - [29/Jun/2025 20:53:19] "OPTIONS /api/implantarItensLaboratorio HTTP/1.1" 200 -
+2025-06-29 20:53:19,894 - INFO - 127.0.0.1 - - [29/Jun/2025 20:53:19] "POST /api/implantarItensLaboratorio HTTP/1.1" 200 -
+2025-06-29 20:53:21,367 - INFO - 127.0.0.1 - - [29/Jun/2025 20:53:21] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:53:25,773 - INFO - 127.0.0.1 - - [29/Jun/2025 20:53:25] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 20:53:25,815 - INFO - 127.0.0.1 - - [29/Jun/2025 20:53:25] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 20:53:32,988 - INFO - 127.0.0.1 - - [29/Jun/2025 20:53:32] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 21:20:24,261 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\valida.py', reloading
+2025-06-29 21:20:24,266 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\util.py', reloading
+2025-06-29 21:20:24,267 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\txtGenerator.py', reloading
+2025-06-29 21:20:24,268 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\Param.py', reloading
+2025-06-29 21:20:24,270 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\Json\\LoadBD.py', reloading
+2025-06-29 21:20:24,289 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\config.py', reloading
+2025-06-29 21:50:41,630 - INFO - 127.0.0.1 - - [29/Jun/2025 21:50:41] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 21:50:41,694 - INFO - 127.0.0.1 - - [29/Jun/2025 21:50:41] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 21:51:11,488 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
+2025-06-29 21:51:11,488 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\db.py', reloading
+2025-06-29 21:51:11,488 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\app.py', reloading
+2025-06-29 21:52:49,131 - INFO - 127.0.0.1 - - [29/Jun/2025 21:52:49] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 21:55:13,542 - INFO - 127.0.0.1 - - [29/Jun/2025 21:55:13] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 21:55:13,617 - INFO - 127.0.0.1 - - [29/Jun/2025 21:55:13] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 21:55:23,275 - INFO - 127.0.0.1 - - [29/Jun/2025 21:55:23] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 21:57:15,511 - INFO - 127.0.0.1 - - [29/Jun/2025 21:57:15] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 21:57:15,567 - INFO - 127.0.0.1 - - [29/Jun/2025 21:57:15] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 21:57:21,039 - INFO - 127.0.0.1 - - [29/Jun/2025 21:57:21] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 21:58:24,792 - INFO - 127.0.0.1 - - [29/Jun/2025 21:58:24] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 21:58:24,844 - INFO - 127.0.0.1 - - [29/Jun/2025 21:58:24] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:01:51,396 - INFO - 127.0.0.1 - - [29/Jun/2025 22:01:51] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:01:57,034 - INFO - 127.0.0.1 - - [29/Jun/2025 22:01:57] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:01:59,325 - INFO - 127.0.0.1 - - [29/Jun/2025 22:01:59] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:02:25,096 - INFO - 127.0.0.1 - - [29/Jun/2025 22:02:25] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:02:25,243 - INFO - 127.0.0.1 - - [29/Jun/2025 22:02:25] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:02:36,416 - INFO - 127.0.0.1 - - [29/Jun/2025 22:02:36] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:02:36,470 - INFO - 127.0.0.1 - - [29/Jun/2025 22:02:36] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:03:31,919 - INFO - 127.0.0.1 - - [29/Jun/2025 22:03:31] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:03:32,186 - INFO - 127.0.0.1 - - [29/Jun/2025 22:03:32] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:04:12,438 - INFO - 127.0.0.1 - - [29/Jun/2025 22:04:12] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:04:12,500 - INFO - 127.0.0.1 - - [29/Jun/2025 22:04:12] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:04:16,546 - INFO - 127.0.0.1 - - [29/Jun/2025 22:04:16] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:04:20,478 - INFO - 127.0.0.1 - - [29/Jun/2025 22:04:20] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:04:20,559 - INFO - 127.0.0.1 - - [29/Jun/2025 22:04:20] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:11:36,069 - INFO - 127.0.0.1 - - [29/Jun/2025 22:11:36] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:11:36,131 - INFO - 127.0.0.1 - - [29/Jun/2025 22:11:36] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:13:58,723 - INFO - 127.0.0.1 - - [29/Jun/2025 22:13:58] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:13:59,812 - INFO - 127.0.0.1 - - [29/Jun/2025 22:13:59] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-29 22:14:01,024 - INFO - 127.0.0.1 - - [29/Jun/2025 22:14:01] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 22:14:01,070 - INFO - 127.0.0.1 - - [29/Jun/2025 22:14:01] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 22:14:02,495 - INFO - 127.0.0.1 - - [29/Jun/2025 22:14:02] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 22:14:02,803 - INFO - 127.0.0.1 - - [29/Jun/2025 22:14:02] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:14:02,962 - INFO - 127.0.0.1 - - [29/Jun/2025 22:14:02] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 22:27:56,561 - INFO - 127.0.0.1 - - [29/Jun/2025 22:27:56] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:27:56,614 - INFO - 127.0.0.1 - - [29/Jun/2025 22:27:56] "GET /api/produtos HTTP/1.1" 200 -
+2025-06-29 22:33:30,220 - INFO - 127.0.0.1 - - [29/Jun/2025 22:33:30] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-29 22:33:30,223 - INFO - 127.0.0.1 - - [29/Jun/2025 22:33:30] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:33:30,281 - INFO - 127.0.0.1 - - [29/Jun/2025 22:33:30] "GET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-06-29 22:33:33,567 - INFO - 127.0.0.1 - - [29/Jun/2025 22:33:33] "GET /api/produtos HTTP/1.1" 200 -
+2025-06-29 22:38:45,630 - INFO - 127.0.0.1 - - [29/Jun/2025 22:38:45] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-29 22:38:45,693 - INFO - 127.0.0.1 - - [29/Jun/2025 22:38:45] "GET /api/produtos HTTP/1.1" 200 -
+2025-06-29 22:39:52,398 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\Json\\LoadBD.py', reloading
+2025-06-29 22:39:52,411 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\config.py', reloading
+2025-06-29 22:39:52,411 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\txtGenerator.py', reloading

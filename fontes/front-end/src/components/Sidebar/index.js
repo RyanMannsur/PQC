@@ -86,6 +86,19 @@ return (
         <ListItemText primary="Relatório" />
       </ListItem>
 
+      <ListItem button component={Link} to="/produto">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Cadastrar Produto" />
+      </ListItem>
+      
+      <ListItem button component={Link} to="/consultaPQC">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Consulta PQC" />
+      </ListItem>
     </List>
   </Drawer>
 );

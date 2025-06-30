@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as C from "./styles";
 import { useLocal } from "../../contexts/local";
-import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
+import { obterEstoqueLocalEstocagem, obterNomeLocalEstocagem } from "../../services/produto/service";
 import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
-import { getEstoqueLocalEstocagem } from "../../services/laboratorio/service";
 
 
 const Home = () => {
@@ -17,25 +16,18 @@ useEffect(() => {
   const fetchLabDetails = async () => {
     const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
 
-
-    const lab = await getEstoqueLocalEstocagem(
-      codCampus,
-      codUnidade,
-      codPredio,
-      codLaboratorio
-    );
-    setLabDetails(lab);
-
     try {
+      const lab = await obterNomeLocalEstocagem(
+        codCampus, codUnidade, codPredio, codLaboratorio
+      );
+      setLabDetails(lab[0].nomLocal);
+
       const produtos = await obterEstoqueLocalEstocagem(
-        codCampus,
-        codUnidade,
-        codPredio,
-        codLaboratorio
+        codCampus, codUnidade, codPredio, codLaboratorio
       );
 
-      const produtosComQuantidade = produtos.filter(
-        (produto) => produto.qtdEstoque > 0
+      const produtosComQuantidade = produtos.filter(produto =>
+        Array.isArray(produto.item) && produto.item.some(i => i.qtdEstoque > 0)
       );
 
       if (produtosComQuantidade.length === 0) {

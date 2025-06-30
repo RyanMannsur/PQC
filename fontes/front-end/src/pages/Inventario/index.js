@@ -56,41 +56,35 @@ const Inventario = () => {
   }, [labId]);
 
   const agruparProdutos = (produtosResponse) => {
-    const agrupados = {};
+  const mapa = {};
 
-    produtosResponse
-      .filter((produto) => produto.qtdEstoque > 0) 
-      .forEach((produto) => {
-        const {
-          codProduto,
-          nomProduto,
-          perPureza,
-          vlrDensidade,
-          datValidade,
-          seqItem,
-          qtdEstoque,
-        } = produto;
+  produtosResponse.forEach((produto) => {
+    const { codProduto, nomProduto, perPureza, vlrDensidade, item } = produto;
+    if (!Array.isArray(item)) return; // garante que é um array
 
-        if (!agrupados[codProduto]) {
-          agrupados[codProduto] = {
-            codProduto,
-            nomProduto,
-            perPureza,
-            vlrDensidade,
-            itens: [],
-          };
-        }
+    if (!mapa[codProduto]) {
+      mapa[codProduto] = {
+        codProduto,
+        nomProduto,
+        perPureza,
+        vlrDensidade,
+        itens: [],
+      };
+    }
 
-        agrupados[codProduto].itens.push({
-          seqItem,
-          datValidade: formatarData(datValidade),
-          qtdAtual: qtdEstoque,
-          qtdNova: qtdEstoque, 
-        });
+    item.forEach(({ seqItem, datValidade, qtdEstoque }) => {
+      mapa[codProduto].itens.push({
+        seqItem,
+        datValidade: formatarData(datValidade),
+        qtdAtual: qtdEstoque,
+        qtdNova: qtdEstoque,
       });
+    });
+  });
 
-    return Object.values(agrupados);
-  };
+  return Object.values(mapa);
+};
+
 
   const handleQuantityChange = (codProduto, seqItem, newQuantity) => {
     setProdutos((prevProdutos) =>
@@ -123,7 +117,8 @@ const Inventario = () => {
         produto.itens.map((item) => ({
           codProduto: produto.codProduto,
           seqItem: item.seqItem,
-          qtdEstoque: parseFloat(item.qtdNova), 
+          qtdEstoque: parseFloat(item.qtdAtual),
+          qtdNova: parseFloat(item.qtdNova), 
         }))
       ),
     };

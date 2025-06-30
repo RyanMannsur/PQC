@@ -17,6 +17,9 @@ return (
     <thead>
       <tr>
         <C.Th>Produto</C.Th>
+        <C.Th>Lista</C.Th>
+        <C.Th>Pureza</C.Th>
+        <C.Th>Densidade</C.Th>
         <C.Th>Quantidade Geral Atual</C.Th>
         <C.Th>Ações</C.Th>
       </tr>
@@ -26,6 +29,9 @@ return (
         <React.Fragment key={produto.produto.codProduto}>
           <C.ProductRow>
             <C.Td>{produto.produto.nomProduto}</C.Td>
+            <C.Td>{produto.produto.nomLista}</C.Td>
+            <C.Td>{produto.produto.perPureza}</C.Td>
+            <C.Td>{produto.produto.vlrDensidade}</C.Td>
             <C.Td>{produto.qtdGeralAtual}</C.Td>
             <C.Td>
               <C.Button onClick={() => toggleMovimentacoes(produto.produto.codProduto)}>
