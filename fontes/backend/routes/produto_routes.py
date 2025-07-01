@@ -325,7 +325,7 @@ def consultarProdutos(codSiape):
               G.codLaboratorio,
               G.nomLocal,
               B.seqItem,
-              B.codEmbalagem,
+              B.seqEmbalagem,
               B.datValidade,
               desTipoMovto(C.idtTipoMovto) as desTipoMovto,
               C.datMovto,
@@ -368,7 +368,7 @@ def consultarProdutos(codSiape):
     for r in produtos:
         (codProduto, nomProduto, perPureza, vlrDensidade,
          codCampus, nomCampus, codUnidade, nomUnidade,
-         codLaboratorio, nomLocal, seqItem, codEmbalagem,
+         codLaboratorio, nomLocal, seqItem, seqEmbalagem,
          datValidade, desTipoMovto, datMovto, qtdEstoque) = r
         
         pr = produtos_map.setdefault(codProduto, {
@@ -398,7 +398,7 @@ def consultarProdutos(codSiape):
         item_map = local_map["items"].setdefault(seqItem, {
             "id": f"item-{codProduto}-{seqItem}",
             "seqItem": seqItem,
-            "nomEmbalagem": codEmbalagem,
+            "nomEmbalagem": seqEmbalagem,
             "datValidade": datValidade.strftime("%d-%m-%Y") if hasattr(datValidade, "strftime") else datValidade,
             "totalItem": 0,
             "movtos": []
@@ -1067,7 +1067,7 @@ def atualizar_estoque():
 
                     # Inserir no ProdutoItem
                 sql = """
-                        INSERT INTO ProdutoItem (codProduto,  idNFe, datValidade, codEmbalagem)
+                        INSERT INTO ProdutoItem (codProduto,  idNFe, datValidade, seqEmbalagem)
                         VALUES (%s, %s, %s, %s, %s)
                         ON CONFLICT (codProduto, seqItem) DO UPDATE
                         SET idNFe = EXCLUDED.idNFe,
@@ -1212,7 +1212,7 @@ def adicionar_produto(codProduto):
     datMovto = data.get('datMovto')
     qtdEstoque = data.get('qtdEstoque')
     idtTipoMovto = data.get('idtTipoMovto')
-    codEmbalagem = data.get('codEmbalagem')
+    seqEmbalagem = data.get('seqEmbalagem')
     datValidade = data.get('datValidade')
     txtJustificativa = data.get('txtJustificativa')
 
@@ -1224,18 +1224,18 @@ def adicionar_produto(codProduto):
     valida.datMovto(datMovto)
     #valida.qtdEstoque(datEstoque)
     valida.idtTipoMovto(idtTipoMovto)
-    valida.codEmbalagem(codEmbalagem)
+    valida.seqEmbalagem(seqEmbalagem)
     #valida.datuniMedida(uniMedida)
     if valida.temMensagem():
         return valida.getMensagens()
 
     sql = """  
         INSERT INTO ProdutoItem
-           (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+           (codProduto, seqItem, idNFe, datValidade, seqEmbalagem)
           VALUES
             (%s, %s, %s, %s, %s)
     """
-    params = (codProduto, seqItem, None, datValidade, codEmbalagem)
+    params = (codProduto, seqItem, None, datValidade, seqEmbalagem)
 
     
 
@@ -1263,10 +1263,10 @@ def adicionar_produto(codProduto):
 
         # Inserir no ProdutoItem
         cursor.execute(
-            INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+            INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, seqEmbalagem)
             VALUES (%s, %s, %s, %s, %s)
          
-        params = (codProduto,  None, data["datValidade"], data["codEmbalagem"]))
+        params = (codProduto,  None, data["datValidade"], data["seqEmbalagem"]))
         
 
         # Inserir no MovtoEstoque
@@ -1405,7 +1405,7 @@ def implantar_itens_laboratorio():
         return valida.getMensagens()
 
     sqlProduto = """
-        INSERT INTO ProdutoItem (codProduto, datValidade, codEmbalagem)
+        INSERT INTO ProdutoItem (codProduto, datValidade, seqEmbalagem)
         VALUES (%s, %s, %s)
         RETURNING codProduto, seqItem
     """
@@ -1432,14 +1432,14 @@ def implantar_itens_laboratorio():
         
         for item in produto.get("items", []):
             datValidade = item.get("datValidade")
-            codEmbalagem = item.get("codEmbalagem")
+            seqEmbalagem = item.get("seqdEmbalagem")
             qtdEstoque = item.get("qtdEstoque")
             txtJustificativa = item.get("txtJustificativa")
 
-            if qtdEstoque is None or datValidade is None or codEmbalagem is None:
+            if qtdEstoque is None or datValidade is None or seqEmbalagem is None:
                 continue
 
-            params = (codProduto, datValidade, codEmbalagem,)
+            params = (codProduto, datValidade, seqEmbalagem,)
             try:
                 if primeiro:
                     primeiro = False
@@ -1509,16 +1509,16 @@ def cadastrar_produtos():
          for item in items:
              qtd = item["qtd"]
              datValidade = item["validade"]
-             codEmbalagem = item["embalagem"]
+             seqEmbalagem = item["embalagem"]
 
              
              seqItem = ultimo_seq_item + 1
              ultimo_seq_item = seqItem
 
              cursor.execute("""
-                 INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+                 INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, seqEmbalagem)
                  VALUES (%s, %s, NULL, %s, %s)
-             """, (codProduto, seqItem, datValidade, codEmbalagem))
+             """, (codProduto, seqItem, datValidade, seqEmbalagem))
 
              cursor.execute("""
                  INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 

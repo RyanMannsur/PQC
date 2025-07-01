@@ -106,3 +106,21 @@
 2025-06-29 22:39:52,398 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\Json\\LoadBD.py', reloading
 2025-06-29 22:39:52,411 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\config.py', reloading
 2025-06-29 22:39:52,411 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\txtGenerator.py', reloading
+2025-06-30 09:19:50,570 - INFO - 127.0.0.1 - - [30/Jun/2025 09:19:50] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-06-30 09:19:53,673 - INFO - 127.0.0.1 - - [30/Jun/2025 09:19:53] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-06-30 09:19:53,960 - INFO - 127.0.0.1 - - [30/Jun/2025 09:19:53] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-30 09:19:53,960 - INFO - 127.0.0.1 - - [30/Jun/2025 09:19:53] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-30 09:19:59,354 - INFO - 127.0.0.1 - - [30/Jun/2025 09:19:59] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-30 09:20:33,946 - INFO - 127.0.0.1 - - [30/Jun/2025 09:20:33] "[31m[1mGET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=1&pureza=&densidade= HTTP/1.1[0m" 415 -
+2025-06-30 10:08:13,128 - INFO - 127.0.0.1 - - [30/Jun/2025 10:08:13] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-06-30 10:08:17,463 - INFO - 127.0.0.1 - - [30/Jun/2025 10:08:17] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-06-30 10:08:17,624 - INFO - 127.0.0.1 - - [30/Jun/2025 10:08:17] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-06-30 10:08:17,624 - INFO - 127.0.0.1 - - [30/Jun/2025 10:08:17] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-06-30 10:08:48,654 - INFO - 127.0.0.1 - - [30/Jun/2025 10:08:48] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-06-30 16:26:07,119 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\txtGenerator.py', reloading
+2025-07-01 11:19:06,718 - INFO - 127.0.0.1 - - [01/Jul/2025 11:19:06] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-01 11:19:13,558 - INFO - 127.0.0.1 - - [01/Jul/2025 11:19:13] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-01 11:19:13,845 - INFO - 127.0.0.1 - - [01/Jul/2025 11:19:13] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-07-01 11:19:13,845 - INFO - 127.0.0.1 - - [01/Jul/2025 11:19:13] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 11:19:16,324 - INFO - 127.0.0.1 - - [01/Jul/2025 11:19:16] "GET /api/consultaPQC/2418912 HTTP/1.1" 200 -
+2025-07-01 11:23:45,949 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\Scripts\\conda-script.py', reloading
