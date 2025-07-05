@@ -1,12 +1,95 @@
-# Projeto PQC
+# PQC - Sistema de Controle de Produtos Químicos
 
-Este é o repositório para o projeto PQC, que inclui um frontend construído com React e Material-UI, e um backend construído com Python e Flask. O banco de dados PostgreSQL é configurado e executado usando Docker.
+Sistema para controle e gerenciamento de produtos químicos do CEFET-MG.
+
+## 🚀 Como Configurar o Projeto
+
+### Pré-requisitos
+- **Docker** (recomendado) OU
+- **Node.js** (versão 18+) e **PostgreSQL** (para execução local)
 
 ---
 
-## Pré-requisitos
+## 🐳 Opção 1: Execução com Docker (RECOMENDADO)
 
-Certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
+### Para Windows:
+1. Clone o repositório
+2. Execute o script automatizado:
+   ```bash
+   start-docker.bat
+   ```
+
+### Para Linux/Mac ou comandos manuais:
+```bash
+# Construir e iniciar todos os serviços
+docker-compose up --build -d
+
+# Ver logs em tempo real
+docker-compose logs -f
+
+# Parar os serviços
+docker-compose down
+```
+
+### Acesso:
+- **Frontend**: http://localhost:3001
+- **Backend**: http://localhost:8088
+- **Banco de dados**: localhost:5432 (usuário: postgres, senha: postgres)
+
+---
+
+## 💻 Opção 2: Execução Local (Desenvolvimento)
+
+### 1. Configurar o Banco de Dados
+```sql
+-- No PostgreSQL, executar o arquivo PQC.sql
+psql -U postgres -d PQC -f PQC.sql
+```
+
+### 2. Backend (Python/Flask)
+```bash
+cd fontes/backend
+
+# Instalar dependências
+pip install -r requirements.txt
+
+# Executar
+python app.py
+```
+
+### 3. Frontend (React/Vite)
+```bash
+cd fontes/front-end
+
+# Instalar dependências
+npm install
+
+# Executar em modo desenvolvimento
+npm run dev
+
+# Build para produção
+npm run build
+```
+
+---
+
+## 🛠️ Comandos Úteis
+
+### Frontend (Vite)
+```bash
+npm run dev        # Servidor de desenvolvimento (porta 3001)
+npm run build      # Build para produção
+npm run preview    # Preview do build
+npm run test       # Executar testes
+```
+
+### Docker
+```bash
+docker-compose up -d          # Iniciar em background
+docker-compose logs backend   # Ver logs do backend
+docker-compose logs database  # Ver logs do banco
+docker-compose down -v        # Parar e limpar volumes
+```
 
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
@@ -76,3 +159,22 @@ http://localhost:3000
 ```bash
    docker volume rm pqc_postgres_data
 ```
+
+---
+
+## 👥 Para Novos Desenvolvedores
+
+### ⚡ Setup em 2 minutos:
+1. **Clone o projeto**
+2. **Execute**: `start-docker.bat` (Windows) ou `./start-docker.sh` (Linux/Mac)
+3. **Pronto!** Acesse http://localhost:3001
+
+### 📚 Documentação completa:
+- **[SETUP-DESENVOLVEDORES.md](SETUP-DESENVOLVEDORES.md)** - Guia completo de configuração
+- **[COMANDOS-UTEIS.md](COMANDOS-UTEIS.md)** - Todos os comandos que você vai precisar
+- **[DOCKER-README.md](DOCKER-README.md)** - Específico para Docker
+
+### 🛠️ Ferramentas recomendadas:
+- **Docker Desktop** (essencial)
+- **VS Code** (editor recomendado)
+- **Git** (controle de versão)

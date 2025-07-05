@@ -1,0 +1,34 @@
+{
+  "folders": [
+    {
+      "name": "🐳 PQC (Raiz)",
+      "path": "."
+    },
+    {
+      "name": "⚛️ Frontend (React/Vite)",
+      "path": "./fontes/front-end"
+    },
+    {
+      "name": "🐍 Backend (Python/Flask)",
+      "path": "./fontes/backend"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "./fontes/backend/venv/bin/python",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    "files.associations": {
+      "*.js": "javascriptreact"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-docker",
+      "dsznajder.es7-react-js-snippets"
+    ]
+  }
+}

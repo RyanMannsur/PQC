@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-docker",
+    "eamodio.gitlens",
+    "dsznajder.es7-react-js-snippets",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
