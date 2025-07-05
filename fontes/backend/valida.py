@@ -88,8 +88,8 @@ class Valida:
         if idtTipoMovto is None:
             self.mensagem.append("Tipo de movimento não pode ser nulo!")
        
-    def idtTipoMovto(self, codEmbalagem):
-        if codEmbalagem is None:
+    def idtTipoMovto(self, seqEmbalagem):
+        if seqEmbalagem is None:
             self.mensagem.append("Código de embalagem não pode ser nulo!")
  
     def uniMedida(self, uniMedida):

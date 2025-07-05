@@ -1,6 +1,6 @@
 2025-06-29 17:28:00,429 - INFO - 127.0.0.1 - - [29/Jun/2025 17:28:00] "GET /api/produtos HTTP/1.1" 200 -
-2025-06-29 17:36:10,328 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\cwp.py', reloading
-2025-06-29 17:36:10,392 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\Scripts\\spyder-script.py', reloading
+2025-06-29 17:36:10,328 - INFO -  * Detected change in 'C:\\Users\\Usuï¿½rio\\anaconda3\\cwp.py', reloading
+2025-06-29 17:36:10,392 - INFO -  * Detected change in 'C:\\Users\\Usuï¿½rio\\anaconda3\\Scripts\\spyder-script.py', reloading
 2025-06-29 20:04:38,701 - INFO - 127.0.0.1 - - [29/Jun/2025 20:04:38] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
 2025-06-29 20:04:38,748 - INFO - 127.0.0.1 - - [29/Jun/2025 20:04:38] "GET /api/produtos HTTP/1.1" 200 -
 2025-06-29 20:04:38,971 - INFO - 127.0.0.1 - - [29/Jun/2025 20:04:38] "GET /api/produtos HTTP/1.1" 200 -
@@ -26,8 +26,8 @@
 2025-06-29 20:32:43,883 - INFO - 127.0.0.1 - - [29/Jun/2025 20:32:43] "GET /api/obterProdutosNaoImplantadosPorLocal/undefined/undefined/undefined/undefined HTTP/1.1" 200 -
 2025-06-29 20:33:41,836 - INFO - 127.0.0.1 - - [29/Jun/2025 20:33:41] "OPTIONS /api/implantarItensLaboratorio HTTP/1.1" 200 -
 2025-06-29 20:33:42,161 - INFO - 127.0.0.1 - - [29/Jun/2025 20:33:42] "[35m[1mPOST /api/implantarItensLaboratorio HTTP/1.1[0m" 500 -
-2025-06-29 20:37:16,201 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\Lib\\datetime.py', reloading
-2025-06-29 20:37:16,203 - INFO -  * Detected change in 'C:\\Users\\Usuário\\anaconda3\\Lib\\_pydatetime.py', reloading
+2025-06-29 20:37:16,201 - INFO -  * Detected change in 'C:\\Users\\Usuï¿½rio\\anaconda3\\Lib\\datetime.py', reloading
+2025-06-29 20:37:16,203 - INFO -  * Detected change in 'C:\\Users\\Usuï¿½rio\\anaconda3\\Lib\\_pydatetime.py', reloading
 2025-06-29 20:40:29,806 - INFO - 127.0.0.1 - - [29/Jun/2025 20:40:29] "[35m[1mPOST /api/implantarItensLaboratorio HTTP/1.1[0m" 500 -
 2025-06-29 20:43:42,959 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
 2025-06-29 20:43:42,962 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\routes\\produto_routes.py', reloading
@@ -123,7 +123,7 @@
 2025-07-01 21:49:49,025 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:49] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
 2025-07-01 21:50:23,686 - ERROR - 'utf-8' codec can't decode byte 0xe3 in position 91: invalid continuation byte
 2025-07-01 21:50:23,687 - INFO - 127.0.0.1 - - [01/Jul/2025 21:50:23] "[31m[1mGET /api/produtos HTTP/1.1[0m" 401 -
-2025-07-01 21:58:56,754 - ERROR - ERRO:  relação "movtoestoque" não existe
+2025-07-01 21:58:56,754 - ERROR - ERRO:  relaï¿½ï¿½o "movtoestoque" nï¿½o existe
 LINE 3:           FROM MovtoEstoque 
                        ^
 
@@ -131,12 +131,12 @@ LINE 3:           FROM MovtoEstoque
 2025-07-01 21:58:56,883 - INFO - 127.0.0.1 - - [01/Jul/2025 21:58:56] "[35m[1mGET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1[0m" 500 -
 2025-07-01 21:58:57,490 - INFO - 127.0.0.1 - - [01/Jul/2025 21:58:57] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
 2025-07-01 21:59:04,488 - INFO - 127.0.0.1 - - [01/Jul/2025 21:59:04] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
-2025-07-01 21:59:04,649 - ERROR - ERRO:  relação "produto" não existe
+2025-07-01 21:59:04,649 - ERROR - ERRO:  relaï¿½ï¿½o "produto" nï¿½o existe
 LINE 7:           FROM Produto A
                        ^
 
 2025-07-01 21:59:04,659 - INFO - 127.0.0.1 - - [01/Jul/2025 21:59:04] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
-2025-07-01 22:01:23,773 - ERROR - ERRO:  coluna a.idtativo não existe
+2025-07-01 22:01:23,773 - ERROR - ERRO:  coluna a.idtativo nï¿½o existe
 LINE 8:          WHERE A.idtAtivo
                        ^
 
@@ -148,20 +148,20 @@ LINE 8:          WHERE A.idtAtivo
 2025-07-01 22:02:11,550 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:11] "[31m[1mGET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1[0m" 400 -
 2025-07-01 22:02:13,219 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:13] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
 2025-07-01 22:02:18,899 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:18] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
-2025-07-01 22:02:19,045 - ERROR - ERRO:  coluna a.idtativo não existe
+2025-07-01 22:02:19,045 - ERROR - ERRO:  coluna a.idtativo nï¿½o existe
 LINE 8:          WHERE A.idtAtivo
                        ^
 
 2025-07-01 22:02:19,058 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:19] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
-2025-07-01 22:02:21,292 - ERROR - ERRO:  coluna "idtativo" não existe
+2025-07-01 22:02:21,292 - ERROR - ERRO:  coluna "idtativo" nï¿½o existe
 LINE 8:          WHERE idtAtivo
                        ^
 
 2025-07-01 22:02:21,293 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:21] "[31m[1mGET /api/produtos HTTP/1.1[0m" 401 -
-2025-07-01 22:02:25,675 - ERROR - ERRO:  função destipomovto(character) não existe
+2025-07-01 22:02:25,675 - ERROR - ERRO:  funï¿½ï¿½o destipomovto(character) nï¿½o existe
 LINE 15:               desTipoMovto(C.idtTipoMovto) as desTipoMovto,
                        ^
-HINT:  Nenhuma função corresponde com o nome e os tipos de argumentos informados. Você precisa adicionar conversões de tipo explícitas.
+HINT:  Nenhuma funï¿½ï¿½o corresponde com o nome e os tipos de argumentos informados. Vocï¿½ precisa adicionar conversï¿½es de tipo explï¿½citas.
 
 2025-07-01 22:02:25,687 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:25] "[35m[1mGET /api/consultaPQC/2418912 HTTP/1.1[0m" 500 -
 2025-07-01 22:02:27,711 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:27] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -

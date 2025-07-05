@@ -14,7 +14,7 @@ const ImplantacaoList = ({ data, onChange }) => {
     if (!implantacoes[codProduto] || implantacoes[codProduto].length === 0) {
       setImplantacoes((prev) => ({
         ...prev,
-        [codProduto]: [{ qtdEstoque: "", datValidade: "", codEmbalagem: "", txtJustificativa: "" }],
+        [codProduto]: [{ qtdEstoque: "", datValidade: "", seqEmbalagem: "", txtJustificativa: "" }],
       }));
     }
   };
@@ -24,7 +24,7 @@ const ImplantacaoList = ({ data, onChange }) => {
       ...prev,
       [codProduto]: [
         ...(prev[codProduto] || []),
-        { qtdEstoque: "", datValidade: "", codEmbalagem: "", txtJustificativa: "" },
+        { qtdEstoque: "", datValidade: "", seqEmbalagem: "", txtJustificativa: "" },
       ],
     }));
   };
@@ -83,9 +83,9 @@ const ImplantacaoList = ({ data, onChange }) => {
                       Embalagem
                       <C.Input
                         type="text"
-                        value={item.codEmbalagem}
+                        value={item.seqEmbalagem}
                         onChange={(e) =>
-                          handleFieldChange(produto.codProduto, idx, "codEmbalagem", e.target.value)
+                          handleFieldChange(produto.codProduto, idx, "seqEmbalagem", e.target.value)
                         }
                       />
                     </C.SublistTd>

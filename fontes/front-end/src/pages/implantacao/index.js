@@ -70,7 +70,7 @@ const handleConfirm = async () => {
     produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
       codProduto: parseInt(codProduto),
       items: items.map((item) => ({
-        codEmbalagem: item.codEmbalagem,
+        seqEmbalagem: item.seqEmbalagem,
         qtdEstoque: parseFloat(item.qtdEstoque),
         datValidade: item.datValidade,
         txtJustificativa: item.txtJustificativa,
