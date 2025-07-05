@@ -101,63 +101,80 @@ docker-compose down -v        # Parar e limpar volumes
 
 ### Configuração do Docker
 
-## Certifique-se de que o Docker está instalado e em execução.
- Abra um terminal e vá para o diretório do projeto.
- Execute os seguintes comandos para construir e iniciar os containers Docker:
+1. Certifique-se de que o Docker está instalado e em execução.
+2. Abra um terminal e vá para o diretório do projeto.
+3. Execute os seguintes comandos para construir e iniciar os containers Docker:
+
 ```bash
 docker-compose up --build
 ```
- Isso iniciará os seguintes serviços:
- - Backend: Flask rodando na porta 5000.
- - Banco de Dados: PostgreSQL rodando na porta 5432.
+
+Isso iniciará os seguintes serviços:
+- **Backend**: Flask rodando na porta 8088
+- **Banco de Dados**: PostgreSQL rodando na porta 5432
 
 ### Testando o Backend
- Após iniciar os containers, você pode acessar o backend no navegador ou Postman:
-http://localhost:5000/api/produtos
+Após iniciar os containers, você pode acessar o backend no navegador ou Postman:
+http://localhost:8088/api/produtos
 
-Testando a Conexão com o Banco de Dados
- Você pode se conectar ao banco de dados PostgreSQL usando uma ferramenta como DBeaver ou psql.
- As credenciais são:
- Host: localhost
- Porta: 5432
- Banco de Dados: PQC
- Usuário: postgres
- Senha: postgres
+### Testando a Conexão com o Banco de Dados
+Você pode se conectar ao banco de dados PostgreSQL usando uma ferramenta como DBeaver ou psql.
 
-### Usando psql:
- Execute o comando abaixo para se conectar ao banco de dados:
+**Credenciais:**
+- Host: localhost
+- Porta: 5432
+- Banco de Dados: PQC
+- Usuário: postgres
+- Senha: postgres
 
- ```bash
-   docker exec -it bd-postgres psql -U postgres -d PQC
+**Usando psql:**
+```bash
+docker exec -it pqc_postgres psql -U postgres -d PQC
 ```
--- Liste as tabelas para verificar se o banco de dados foi criado corretamente:
-\dt
 
-## Executando o Frontend
- Vá para o diretório fontes/front-end:
-  ```bash
-   cd fontes/front-end
- ```
+Liste as tabelas para verificar se o banco de dados foi criado corretamente:
+```sql
+\dt
+```
+
+## Executando o Frontend (Vite)
+
+Vá para o diretório fontes/front-end:
+```bash
+cd fontes/front-end
+```
+
 ### Instale as dependências:
 ```bash
-   npm install
+npm install
 ```
+
 ### Execute o servidor de desenvolvimento:
 ```bash
-   npm start
+npm run dev
 ```
-### O servidor de desenvolvimento React estará disponível em:
-http://localhost:3000
+
+**⚠️ IMPORTANTE:** Com a migração para Vite, **NÃO USE MAIS** `npm start`. Use `npm run dev` para desenvolvimento.
+
+### Comandos disponíveis:
+- `npm run dev` - Servidor de desenvolvimento (porta 3001)
+- `npm run build` - Build para produção  
+- `npm run preview` - Preview do build de produção
+- `npm run test` - Executar testes
+
+O servidor de desenvolvimento Vite estará disponível em:
+http://localhost:3001
 
 ## Estrutura do Banco de Dados
- O banco de dados será inicializado automaticamente com as tabelas e dados definidos no arquivo PQC.sql.
- Certifique-se de que o arquivo PQC.sql está localizado na raiz do projeto e conté
+O banco de dados será inicializado automaticamente com as tabelas e dados definidos no arquivo PQC.sql.
+Certifique-se de que o arquivo PQC.sql está localizado na raiz do projeto.
 
- ## Observações Importantes
- Durante o desenvolvimento, alterações feitas no código do backend (fontes/backend) serão refletidas automaticamente no container Docker devido à configuração de volumes no docker-compose.yml. Não é necessário reconstruir o container após cada alteração.
-  Para garantir que o script PQC.sql seja executado novamente, remova o volume associado ao banco de dados:
+## Observações Importantes
+- Durante o desenvolvimento, alterações feitas no código do backend (fontes/backend) serão refletidas automaticamente no container Docker devido à configuração de volumes no docker-compose.yml.
+- **Frontend migrado para Vite**: Use `npm run dev` ao invés de `npm start`
+- Para garantir que o script PQC.sql seja executado novamente, remova o volume associado ao banco de dados:
 ```bash
-   docker volume rm pqc_postgres_data
+docker volume rm pqc_pgdata
 ```
 
 ---
