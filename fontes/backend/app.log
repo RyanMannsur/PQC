@@ -106,3 +106,86 @@
 2025-06-29 22:39:52,398 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\Json\\LoadBD.py', reloading
 2025-06-29 22:39:52,411 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\config.py', reloading
 2025-06-29 22:39:52,411 - INFO -  * Detected change in 'D:\\CEFET\\PROJETOSEXTENSAO\\CEFET\\PQC25-06\\PQC\\fontes\\backend\\txtGenerator.py', reloading
+2025-07-01 21:49:10,549 - ERROR - 'utf-8' codec can't decode byte 0xe3 in position 91: invalid continuation byte
+2025-07-01 21:49:10,573 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:10] "[35m[1mGET /api/obterLocaisEstoque/2418912 HTTP/1.1[0m" 500 -
+2025-07-01 21:49:26,582 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:26] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 21:49:26,895 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:26] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-07-01 21:49:32,519 - ERROR - 'utf-8' codec can't decode byte 0xe3 in position 91: invalid continuation byte
+2025-07-01 21:49:32,634 - ERROR - 'utf-8' codec can't decode byte 0xe3 in position 91: invalid continuation byte
+2025-07-01 21:49:32,642 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:32] "[35m[1mGET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1[0m" 500 -
+2025-07-01 21:49:33,208 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:33] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 21:49:35,830 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:35] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 21:49:35,973 - ERROR - 'utf-8' codec can't decode byte 0xe3 in position 91: invalid continuation byte
+2025-07-01 21:49:35,982 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:35] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
+2025-07-01 21:49:38,617 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:38] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 21:49:48,877 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:48] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 21:49:49,016 - ERROR - 'utf-8' codec can't decode byte 0xe3 in position 91: invalid continuation byte
+2025-07-01 21:49:49,025 - INFO - 127.0.0.1 - - [01/Jul/2025 21:49:49] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
+2025-07-01 21:50:23,686 - ERROR - 'utf-8' codec can't decode byte 0xe3 in position 91: invalid continuation byte
+2025-07-01 21:50:23,687 - INFO - 127.0.0.1 - - [01/Jul/2025 21:50:23] "[31m[1mGET /api/produtos HTTP/1.1[0m" 401 -
+2025-07-01 21:58:56,754 - ERROR - ERRO:  relação "movtoestoque" não existe
+LINE 3:           FROM MovtoEstoque 
+                       ^
+
+2025-07-01 21:58:56,867 - ERROR - can't adapt type 'Response'
+2025-07-01 21:58:56,883 - INFO - 127.0.0.1 - - [01/Jul/2025 21:58:56] "[35m[1mGET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1[0m" 500 -
+2025-07-01 21:58:57,490 - INFO - 127.0.0.1 - - [01/Jul/2025 21:58:57] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 21:59:04,488 - INFO - 127.0.0.1 - - [01/Jul/2025 21:59:04] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 21:59:04,649 - ERROR - ERRO:  relação "produto" não existe
+LINE 7:           FROM Produto A
+                       ^
+
+2025-07-01 21:59:04,659 - INFO - 127.0.0.1 - - [01/Jul/2025 21:59:04] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
+2025-07-01 22:01:23,773 - ERROR - ERRO:  coluna a.idtativo não existe
+LINE 8:          WHERE A.idtAtivo
+                       ^
+
+2025-07-01 22:01:23,802 - INFO - 127.0.0.1 - - [01/Jul/2025 22:01:23] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
+2025-07-01 22:02:03,472 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:03] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-01 22:02:06,889 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:06] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-01 22:02:07,098 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:07] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 22:02:07,101 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:07] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-07-01 22:02:11,550 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:11] "[31m[1mGET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1[0m" 400 -
+2025-07-01 22:02:13,219 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:13] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 22:02:18,899 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:18] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 22:02:19,045 - ERROR - ERRO:  coluna a.idtativo não existe
+LINE 8:          WHERE A.idtAtivo
+                       ^
+
+2025-07-01 22:02:19,058 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:19] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
+2025-07-01 22:02:21,292 - ERROR - ERRO:  coluna "idtativo" não existe
+LINE 8:          WHERE idtAtivo
+                       ^
+
+2025-07-01 22:02:21,293 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:21] "[31m[1mGET /api/produtos HTTP/1.1[0m" 401 -
+2025-07-01 22:02:25,675 - ERROR - ERRO:  função destipomovto(character) não existe
+LINE 15:               desTipoMovto(C.idtTipoMovto) as desTipoMovto,
+                       ^
+HINT:  Nenhuma função corresponde com o nome e os tipos de argumentos informados. Você precisa adicionar conversões de tipo explícitas.
+
+2025-07-01 22:02:25,687 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:25] "[35m[1mGET /api/consultaPQC/2418912 HTTP/1.1[0m" 500 -
+2025-07-01 22:02:27,711 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:27] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-01 22:02:38,955 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:38] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-01 22:02:38,956 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:38] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNS/11.55.11/01/001 HTTP/1.1[0m" 404 -
+2025-07-01 22:02:39,054 - INFO - 127.0.0.1 - - [01/Jul/2025 22:02:39] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-05 16:50:22,760 - ERROR - column "idtativo" does not exist
+LINE 8:          WHERE idtAtivo
+                       ^
+
+2025-07-05 16:50:22,762 - INFO - 172.19.0.1 - - [05/Jul/2025 16:50:22] "[31m[1mGET /api/produtos HTTP/1.1[0m" 401 -
+2025-07-05 16:50:34,508 - INFO -  * Detected change in '/app/routes/produto_routes.py', reloading
+2025-07-05 16:50:47,739 - INFO - 172.19.0.1 - - [05/Jul/2025 16:50:47] "GET /api/produtos HTTP/1.1" 200 -
+2025-07-05 16:51:41,249 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:41] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-05 16:51:44,579 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:44] "GET /api/obterLocaisEstoque/2418912 HTTP/1.1" 200 -
+2025-07-05 16:51:44,619 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:44] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-05 16:51:44,621 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:44] "[33mGET /api/obterProdutosNaoImplantadosNoLocalNG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-07-05 16:51:49,984 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:49] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1" 200 -
+2025-07-05 16:51:52,996 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:52] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-05 16:51:57,472 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:57] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -
+2025-07-05 16:51:57,487 - ERROR - column a.idtativo does not exist
+LINE 8:          WHERE A.idtAtivo
+                       ^
+
+2025-07-05 16:51:57,507 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:57] "[35m[1mGET /api/obterProdutosNaoImplantadosPorLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 500 -
+2025-07-05 16:51:59,842 - INFO - 172.19.0.1 - - [05/Jul/2025 16:51:59] "GET /api/produtos HTTP/1.1" 200 -
+2025-07-05 16:52:19,530 - INFO - 172.19.0.1 - - [05/Jul/2025 16:52:19] "[33mGET /api/obterNomeLocalEstocagem HTTP/1.1[0m" 404 -

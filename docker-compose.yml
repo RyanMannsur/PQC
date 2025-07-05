@@ -1,41 +1,41 @@
-version: "3.8"
-
 services:
-  postgres:
-    build: 
-      context: .
-      dockerfile: Dockerfile.db
-    container_name: bd-postgres
+  backend:
+    build:
+      context: .  # Diretório onde está o Dockerfile do backend
+    ports:
+      - "8088:8088"
     environment:
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_NAME=PQC
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    volumes:
+      - ./fontes/backend:/app  # Monta o diretório correto onde está o app.py
+    working_dir: /app  # Define o diretório de trabalho para /app
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  database:
+    image: postgres:15
+    container_name: pqc_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: PQC
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: PQC
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./PQC.sql:/docker-entrypoint-initdb.d/PQC.sql
+      - pgdata:/var/lib/postgresql/data
+      - ./PQC.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d PQC"]
+      interval: 5s
       timeout: 5s
       retries: 5
 
-
-  backend:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    container_name: backend
-    ports:
-      - "8088:8088"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/PQC
-    volumes:
-      - ./fontes/backend:/app
-
 volumes:
-  postgres_data:
+  pgdata:

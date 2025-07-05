@@ -26,7 +26,6 @@ def get_produtos():
                perPureza,
                vlrDensidade
           FROM Produto
-         WHERE idtAtivo
         """
 
     try:
