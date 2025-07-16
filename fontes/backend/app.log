@@ -939,3 +939,40 @@ LINE 6:
 2025-07-16 20:05:42,671 - INFO - 172.19.0.1 - - [16/Jul/2025 20:05:42] "POST /api/cadastrarProdutos HTTP/1.1" 200 -
 2025-07-16 20:05:43,918 - INFO - 172.19.0.1 - - [16/Jul/2025 20:05:43] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1" 200 -
 2025-07-16 20:06:01,238 - INFO -  * Detected change in '/app/routes/produto_routes.py', reloading
+2025-07-16 20:07:26,912 - INFO - 172.19.0.1 - - [16/Jul/2025 20:07:26] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:07:32,995 - INFO - 172.19.0.1 - - [16/Jul/2025 20:07:32] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1" 200 -
+2025-07-16 20:07:39,452 - INFO - 172.19.0.1 - - [16/Jul/2025 20:07:39] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:07:45,222 - INFO - 172.19.0.1 - - [16/Jul/2025 20:07:45] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1" 200 -
+2025-07-16 20:07:49,786 - INFO - 172.19.0.1 - - [16/Jul/2025 20:07:49] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:08:03,861 - INFO - 172.19.0.1 - - [16/Jul/2025 20:08:03] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:09:57,262 - INFO -  * Detected change in '/app/routes/produto_routes.py', reloading
+2025-07-16 20:10:25,558 - INFO - 172.19.0.1 - - [16/Jul/2025 20:10:25] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:10:33,176 - INFO - 172.19.0.1 - - [16/Jul/2025 20:10:33] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101?data=1900-01-01 HTTP/1.1" 200 -
+2025-07-16 20:10:38,288 - INFO - 172.19.0.1 - - [16/Jul/2025 20:10:38] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:10:41,902 - INFO - 172.19.0.1 - - [16/Jul/2025 20:10:41] "GET /api/obterTodosLaboratorios HTTP/1.1" 200 -
+2025-07-16 20:10:41,909 - INFO - 172.19.0.1 - - [16/Jul/2025 20:10:41] "GET /api/ObterProdutoBYCodigoAndSequencia/NG/11.56.12/17/101/12/2 HTTP/1.1" 200 -
+2025-07-16 20:11:00,419 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:00] "GET /api/obterNomeLocalEstocagem/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-07-16 20:11:00,472 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:00] "GET /api/obterEstoqueLocalEstocagem/NG/11.56.12/17/101 HTTP/1.1" 200 -
+2025-07-16 20:11:05,964 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:05] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:11:08,789 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:08] "GET /api/obterTodosLaboratorios HTTP/1.1" 200 -
+2025-07-16 20:11:08,795 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:08] "GET /api/ObterProdutoBYCodigoAndSequencia/NG/11.56.12/17/101/12/2 HTTP/1.1" 200 -
+2025-07-16 20:11:22,562 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:22] "[33mGET /api/obterProdutosNaoImplantadosNoLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-07-16 20:11:22,607 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:22] "GET /api/obterTodosLaboratorios HTTP/1.1" 200 -
+2025-07-16 20:11:22,642 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:22] "GET /api/ObterProdutoBYCodigoAndSequencia/NG/11.56.12/17/101/12/2 HTTP/1.1" 200 -
+2025-07-16 20:11:40,585 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:40] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:11:45,626 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:45] "GET /api/obterTodosLaboratorios HTTP/1.1" 200 -
+2025-07-16 20:11:45,633 - INFO - 172.19.0.1 - - [16/Jul/2025 20:11:45] "GET /api/ObterProdutoBYCodigoAndSequencia/NG/11.56.12/17/101/12/2 HTTP/1.1" 200 -
+2025-07-16 20:12:55,633 - INFO -  * Detected change in '/app/routes/produto_routes.py', reloading
+2025-07-16 20:13:19,090 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:19] "[33mGET /api/obterProdutosNaoImplantadosNoLocal/NG/11.56.12/17/101 HTTP/1.1[0m" 404 -
+2025-07-16 20:13:19,130 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:19] "GET /api/obterTodosLaboratorios HTTP/1.1" 200 -
+2025-07-16 20:13:19,137 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:19] "GET /api/ObterProdutoBYCodigoAndSequencia/NG/11.56.12/17/101/12/2 HTTP/1.1" 200 -
+2025-07-16 20:13:26,678 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:26] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:13:30,426 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:30] "GET /api/obterTodosLaboratorios HTTP/1.1" 200 -
+2025-07-16 20:13:30,435 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:30] "GET /api/ObterProdutoBYCodigoAndSequencia/NG/11.56.12/17/101/12/1 HTTP/1.1" 200 -
+2025-07-16 20:13:41,169 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:41] "OPTIONS /api/atualizarInventarioBySequencia HTTP/1.1" 200 -
+2025-07-16 20:13:41,216 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:41] "[35m[1mPOST /api/atualizarInventarioBySequencia HTTP/1.1[0m" 500 -
+2025-07-16 20:13:41,237 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:41] "[35m[1mPOST /api/atualizarInventarioBySequencia HTTP/1.1[0m" 500 -
+2025-07-16 20:13:51,323 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:51] "[31m[1mGET /api/atualizarInventarioBySequencia HTTP/1.1[0m" 405 -
+2025-07-16 20:13:51,401 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:51] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-16 20:13:54,577 - INFO - 172.19.0.1 - - [16/Jul/2025 20:13:54] "GET /api/buscarProdutos?codCampus=NG&codUnidade=11.56.12&codPredio=17&codLaboratorio=101&nomProduto=&pureza=&densidade= HTTP/1.1" 200 -
+2025-07-16 20:15:57,420 - INFO -  * Detected change in '/app/routes/produto_routes.py', reloading

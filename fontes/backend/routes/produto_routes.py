@@ -1168,9 +1168,16 @@ def atualizar_inventario_by_sequencia():
     idtTipoMovto = data.get("idtTipoMovto")  # Agora é dinâmico e recebido pelo JSON
     txtJustificativa = data.get("txtJustificativa", "Atualização de inventário") 
 
+    # Converter tipos de dados se necessário
+    try:
+        codProduto = int(codProduto)
+        seqItem = int(seqItem)
+        qtdEstoque = float(qtdEstoque)
+    except (ValueError, TypeError):
+        return util.formataAviso("Erro: codProduto, seqItem e qtdEstoque devem ser números válidos")
+
     valida = Valida()
     valida.codProduto(codProduto)
-    valida.ano(qtdEstoque)
     valida.codCampus(codCampus)
     valida.codUnidade(codUnidade)
     valida.codPredio(codPredio)
@@ -1181,7 +1188,7 @@ def atualizar_inventario_by_sequencia():
 
     
     # Define a data do movimento como a data atual
-    datMovto = datetime.now()
+    datMovto = datetime.datetime.now()
 
     sql = """
         INSERT INTO MovtoEstoque
