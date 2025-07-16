@@ -1540,7 +1540,7 @@ def login():
     senha = data['senha']
     
     sql = """
-        SELECT token, cpf, id 
+        SELECT token, cpf, id, isADM 
         FROM usuario 
         WHERE cpf = %s AND senha = %s
     """
@@ -1562,6 +1562,7 @@ def login():
             "token": usuario[0],
             "cpf": usuario[1],
             "id": usuario[2],
+            "isADM": usuario[3],
             "laboratorios": laboratorios
         }), 200
         
@@ -1583,7 +1584,7 @@ def validate_token():
     
     # Buscar dados do usuário
     sql = """
-        SELECT token, cpf, id 
+        SELECT token, cpf, id, isADM 
         FROM usuario 
         WHERE token = %s
     """
@@ -1605,6 +1606,7 @@ def validate_token():
             "token": usuario[0],
             "cpf": usuario[1],
             "id": usuario[2],
+            "isADM": usuario[3],
             "laboratorios": laboratorios
         }), 200
         

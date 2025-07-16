@@ -7,6 +7,7 @@ import Inventario from "../pages/Inventario";
 import TransferirProduto from "../pages/Transferencia/tranferirProduto";
 import CreateProdutos from "../pages/createProduto";
 import PrivateRoute from "./private";
+import AdminRoute from "./admin";
 import AppNotSidebar from "../layout/AppNotSidebar";
 import AppLayout from "../layout/App";
 import PublicoLayout from "../layout/publico";
@@ -125,11 +126,11 @@ const RoutesApp = () => {
         <Route
           path="/produto"
           element={
-            <PrivateRoute>
+            <AdminRoute>
               <AppLayout>
                 <ProdutoPage />
               </AppLayout>
-            </PrivateRoute>
+            </AdminRoute>
           }
         />
         <Route

@@ -7,12 +7,15 @@ ListItemIcon,
 } from "@mui/material";
 import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd, Assessment } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { isAdmin } from "../../services/auth/service";
 
 const Sidebar = () => {
 const handleClearLabAndNavigate = () => {
   localStorage.removeItem("labId");
   localStorage.removeItem("labName");
 };
+
+const userIsAdmin = isAdmin();
 
 return (
   <Drawer
@@ -86,12 +89,14 @@ return (
         <ListItemText primary="Relatório" />
       </ListItem>
 
-      <ListItem component={Link} to="/produto">
-        <ListItemIcon>
-          <Assessment />
-        </ListItemIcon>
-        <ListItemText primary="Cadastrar Produto" />
-      </ListItem>
+      {userIsAdmin && (
+        <ListItem component={Link} to="/produto">
+          <ListItemIcon>
+            <Assessment />
+          </ListItemIcon>
+          <ListItemText primary="Cadastrar Produto" />
+        </ListItem>
+      )}
       
       <ListItem component={Link} to="/consultaPQC">
         <ListItemIcon>

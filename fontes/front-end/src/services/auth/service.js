@@ -22,6 +22,7 @@ export const login = async (cpf, senha) => {
     localStorage.setItem("userToken", data.token);
     localStorage.setItem("userCpf", data.cpf);
     localStorage.setItem("userId", data.id);
+    localStorage.setItem("userIsADM", data.isADM);
     
     return data;
   } catch (error) {
@@ -45,7 +46,15 @@ export const validateToken = async (token) => {
       throw new Error(errorData.error || "Token inválido");
     }
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Atualizar dados no localStorage
+    localStorage.setItem("userToken", data.token);
+    localStorage.setItem("userCpf", data.cpf);
+    localStorage.setItem("userId", data.id);
+    localStorage.setItem("userIsADM", data.isADM);
+    
+    return data;
   } catch (error) {
     console.error("Erro na validação do token:", error);
     throw error;
@@ -56,6 +65,7 @@ export const logout = () => {
   localStorage.removeItem("userToken");
   localStorage.removeItem("userCpf");
   localStorage.removeItem("userId");
+  localStorage.removeItem("userIsADM");
   localStorage.removeItem("labId");
 };
 
@@ -67,15 +77,21 @@ export const getCurrentUser = () => {
   const token = localStorage.getItem("userToken");
   const cpf = localStorage.getItem("userCpf");
   const id = localStorage.getItem("userId");
+  const isADM = localStorage.getItem("userIsADM") === "true";
   
   if (!token || !cpf || !id) {
     return null;
   }
   
-  return { token, cpf, id };
+  return { token, cpf, id, isADM };
 };
 
 export const isAuthenticated = () => {
   const token = getCurrentToken();
   return token !== null;
+};
+
+export const isAdmin = () => {
+  const user = getCurrentUser();
+  return user && user.isADM === true;
 };
