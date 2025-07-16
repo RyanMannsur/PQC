@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Button } from '../../components';
 import ProdutoForm from '../../features/produto';
-import { Container, Table, Td, Th, Tr, Button } from './styles';
+import { Container, Table, Td, Th, Tr } from './styles';
 import produtoService from '../../services/produto/service';
 
 
@@ -66,8 +67,8 @@ const ProdutoPage = () => {
               <Td>{prod.vlrDensidade}</Td>
               <Td>{prod.idtAtivo ? 'Sim' : 'Não'}</Td>
               <Td>
-                <Button onClick={() => setEditing(prod)}>Editar</Button>
-                <Button onClick={() => handleDelete(prod.codProduto)}>Excluir</Button>
+                <Button variant="secondary" size="small" onClick={() => setEditing(prod)}>Editar</Button>
+                <Button variant="danger" size="small" onClick={() => handleDelete(prod.codProduto)} style={{ marginLeft: '8px' }}>Excluir</Button>
               </Td>
             </Tr>
           ))}

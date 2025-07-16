@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
-import Select from "../../components/InputSelect"; 
+import { Select, Button, FormGroup } from "../../components"; 
 import { obterProdutosNaoImplantadosPorLocal, cadastrarProdutos } from "../../services/produto/service"; 
 import { useLocal } from "../../contexts/local";
 import * as C from "./styles";
@@ -134,7 +134,9 @@ return (
       <p>Nenhum produto encontrado.</p>
     )}
 
-    <C.ConfirmButton onClick={handleConfirm}>Confirmar</C.ConfirmButton>
+    <FormGroup justifyContent="center">
+      <Button variant="primary" onClick={handleConfirm}>Confirmar</Button>
+    </FormGroup>
 
     <Modal
       title="Cadastro Realizado"

@@ -1,6 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import Select from "../../components/InputSelect";
-import Button from "../../components/Button";
+import { Button, Select, FormGroup } from "../../components";
 import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
 import { LocalContext } from "../../contexts/local";
@@ -74,22 +73,30 @@ const SelecionarLocal = () => {
     <C.Container>
       <C.Label>SELECIONE O LOCAL DE ESTOCAGEM</C.Label>
       <C.Content>
-        {labOptions.length > 1 && (
-          <Select
-            options={labOptions.map((lab) => ({
-              value: lab.codLaboratorio,
-              label: lab.nomLocal,
-              object: lab,
-            }))}
-            value={lab ? lab.codLaboratorio : ""}
-            onChange={(selectedOption) => {
-              setLab(selectedOption.object);
-              setError("");
-            }}
-          />
-        )}
-        <C.labelError>{error}</C.labelError>
-        {labOptions.length > 1 && <Button Text="Selecionar" onClick={handleSelect} />}
+        <FormGroup gap="medium" alignItems="center">
+          {labOptions.length > 1 && (
+            <Select
+              options={labOptions.map((lab) => ({
+                value: lab.codLaboratorio,
+                label: lab.nomLocal,
+                object: lab,
+              }))}
+              value={lab ? lab.codLaboratorio : ""}
+              onChange={(selectedOption) => {
+                setLab(selectedOption.object);
+                setError("");
+              }}
+              placeholder="Selecione o laboratório"
+              error={!!error}
+            />
+          )}
+          {error && <C.labelError>{error}</C.labelError>}
+          {labOptions.length > 1 && (
+            <Button onClick={handleSelect} fullWidth>
+              Selecionar
+            </Button>
+          )}
+        </FormGroup>
       </C.Content>
     </C.Container>
   );

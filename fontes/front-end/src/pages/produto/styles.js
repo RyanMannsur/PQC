@@ -20,8 +20,3 @@ export const Td = styled.td`
   border: 1px solid #ccc;
   padding: 8px;
 `;
-
-export const Button = styled.button`
-  margin-right: 8px;
-  padding: 4px 8px;
-`;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Select from "../../../components/InputSelect";
-import Button from "../../../components/Button";
+import { Select, Button, FormGroup } from "../../../components";
 import * as C from "./styles";
 import {
 obterProduto,
@@ -175,15 +174,19 @@ return (
     )}
     <C.Content>
       <Select
+        label="Selecionar Laboratório de Destino"
         options={labs}
         value={novoLab ? novoLab.value : ""}
         onChange={(selectedOption) => {
           setNovoLab(selectedOption);
           setMensagem("");
         }}
+        placeholder="Selecione um laboratório"
       />
       <C.labelError>{mensagem}</C.labelError>
-      <Button Text="Transferir" onClick={handleTransferir} />
+      <FormGroup justifyContent="center">
+        <Button Text="Transferir" onClick={handleTransferir} />
+      </FormGroup>
     </C.Content>
   </C.Container>
 );

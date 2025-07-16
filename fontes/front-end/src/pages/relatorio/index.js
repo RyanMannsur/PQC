@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button, FormGroup } from "../../components";
 import * as C from "./styles";
 import RelatorioProdutos from "../../features/relatorio"; 
 import { obterRelatorioProdutos } from "../../services/produto/service"; 
@@ -54,7 +55,9 @@ const Relatorio = () => {
          />
        </C.InputGroup>
 
-       <C.Button onClick={handleBuscarClick}>Buscar</C.Button>
+       <FormGroup justifyContent="center">
+         <Button variant="primary" onClick={handleBuscarClick}>Buscar</Button>
+       </FormGroup>
      </C.FiltersContainer>
 
      {erro && <p style={{ color: "red" }}>{erro}</p>}

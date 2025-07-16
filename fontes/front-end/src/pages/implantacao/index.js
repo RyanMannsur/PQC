@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
+import { Button, FormGroup } from "../../components";
 import { obterProdutosNaoImplantadosPorLocal, implantarItensLaboratorio } from "../../services/produto/service";
 import { useLocal } from "../../contexts/local";
 import * as C from "./styles";
@@ -81,14 +82,20 @@ const handleCloseModal = () => {
 };
 
 if (loading) {
-  return <C.Loading>Carregando produtos...</C.Loading>;
+  return (
+    <C.Loading>
+      Carregando produtos...
+    </C.Loading>
+  );
 }
 
 return (
   <C.Container>
     <C.Title>Implantação de Produtos no {labName}</C.Title>
     <ImplantacaoList data={produtos} onChange={handleChange} />
-    <C.ConfirmButton onClick={handleConfirm}>Confirmar</C.ConfirmButton>
+    <FormGroup justifyContent="center">
+      <Button variant="primary" onClick={handleConfirm}>Confirmar</Button>
+    </FormGroup>
 
     <Modal
       title="Implantação Realizada"

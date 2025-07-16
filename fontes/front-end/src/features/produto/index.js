@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Button, Checkbox, Row } from './styles';
+import { Button, Input, Checkbox } from '../../components';
+import { Form, Row } from './styles';
 
 const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
   const [formData, setFormData] = useState({
@@ -54,9 +55,14 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
       </Row>
       <Row>
         <label>Ativo:</label>
-        <Checkbox name="idtAtivo" type="checkbox" checked={formData.idtAtivo} onChange={handleChange} />
+        <input 
+          type="checkbox" 
+          name="idtAtivo" 
+          checked={formData.idtAtivo} 
+          onChange={handleChange} 
+        />
       </Row>
-      <Button type="submit">{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
+      <Button variant="primary" type="submit">{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
     </Form>
   );
 };

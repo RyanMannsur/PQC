@@ -49,7 +49,7 @@ const Signin = () => {
         />
         <C.labelError>{error}</C.labelError>
         <div>*Utilizar as mesmas credenciais do SIGAA</div>
-        <Button Text="Entrar" onClick={handleLogin} />
+        <Button Text="Entrar" onClick={handleLogin} fullWidth />
       </C.Content>
     </C.Container>
   );

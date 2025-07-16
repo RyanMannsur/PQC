@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Button, Input } from "../../components";
 import * as C from "./styles";
 
 const ImplantacaoList = ({ data, onChange }) => {
@@ -69,9 +70,13 @@ const ImplantacaoList = ({ data, onChange }) => {
               <C.Td>{produto.perPureza}</C.Td>
               <C.Td>{produto.vlrDensidade}</C.Td>
               <C.Td>
-                <C.Button onClick={() => toggleExpand(produto.codProduto)}>
+                <Button 
+                  variant="outline" 
+                  size="small"
+                  onClick={() => toggleExpand(produto.codProduto)}
+                >
                   {expanded[produto.codProduto] ? "🔼" : "🔽"}
-                </C.Button>
+                </Button>
               </C.Td>
             </C.ProductRow>
 
@@ -81,7 +86,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                   <C.ItemRow key={`${produto.codProduto}-${idx}`}>
                     <C.SublistTd>
                       Embalagem
-                      <C.Input
+                      <Input
                         type="text"
                         value={item.codEmbalagem}
                         onChange={(e) =>
@@ -91,7 +96,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                     </C.SublistTd>
                     <C.SublistTd>
                       Quantidade
-                      <C.Input
+                      <Input
                         type="number"
                         value={item.qtdEstoque}
                         onChange={(e) =>
@@ -101,7 +106,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                     </C.SublistTd>
                     <C.SublistTd>
                       Validade
-                      <C.Input
+                      <Input
                         type="date"
                         value={item.datValidade}
                         onChange={(e) =>
@@ -111,7 +116,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                     </C.SublistTd>
                     <C.SublistTd>
                       Observação
-                      <C.Input
+                      <Input
                         type="text"
                         value={item.txtJustificativa}
                         onChange={(e) =>
@@ -121,12 +126,29 @@ const ImplantacaoList = ({ data, onChange }) => {
                     </C.SublistTd>
                     <C.SublistTd>
                       <div className="button-container">
-                        <C.Button onClick={() => handleAddSubitem(produto.codProduto)}>
+                        <Button 
+                          variant="success" 
+                          size="small"
+                          onClick={() => handleAddSubitem(produto.codProduto)}
+                          style={{ 
+                            padding: '4px 8px', 
+                            fontSize: '12px', 
+                            minWidth: '30px',
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            fontWeight: 'bold'
+                          }}
+                        >
                           ➕
-                        </C.Button>
-                        <C.Button onClick={() => handleRemoveSubitem(produto.codProduto, idx)}>
+                        </Button>
+                        <Button 
+                          variant="danger" 
+                          size="small"
+                          onClick={() => handleRemoveSubitem(produto.codProduto, idx)}
+                          style={{ padding: '4px 8px', fontSize: '12px', minWidth: '30px', marginLeft: '8px' }}
+                        >
                           🗑️
-                        </C.Button>
+                        </Button>
                       </div>  
                     </C.SublistTd>
                   </C.ItemRow>

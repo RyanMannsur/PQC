@@ -164,6 +164,8 @@ const Inventario = () => {
         <Button
           Text="Confirmar Atualização"
           onClick={enviarAtualizacao}
+          size="large"
+          fullWidth
         />
       </C.ButtonGroup>
       <Modal
