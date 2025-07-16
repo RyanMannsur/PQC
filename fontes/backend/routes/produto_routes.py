@@ -210,31 +210,27 @@ def verifica_local_estocagem_Ja_implantado(codCampus, codUnidade, codPredio, cod
 @produto_bp.route("/obterEstoqueLocalEstocagem/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaboratorio):
     
-    data_param = request.args.get('data')
+    # Buscar o último movimento de inventário (IN) para cada produto/item neste local
+    sql_ultimo_inventario = """
+        SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+          FROM MovtoEstoque
+         WHERE codCampus = %s
+           AND codUnidade = %s
+           AND codPredio = %s
+           AND codLaboratorio = %s
+           AND idtTipoMovto = 'IN'
+         GROUP BY codProduto, seqItem
+    """
+    
+    try:
+        db = Db()
+        params_inventario = (codCampus, codUnidade, codPredio, codLaboratorio,)
+        ultimos_inventarios = db.execSql(sql_ultimo_inventario, params_inventario, Mode.SELECT)
+    except Exception as e:
+        return db.getErro(e)
 
-    if data_param and data_param != '1900-01-01':
-        datInicio = data_param
-    else:
-        sql = """
-            SELECT min(datMovto)
-              FROM MovtoEstoque 
-             WHERE codCampus = %s
-               AND codUnidade = %s
-               AND codPredio = %s
-               AND codLaboratorio = %s
-        """
-        params = (codCampus, codUnidade, codPredio, codLaboratorio,)
-
-        try:
-            db = Db()
-            datPrimeiraMovimentacao = db.execSql(sql, params, Mode.SELECT)
-        except Exception as e:
-            return db.getErro(e)
-
-        if datPrimeiraMovimentacao and datPrimeiraMovimentacao[0] and datPrimeiraMovimentacao[0][0]:
-            datInicio = datPrimeiraMovimentacao[0][0]
-        else:
-            return util.formataAviso("Local de estocagem não possui movimentações registradas!")
+    # Construir a consulta principal considerando o último inventário
+    # Usar uma única consulta que funciona para ambos os cenários
     sql = """
        SELECT A.codProduto,
               A.nomProduto,
@@ -249,15 +245,26 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
          JOIN MovtoEstoque C
            ON C.codProduto = B.codProduto
           AND C.seqItem = B.seqItem
-        WHERE C.datMovto >= %s 
-          AND C.codCampus = %s
+         LEFT JOIN (
+            SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+              FROM MovtoEstoque
+             WHERE codCampus = %s
+               AND codUnidade = %s
+               AND codPredio = %s
+               AND codLaboratorio = %s
+               AND idtTipoMovto = 'IN'
+             GROUP BY codProduto, seqItem
+         ) UltInv ON UltInv.codProduto = C.codProduto AND UltInv.seqItem = C.seqItem
+        WHERE C.codCampus = %s
           AND C.codUnidade = %s
           AND C.codPredio = %s
-          AND C.codLaboratorio = %s 
+          AND C.codLaboratorio = %s
+          AND (UltInv.ultimo_inventario_id IS NULL OR C.idMovtoEstoque >= UltInv.ultimo_inventario_id)
         GROUP BY 1,2,3,4,5,6
+        HAVING sum(C.qtdEstoque) > 0
         ORDER By 2, 5
     """
-    params = (datInicio, codCampus, codUnidade, codPredio, codLaboratorio,)
+    params = (codCampus, codUnidade, codPredio, codLaboratorio, codCampus, codUnidade, codPredio, codLaboratorio,)
 
     try:
         db = Db()
