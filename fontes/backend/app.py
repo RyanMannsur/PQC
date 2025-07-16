@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 cfg = Param()
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", "http://localhost:3001"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+CORS(app, origins=["http://localhost:3000", "http://localhost:3001"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
 
 app.config["DEBUG_MODE"] = cfg.getDebug()
 portaBackend = cfg.getPortaBackend()

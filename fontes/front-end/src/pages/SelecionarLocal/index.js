@@ -3,7 +3,7 @@ import { Button, Select, FormGroup } from "../../components";
 import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
 import { LocalContext } from "../../contexts/local";
-import { getLabs } from "../../services/laboratorio/service";
+import { obterLocaisEstoque } from "../../services/produto/tokenService";
 
 const SelecionarLocal = () => {
   const { setLabId, setLabName } = useContext(LocalContext); 
@@ -16,7 +16,7 @@ const SelecionarLocal = () => {
   useEffect(() => {
     const fetchLabs = async () => {
       try {
-        const labs = await getLabs(); 
+        const labs = await obterLocaisEstoque(); 
 
         if (labs && Array.isArray(labs)) {
           if (labs.length === 1) {

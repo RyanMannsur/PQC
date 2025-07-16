@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getConsultaPQC } from "../../services/produto/service";
+import { consultarProdutos } from "../../services/produto/tokenService";
 import { Button } from "../../components";
 import * as C from "./styles";
 
@@ -9,13 +9,8 @@ function ConsultaPQC({ labId }) {
 
   useEffect(() => {
     (async () => {
-      //salvar codSiape no context
-      const codSiape = 2418912
-      if (!codSiape) 
-        return;
-
       try {
-        const result = await getConsultaPQC(codSiape);
+        const result = await consultarProdutos();
         setData(result);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);

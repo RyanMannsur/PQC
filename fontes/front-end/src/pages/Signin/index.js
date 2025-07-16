@@ -1,32 +1,48 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/auth";
+import { login } from "../../services/auth/service";
 
 const Signin = () => {
-  const { signin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [cpf, setCpf] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!cpf || !senha) {
       setError("Preencha todos os campos");
       return;
     }
 
-    const res = signin(cpf, senha);
+    setLoading(true);
+    setError("");
 
-    if (res) {
-      setError(res);
-      return;
+    try {
+      const userData = await login(cpf, senha);
+      
+      // Se o usuário tem laboratórios, definir o primeiro como padrão
+      if (userData.laboratorios && userData.laboratorios.length > 0) {
+        const firstLab = userData.laboratorios[0];
+        localStorage.setItem("labId", JSON.stringify({
+          codCampus: firstLab.codCampus,
+          codUnidade: firstLab.codUnidade,
+          codPredio: firstLab.codPredio,
+          codLaboratorio: firstLab.codLaboratorio,
+          nomLocal: firstLab.nomLocal
+        }));
+      }
+
+      navigate("/selecionar-lab");
+    } catch (err) {
+      setError(err.message || "Erro no login");
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/selecionar-lab");
   };
 
   return (
@@ -49,7 +65,12 @@ const Signin = () => {
         />
         <C.labelError>{error}</C.labelError>
         <div>*Utilizar as mesmas credenciais do SIGAA</div>
-        <Button Text="Entrar" onClick={handleLogin} fullWidth />
+        <Button 
+          Text={loading ? "Entrando..." : "Entrar"} 
+          onClick={handleLogin} 
+          fullWidth 
+          disabled={loading}
+        />
       </C.Content>
     </C.Container>
   );

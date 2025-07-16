@@ -8,6 +8,45 @@ from db import Db, Mode
 from valida import Valida
 import util
 
+# Função auxiliar para validar token
+def validar_token(token):
+    """Valida se o token existe na base de dados."""
+    sql = "SELECT COUNT(*) as count FROM usuario WHERE token = %s"
+    params = (token,)
+    
+    try:
+        db = Db()
+        result = db.execSql(sql, params, Mode.SELECT)
+        return result[0][0] > 0 if result else False
+    except Exception:
+        return False
+
+# Função para obter laboratórios do usuário por token
+def obter_laboratorios_usuario(token):
+    """Obtém os laboratórios associados ao token do usuário."""
+    sql = """
+        SELECT ul.codCampus, 
+               ul.codUnidade,
+               ul.codPredio,
+               ul.codLaboratorio,
+               le.nomLocal 
+          FROM usuariolocalestocagem ul
+          JOIN LocalEstocagem le
+            ON le.codCampus = ul.codCampus
+           AND le.codUnidade = ul.codUnidade
+           AND le.codPredio = ul.codPredio
+           AND le.codLaboratorio = ul.codLaboratorio
+         WHERE ul.token = %s 
+         ORDER BY le.nomLocal           
+        """
+    params = (token,)
+    
+    try:
+        db = Db()
+        return db.execSql(sql, params, Mode.SELECT)
+    except Exception as e:
+        return []
+
 # Adicionar endpoint para monitorar migrações
 @produto_bp.route("/migrations/status", methods=["GET"])
 def get_migrations_status():
@@ -132,29 +171,18 @@ def obter_produto(codProduto):
 
     return produto_dict
 
-# Rota para obter os Locais de Estocagem que o Usuario é o responsavel
-@produto_bp.route("/obterLocaisEstoque/<int:codSiape>", methods=["GET"])
-def obter_Locais_Estoque(codSiape):
-    sql = """
-        SELECT codCampus, 
-               codUnidade,
-               codPredio,
-               codLaboratorio,
-               nomLocal 
-          FROM LocalEstocagem        
-         WHERE codSiapeResponsavel = %s 
-         ORDER BY nomLocal           
-        """
-    params = (codSiape,)
+# ROTAS BASEADAS EM TOKEN
 
-    try:
-        db = Db()
-        locais = db.execSql(sql, params, Mode.SELECT)
-    except Exception as e:
-        return db.getErro(e)
-
+# Rota para obter os Locais de Estocagem que o Usuario é o responsavel (por token)
+@produto_bp.route("/obterLocaisEstoque/token/<string:token>", methods=["GET"])
+def obter_Locais_Estoque_por_token(token):
+    if not validar_token(token):
+        return util.formataAviso("Token inválido!")
+    
+    locais = obter_laboratorios_usuario(token)
+    
     if not locais:
-        return util.formataAviso("Usuário não é responsável por nenhum Local de Estogem de Produtos Químicos Controlados!")
+        return util.formataAviso("Usuário não é responsável por nenhum Local de Estocagem de Produtos Químicos Controlados!")
         
     locais_formatado = []
     for local in locais: 
@@ -167,6 +195,69 @@ def obter_Locais_Estoque(codSiape):
         })
 
     return locais_formatado
+
+# Rota para consulta em grid (por token)
+@produto_bp.route("/consultaPQC/token/<string:token>", methods=["GET"])
+def consultarProdutos_por_token(token):
+    if not validar_token(token):
+        return util.formataAviso("Token inválido!")
+    
+    sql = """
+       SELECT A.codProduto,
+              A.nomProduto,
+              A.perPureza,
+              A.vlrDensidade,
+              E.codCampus,
+              E.nomCampus,
+              F.codUnidade,
+              F.nomUnidade,
+              G.codLaboratorio,
+              G.nomLocal,
+              B.seqItem,
+              B.seqEmbalagem,
+              B.datValidade,
+              desTipoMovto(C.idtTipoMovto) as desTipoMovto,
+              C.datMovto,
+              C.qtdEstoque
+         FROM Produto A
+         JOIN ProdutoItem B
+           ON B.codProduto = A.codProduto
+         JOIN MovtoEstoque C
+           ON C.codProduto = B.codProduto
+          AND C.seqItem = B.seqItem
+         JOIN LocalEstocagem D
+           ON D.codCampus = C.codCampus
+          AND D.codUnidade = C.codUnidade
+          AND D.codPredio = C.codPredio
+          AND D.codLaboratorio = C.codLaboratorio
+         JOIN usuariolocalestocagem UL
+           ON UL.codCampus = D.codCampus
+          AND UL.codUnidade = D.codUnidade
+          AND UL.codPredio = D.codPredio
+          AND UL.codLaboratorio = D.codLaboratorio
+         JOIN Campus E
+           ON E.codCampus = C.codCampus
+         JOIN UnidadeOrganizacional F
+           ON F.codUnidade = C.codUnidade
+         JOIN LocalEstocagem G
+           ON G.codPredio = C.codPredio
+          AND G.codLaboratorio = C.codLaboratorio
+        WHERE UL.token = %s 
+        ORDER By  A.nomProduto, E.nomCampus,  F.nomUnidade, G.nomLocal, B.seqItem
+    """
+    params = (token,) 
+
+    try:
+        db = Db()
+        produtos = db.execSql(sql, params, Mode.SELECT)
+    except Exception as e:
+        return db.getErro(e)
+
+    if not produtos:
+        return util.formataAviso("Nenhum produto encontrado no inventário!")
+        
+    return produtos
+   
    
 
 @produto_bp.route("/obterProdutosPorLaboratorio/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
@@ -328,121 +419,6 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
         })
 
     return list(dictProduto.values())
-   
-#Rota para consulta em grid
-@produto_bp.route("/consultaPQC/<int:codSiape>", methods=["GET"])
-def consultarProdutos(codSiape):
-    
-    sql = """
-       SELECT A.codProduto,
-              A.nomProduto,
-              A.perPureza,
-              A.vlrDensidade,
-              E.codCampus,
-              E.nomCampus,
-              F.codUnidade,
-              F.nomUnidade,
-              G.codLaboratorio,
-              G.nomLocal,
-              B.seqItem,
-              B.seqEmbalagem,
-              B.datValidade,
-              desTipoMovto(C.idtTipoMovto) as desTipoMovto,
-              C.datMovto,
-              C.qtdEstoque
-         FROM Produto A
-         JOIN ProdutoItem B
-           ON B.codProduto = A.codProduto
-         JOIN MovtoEstoque C
-           ON C.codProduto = B.codProduto
-          AND C.seqItem = B.seqItem
-         JOIN LocalEstocagem D
-           ON D.codCampus = C.codCampus
-          AND D.codUnidade = C.codUnidade
-          AND D.codPredio = C.codPredio
-          AND D.codLaboratorio = C.codLaboratorio
-         JOIN Campus E
-           ON E.codCampus = C.codCampus
-         JOIN UnidadeOrganizacional F
-           ON F.codUnidade = C.codUnidade
-         JOIN LocalEstocagem G
-           ON G.codPredio = C.codPredio
-          AND G.codLaboratorio = C.codLaboratorio
-        WHERE D.codSiapeResponsavel = %s 
-        ORDER By  A.nomProduto, E.nomCampus,  F.nomUnidade, G.nomLocal, B.seqItem
-    """
-    params = (codSiape,) 
-
-    try:
-        db = Db()
-        produtos = db.execSql(sql, params, Mode.SELECT)
-    except Exception as e:
-        return db.getErro(e)
-
-    if not produtos:
-         return util.formataAviso("Nenhum produto encontrado no local corrente de estocagem do usuário!")  
-
-    produtos_map = {}
-    
-    for r in produtos:
-        (codProduto, nomProduto, perPureza, vlrDensidade,
-         codCampus, nomCampus, codUnidade, nomUnidade,
-         codLaboratorio, nomLocal, seqItem, seqEmbalagem,
-         datValidade, desTipoMovto, datMovto, qtdEstoque) = r
-        
-        pr = produtos_map.setdefault(codProduto, {
-            "id": f"prod-{codProduto}",
-            "codProduto": codProduto,
-            "nomProduto": nomProduto,
-            "perPureza": perPureza,
-            "vlrDensidade": vlrDensidade,
-            "totProduto": 0,
-            "local": {}
-        })
-
-        pr["totProduto"] += qtdEstoque
-
-        local_map = pr["local"].setdefault(codLaboratorio, {
-            "id": f"loc-{codCampus}-{codUnidade}-{codLaboratorio}",
-            "codCampus": codCampus,
-            "nomCampus": nomCampus,
-            "nomUnidade": nomUnidade,
-            "nomLaboratorio": nomLocal,
-            "totalLocais": 0,
-            "items": {}
-        })
-
-        local_map["totalLocais"] += qtdEstoque
-
-        item_map = local_map["items"].setdefault(seqItem, {
-            "id": f"item-{codProduto}-{seqItem}",
-            "seqItem": seqItem,
-            "nomEmbalagem": seqEmbalagem,
-            "datValidade": datValidade.strftime("%d-%m-%Y") if hasattr(datValidade, "strftime") else datValidade,
-            "totalItem": 0,
-            "movtos": []
-        })
-
-        item_map["totalItem"] += qtdEstoque
-
-        item_map["movtos"].append({
-            "id": f"mov-{codProduto}-{seqItem}-{desTipoMovto}",
-            "idtTipoMovto": desTipoMovto,
-            "datMovto": datMovto.strftime("%d-%m-%Y") if hasattr(datMovto, "strftime") else datMovto,
-            "qtdMovto": qtdEstoque
-        })
-
-    result = []
-    for prod in produtos_map.values():
-        prod_out = {**prod, "local": []}
-        for loc in prod["local"].values():
-            camp_out = {**loc, "items": []}
-            for item in loc["items"].values():
-                camp_out["items"].append(item)
-            prod_out["local"].append(camp_out)
-        result.append(prod_out)
-
-    return result
    
 #Rota para obter os produtos de um local
 @produto_bp.route("/buscarProdutos", methods=["GET"])
@@ -1547,5 +1523,90 @@ def cadastrar_produtos():
 
         return jsonify({"message": f"Produtos cadastrados com sucesso! Total: {itens_processados}"}), 200
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ROTAS DE AUTENTICAÇÃO
+
+@produto_bp.route("/auth/login", methods=["POST"])
+def login():
+    """Rota para autenticação de usuários."""
+    data = request.get_json()
+    
+    if not data or 'cpf' not in data or 'senha' not in data:
+        return jsonify({"error": "CPF e senha são obrigatórios"}), 400
+    
+    cpf = data['cpf']
+    senha = data['senha']
+    
+    sql = """
+        SELECT token, cpf, id 
+        FROM usuario 
+        WHERE cpf = %s AND senha = %s
+    """
+    params = (cpf, senha)
+    
+    try:
+        db = Db()
+        result = db.execSql(sql, params, Mode.SELECT)
+        
+        if not result:
+            return jsonify({"error": "Credenciais inválidas"}), 401
+        
+        usuario = result[0]
+        
+        # Buscar laboratórios do usuário
+        laboratorios = obter_laboratorios_usuario(usuario[0])  # usuario[0] é o token
+        
+        return jsonify({
+            "token": usuario[0],
+            "cpf": usuario[1],
+            "id": usuario[2],
+            "laboratorios": laboratorios
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@produto_bp.route("/auth/validate", methods=["POST"])
+def validate_token():
+    """Rota para validar token."""
+    data = request.get_json()
+    
+    if not data or 'token' not in data:
+        return jsonify({"error": "Token é obrigatório"}), 400
+    
+    token = data['token']
+    
+    if not validar_token(token):
+        return jsonify({"error": "Token inválido"}), 401
+    
+    # Buscar dados do usuário
+    sql = """
+        SELECT token, cpf, id 
+        FROM usuario 
+        WHERE token = %s
+    """
+    params = (token,)
+    
+    try:
+        db = Db()
+        result = db.execSql(sql, params, Mode.SELECT)
+        
+        if not result:
+            return jsonify({"error": "Token inválido"}), 401
+        
+        usuario = result[0]
+        
+        # Buscar laboratórios do usuário
+        laboratorios = obter_laboratorios_usuario(token)
+        
+        return jsonify({
+            "token": usuario[0],
+            "cpf": usuario[1],
+            "id": usuario[2],
+            "laboratorios": laboratorios
+        }), 200
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500

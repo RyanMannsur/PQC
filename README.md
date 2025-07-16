@@ -210,7 +210,17 @@ docker volume rm pqc_pgdata
 3. **Pronto!** Acesse http://localhost:3001
    - As migrações do banco são executadas automaticamente na inicialização
 
-### 📚 Documentação completa:
+### � Usuários de Teste:
+- **Usuário Administrador (Acesso Total)**: 
+  - CPF: `333.333.333-33` 
+  - Senha: `PQC1*`
+  - **Acesso**: Todos os laboratórios do sistema
+- **Usuário Comum (Acesso Limitado)**:
+  - CPF: `123.456.789-01`
+  - Senha: `Senha@123`
+  - **Acesso**: Laboratórios específicos
+
+### �📚 Documentação completa:
 - **[SETUP-DESENVOLVEDORES.md](SETUP-DESENVOLVEDORES.md)** - Guia completo de configuração
 - **[COMANDOS-UTEIS.md](COMANDOS-UTEIS.md)** - Todos os comandos que você vai precisar
 - **[DOCKER-README.md](DOCKER-README.md)** - Específico para Docker

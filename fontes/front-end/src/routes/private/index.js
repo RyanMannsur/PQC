@@ -1,15 +1,13 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+import { isAuthenticated } from "../../services/auth/service";
 
 const PrivateRoute = ({ children }) => {
-  const { usuario, loading } = useAuth();
-
-  if (loading) {
-    return <div>Carregando...</div>;
+  if (!isAuthenticated()) {
+    return <Navigate to="/" />;
   }
   
-  return usuario ? children : <Navigate to="/" />;
+  return children;
 };
 
 export default PrivateRoute;

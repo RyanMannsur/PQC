@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { signin as signinService } from "../services/authService";
+import { validateToken, getCurrentUser, logout, login } from "../services/auth/service";
 
 export const AuthContext = createContext({});
 
@@ -8,27 +8,37 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user_data");
-    if (storedUser) {
-      setUsuario(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const checkAuth = async () => {
+      const user = getCurrentUser();
+      if (user && user.token) {
+        try {
+          const validatedUser = await validateToken(user.token);
+          setUsuario(validatedUser);
+        } catch (error) {
+          console.error("Token inválido:", error);
+          logout();
+          setUsuario(null);
+        }
+      }
+      setLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
-  const signin = (cpf, senha) => {
-    const resultado = signinService(cpf, senha);
-    if (typeof resultado === "string") {
-      return resultado;
-    } else {
-      setUsuario(resultado);
+  const signin = async (cpf, senha) => {
+    try {
+      const result = await login(cpf, senha);
+      setUsuario(result);
       return null;
+    } catch (error) {
+      return error.message || "Erro no login";
     }
   };
 
   const signout = () => {
     setUsuario(null);
-    localStorage.removeItem("user_data");
-    localStorage.removeItem("labId");
+    logout();
   };
 
   return (
