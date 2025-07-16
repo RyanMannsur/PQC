@@ -1,26 +1,27 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import Header from "../components/Header";
 import { AuthContext } from "../contexts/auth"; 
 import { useLocal } from "../contexts/local"; 
-import { getProdutosImplantar } from "../services/laboratorio/service";
+import { obterNomeLocalEstocagem } from "../services/produto/service";
 
 const AppLayout = ({ children }) => {
 const { usuario } = useContext(AuthContext);
-const { labId } = useLocal(); 
-const [labName, setLabName] = useState(null); 
+const { labId, labName, setLabName } = useLocal(); 
 
 useEffect(() => {
   const fetchLabDetails = async () => {
     if (labId) {
       const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
       try {
-        const labDetails = await getProdutosImplantar(
+        const labDetails = await obterNomeLocalEstocagem(
           codCampus,
           codUnidade,
           codPredio,
           codLaboratorio
         );
-        setLabName(labDetails[0].nomLocal); 
+        if (labDetails && labDetails.length > 0) {
+          setLabName(labDetails[0].nomLocal); 
+        }
       } catch (error) {
         console.error("Erro ao buscar detalhes do laboratório:", error);
       }
@@ -28,7 +29,7 @@ useEffect(() => {
   };
 
   fetchLabDetails();
-}, [labId]);
+}, [labId, setLabName]);
 
 return (
   <Header

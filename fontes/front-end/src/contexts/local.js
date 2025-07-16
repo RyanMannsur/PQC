@@ -4,11 +4,16 @@ export const LocalContext = createContext({});
 
 export const LocalProvider = ({ children }) => {
 const [labId, setLabId] = useState(null);
+const [labName, setLabName] = useState(null);
 
 useEffect(() => {
   const storedLocalId = localStorage.getItem("labId");
+  const storedLabName = localStorage.getItem("labName");
   if (storedLocalId) {
     setLabId(JSON.parse(storedLocalId));
+  }
+  if (storedLabName) {
+    setLabName(storedLabName);
   }
 }, []);
 
@@ -17,8 +22,18 @@ const handleSetLabId = (id) => {
   localStorage.setItem("labId", JSON.stringify(id));
 };
 
+const handleSetLabName = (name) => {
+  setLabName(name);
+  localStorage.setItem("labName", name);
+};
+
 return (
-  <LocalContext.Provider value={{ labId, setLabId: handleSetLabId }}>
+  <LocalContext.Provider value={{ 
+    labId, 
+    setLabId: handleSetLabId,
+    labName,
+    setLabName: handleSetLabName
+  }}>
     {children}
   </LocalContext.Provider>
 );

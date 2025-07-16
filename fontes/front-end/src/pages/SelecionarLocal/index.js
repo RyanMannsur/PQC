@@ -7,7 +7,7 @@ import { LocalContext } from "../../contexts/local";
 import { getLabs } from "../../services/laboratorio/service";
 
 const SelecionarLocal = () => {
-  const { setLabId } = useContext(LocalContext); 
+  const { setLabId, setLabName } = useContext(LocalContext); 
   const navigate = useNavigate();
 
   const [lab, setLab] = useState(null); 
@@ -23,7 +23,13 @@ const SelecionarLocal = () => {
           if (labs.length === 1) {
             const selectedLab = labs[0];
             setLab(selectedLab);
-            setLabId(selectedLab);
+            setLabId({
+              codCampus: selectedLab.codCampus,
+              codUnidade: selectedLab.codUnidade,
+              codPredio: selectedLab.codPredio,
+              codLaboratorio: selectedLab.codLaboratorio,
+            });
+            setLabName(selectedLab.nomLocal);
             navigate("/home");
             return;
           }
@@ -48,7 +54,6 @@ const SelecionarLocal = () => {
 
     fetchLabs();
   }, [navigate, setLabId]);
-
   const handleSelect = () => {
     if (!lab) {
       setError("Por favor, selecione um local");
@@ -61,7 +66,7 @@ const SelecionarLocal = () => {
       codPredio: lab.codPredio,
       codLaboratorio: lab.codLaboratorio,
     });
-
+    setLabName(lab.nomLocal);
     navigate("/home");
   };
 

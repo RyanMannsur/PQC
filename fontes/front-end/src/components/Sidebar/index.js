@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 const Sidebar = () => {
 const handleClearLabAndNavigate = () => {
   localStorage.removeItem("labId");
+  localStorage.removeItem("labName");
 };
 
 return (

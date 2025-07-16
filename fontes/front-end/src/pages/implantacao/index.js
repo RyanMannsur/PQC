@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
-import { obterProdutosNaoImplantadosPorLocal, implantarItensLaboratorio, obterNomeLocalEstocagem } from "../../services/produto/service";
+import { obterProdutosNaoImplantadosPorLocal, implantarItensLaboratorio } from "../../services/produto/service";
 import { useLocal } from "../../contexts/local";
 import * as C from "./styles";
 
@@ -10,31 +10,14 @@ const Implantacao = () => {
 const [produtos, setProdutos] = useState([]);
 const [implantacoes, setImplantacoes] = useState({});
 const [loading, setLoading] = useState(true);
-const { labId } = useLocal();
-const [labName, setLabName] = useState(null);
+const { labId, labName } = useLocal();
 const [isModalOpen, setIsModalOpen] = useState(false); 
 const navigate = useNavigate(); 
 
 useEffect(() => {
-  const fetchLabDetails = async () => {
-    console.log("LabId carregado:", labId);
-    if (labId) {
-      const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-      try {
-        const labDetails = await obterNomeLocalEstocagem(
-          codCampus,
-          codUnidade,
-          codPredio,
-          codLaboratorio
-        );
-        setLabName(labDetails[0].nomLocal);
-      } catch (error) {
-        console.error("Erro ao buscar detalhes do laboratório:", error);
-      }
-    }
-  };
-
   const fetchProdutos = async () => {
+    if (!labId) return;
+    
     const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
     try {
       const produtosResponse = await obterProdutosNaoImplantadosPorLocal(codCampus, codUnidade, codPredio, codLaboratorio,);
@@ -46,7 +29,6 @@ useEffect(() => {
     }
   };
 
-  fetchLabDetails();
   fetchProdutos();
 }, [labId]);
 

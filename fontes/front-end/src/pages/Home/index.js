@@ -1,27 +1,23 @@
 import { useEffect, useState } from "react";
 import * as C from "./styles";
 import { useLocal } from "../../contexts/local";
-import { obterEstoqueLocalEstocagem, obterNomeLocalEstocagem } from "../../services/produto/service";
+import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
 import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 
 
 const Home = () => {
-const { labId } = useLocal();
-const [labDetails, setLabDetails] = useState(null);
+const { labId, labName } = useLocal();
 const [isModalOpen, setIsModalOpen] = useState(false);
 const navigate = useNavigate();
 
 useEffect(() => {
   const fetchLabDetails = async () => {
+    if (!labId) return;
+    
     const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
 
     try {
-      const lab = await obterNomeLocalEstocagem(
-        codCampus, codUnidade, codPredio, codLaboratorio
-      );
-      setLabDetails(lab[0]);
-
       const produtos = await obterEstoqueLocalEstocagem(
         codCampus, codUnidade, codPredio, codLaboratorio
       );
@@ -46,7 +42,7 @@ const handleModalClose = () => {
   navigate("/implantacao"); 
 };
 
-if (!labDetails && !isModalOpen) {
+if (!labName && !isModalOpen) {
   return <C.Label>Carregando informações...</C.Label>;
 }
 
@@ -59,10 +55,10 @@ return (
     >
       Laboratório vazio. Você será redirecionado(a) para a implantação do local selecionado.
     </Modal>
-    {labDetails && (
+    {labName && (
       <C.Container>
         <C.Content>
-          <C.Label>Bem-vindo ao {labDetails.nomLocal}</C.Label>
+          <C.Label>Bem-vindo ao {labName}</C.Label>
         </C.Content>
       </C.Container>
     )}

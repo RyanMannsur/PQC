@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
 import Select from "../../components/InputSelect"; 
-import { obterProdutosNaoImplantadosPorLocal, cadastrarProdutos, obterNomeLocalEstocagem } from "../../services/produto/service"; 
+import { obterProdutosNaoImplantadosPorLocal, cadastrarProdutos } from "../../services/produto/service"; 
 import { useLocal } from "../../contexts/local";
 import * as C from "./styles";
 
@@ -12,8 +12,7 @@ const [produtos, setProdutos] = useState([]);
 const [implantacoes, setImplantacoes] = useState({});
 const [tipoCadastro, setTipoCadastro] = useState(""); 
 const [loading, setLoading] = useState(true);
-const { labId } = useLocal(); 
-const [labName, setLabName] = useState(null); 
+const { labId, labName } = useLocal(); 
 const [isModalOpen, setIsModalOpen] = useState(false); 
 const navigate = useNavigate(); 
 
@@ -22,14 +21,6 @@ useEffect(() => {
     if (labId) {
       const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
       try {
-        const labDetails = await obterNomeLocalEstocagem(
-          codCampus,
-          codUnidade,
-          codPredio,
-          codLaboratorio
-        );
-        setLabName(labDetails[0].nomLocal);
-
         const produtosResponse = await obterProdutosNaoImplantadosPorLocal(
           codCampus,
           codUnidade,
