@@ -430,6 +430,7 @@ def buscar_produtos_local_estocagem():
     perPureza = request.args.get("perPureza")
     vlrDensidade = request.args.get("vlrDensidade")
 
+    # Construir filtros dinâmicos
     filtro = ''
     if nomProduto:
          filtro += f" AND A.nomProduto like '%{nomProduto}%'"
@@ -440,6 +441,7 @@ def buscar_produtos_local_estocagem():
     if vlrDensidade:
          filtro += f" AND A.vlrDensidade = {vlrDensidade}"
 
+    # Usar a mesma lógica do inventário para considerar o último 'IN' como marco
     sql = f"""
        SELECT A.codProduto,
               A.nomProduto,
@@ -454,17 +456,28 @@ def buscar_produtos_local_estocagem():
          JOIN MovtoEstoque C
            ON C.codProduto = B.codProduto
           AND C.seqItem = B.seqItem
+         LEFT JOIN (
+            SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+              FROM MovtoEstoque
+             WHERE codCampus = %s
+               AND codUnidade = %s
+               AND codPredio = %s
+               AND codLaboratorio = %s
+               AND idtTipoMovto = 'IN'
+             GROUP BY codProduto, seqItem
+         ) UltInv ON UltInv.codProduto = C.codProduto AND UltInv.seqItem = C.seqItem
         WHERE A."idtAtivo" = true
           AND C.codCampus = %s
           AND C.codUnidade = %s
           AND C.codPredio = %s
-          AND C.codLaboratorio = %s 
+          AND C.codLaboratorio = %s
+          AND (UltInv.ultimo_inventario_id IS NULL OR C.idMovtoEstoque >= UltInv.ultimo_inventario_id)
           {filtro}
         GROUP BY 1,2,3,4,5,6
         HAVING sum(C.qtdEstoque) > 0
         ORDER By 2, 6
     """
-    params = (codCampus, codUnidade, codPredio, codLaboratorio,)
+    params = (codCampus, codUnidade, codPredio, codLaboratorio, codCampus, codUnidade, codPredio, codLaboratorio,)
 
     try:
         db = Db()
@@ -491,6 +504,7 @@ def buscar_produtos_local_estocagem():
 
 @produto_bp.route("/ObterProdutoBYCodigoAndSequencia/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>/<int:codProduto>/<int:seqItem>", methods=["GET"])
 def obter_produto_por_codigo_e_sequencia(codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem):
+    # Usar a mesma lógica das outras funções para considerar o último 'IN' como marco
     sql = """
        SELECT A.codProduto,
               A.nomProduto,
@@ -505,24 +519,29 @@ def obter_produto_por_codigo_e_sequencia(codCampus, codUnidade, codPredio, codLa
          JOIN MovtoEstoque C
            ON C.codProduto = B.codProduto
           AND C.seqItem = B.seqItem
-        WHERE C.datMovto >= (SELECT max(datMovto) FROM MovtoEstoque D
-                              WHERE D.codProduto = A.codProduto
-                                AND D.seqItem = B.seqItem
-                                AND D.codCampus = C.codCampus
-                                AND D.codUnidade = C.codUnidade
-                                AND D.codPredio = C.codPredio
-                                AND D.codLaboratorio = C.codLaboratorio
-                                AND D.idtTipoMovto = 'IN') 
-          AND A.codProduto = %s
+         LEFT JOIN (
+            SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+              FROM MovtoEstoque
+             WHERE codCampus = %s
+               AND codUnidade = %s
+               AND codPredio = %s
+               AND codLaboratorio = %s
+               AND idtTipoMovto = 'IN'
+               AND codProduto = %s
+               AND seqItem = %s
+             GROUP BY codProduto, seqItem
+         ) UltInv ON UltInv.codProduto = C.codProduto AND UltInv.seqItem = C.seqItem
+        WHERE A.codProduto = %s
           AND B.seqItem = %s
           AND C.codCampus = %s
           AND C.codUnidade = %s
           AND C.codPredio = %s
-          AND C.codLaboratorio = %s 
+          AND C.codLaboratorio = %s
+          AND (UltInv.ultimo_inventario_id IS NULL OR C.idMovtoEstoque >= UltInv.ultimo_inventario_id)
         GROUP BY 1,2,3,4,5,6
         ORDER By 2, 6
     """
-    params = (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,)
+    params = (codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem, codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,)
 
     try:
         db = Db()
