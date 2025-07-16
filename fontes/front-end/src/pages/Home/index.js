@@ -20,7 +20,7 @@ useEffect(() => {
       const lab = await obterNomeLocalEstocagem(
         codCampus, codUnidade, codPredio, codLaboratorio
       );
-      setLabDetails(lab[0].nomLocal);
+      setLabDetails(lab[0]);
 
       const produtos = await obterEstoqueLocalEstocagem(
         codCampus, codUnidade, codPredio, codLaboratorio

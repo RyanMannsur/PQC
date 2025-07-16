@@ -69,9 +69,15 @@ useEffect(() => {
           codProduto,
           seqItem
         );
+        
+        // Backend retorna um array, pegar o primeiro elemento
+        const produtoData = Array.isArray(produtoResponse) && produtoResponse.length > 0 
+          ? produtoResponse[0] 
+          : produtoResponse;
+          
         setProduto({
-          ...produtoResponse,
-          datValidade: formatarData(produtoResponse.datValidade),
+          ...produtoData,
+          datValidade: formatarData(produtoData.datValidade),
         });
       } catch (error) {
         console.error("Erro ao buscar produto:", error);

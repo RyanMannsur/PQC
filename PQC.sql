@@ -24,6 +24,7 @@ create table Produto (
    nomLista varchar(15) not null,
    perPureza decimal (5,2),
    vlrDensidade decimal  (5,2),
+   "idtAtivo" boolean,
    primary key (codProduto)
 );
 
@@ -137,28 +138,28 @@ insert into Embalagem (codEmbalagem, nomEmbalagem, qtdCapacidade)
    values
    (1, 'Frasco de 1 litro', 1000);
    
-insert into Produto (codProduto, nomProduto, nomLista, perPureza, vlrDensidade)
+insert into Produto (codProduto, nomProduto, nomLista, perPureza, vlrDensidade, "idtAtivo")
   values
-     (1, '1,2-DICLOROETANO', 'Lista II', 99.99, 1.30),
-     (2, 'ACETATO DE ETILA', 'Lista II', 99.80, 0.90),
-     (3, 'ACETONA', 'Lista II', 9.50, 0.79),
-     (4, 'ÁCIDO ACÉTICO', 'Lista IV', 99.70, 1.05),
-     (5, 'ÁCIDO BENZÓICO', 'Lista IV', 99.50, 1.27),
-     (6, 'ÁCIDO BÓRICO e seus sais', 'Lista IV', 99.50, 1.44),
-     (7, 'ÁCIDO BROMÍDRICO', 'Lista IV', 48.00, 1.49),
-     (8, 'ÁCIDO CLORÍDRICO (37%)', 'Lista IV', 37.00, 1.19),
-     (9, 'ÁCIDO CLORÍDRICO solução 0,1 N', 'Lista IV', 0.80, 1.01),
-     (10, 'ÁCIDO CLORÍDRICO solução 1,0', 'Lista IV', 86.00, 1.20),
-     (12, 'ÁCIDO FÓRMICO (98%)', 'Lista IV', 8.00, 1.01),
-     (11, 'ÁCIDO FÓRMICO (86%)', 'Lista IV', 98.00, 1.22),
-     (13, 'ÁCIDO SULFÚRICO', 'Lista IV', 98.00, 1.83),
-     (14, 'ANIDO ACÉTICO', 'Lista VI', 99.00, 1.08),
-     (15, 'BICARBONATO DE POTÁSSIO', 'Lista V', 100.00, 2.17),
-     (40, 'SAFROL', 'Lista I', 97.00, 1.10),
-     (43, '2, 2 DICLORO-DIETIL-METILAMINA (HN-2)', 'EXÉRCITO', null, null),			
-     (44, 'ÁCIDO BENZÍLICO (ÁCIDO-ALFA-HIDROXI-ALFA-FENIL-BENZENOACÉTICO; ÁCIDO 2,2-DIFENIL-2-HIDROXIACÉTICO)', 'EXÉRCITO', null, null),			
-     (45, 'ÁCIDO FLUORÍDRICO (FLUORETO DE HIDROGÊNIO)', 'EXÉRCITO', null, null),			
-     (69, 'TRIETANOLAMINA (TRI(2-HIDROXIETIL) AMINA)', 'EXÉRCITO', null, null);
+     (1, '1,2-DICLOROETANO', 'Lista II', 99.99, 1.30, true),
+     (2, 'ACETATO DE ETILA', 'Lista II', 99.80, 0.90, true),
+     (3, 'ACETONA', 'Lista II', 9.50, 0.79, true),
+     (4, 'ÁCIDO ACÉTICO', 'Lista IV', 99.70, 1.05, true),
+     (5, 'ÁCIDO BENZÓICO', 'Lista IV', 99.50, 1.27, true),
+     (6, 'ÁCIDO BÓRICO e seus sais', 'Lista IV', 99.50, 1.44, true),
+     (7, 'ÁCIDO BROMÍDRICO', 'Lista IV', 48.00, 1.49, true),
+     (8, 'ÁCIDO CLORÍDRICO (37%)', 'Lista IV', 37.00, 1.19, true),
+     (9, 'ÁCIDO CLORÍDRICO solução 0,1 N', 'Lista IV', 0.80, 1.01, true),
+     (10, 'ÁCIDO CLORÍDRICO solução 1,0', 'Lista IV', 86.00, 1.20, true),
+     (12, 'ÁCIDO FÓRMICO (98%)', 'Lista IV', 8.00, 1.01, true),
+     (11, 'ÁCIDO FÓRMICO (86%)', 'Lista IV', 98.00, 1.22, true),
+     (13, 'ÁCIDO SULFÚRICO', 'Lista IV', 98.00, 1.83, true),
+     (14, 'ANIDO ACÉTICO', 'Lista VI', 99.00, 1.08, true),
+     (15, 'BICARBONATO DE POTÁSSIO', 'Lista V', 100.00, 2.17, true),
+     (40, 'SAFROL', 'Lista I', 97.00, 1.10, true),
+     (43, '2, 2 DICLORO-DIETIL-METILAMINA (HN-2)', 'EXÉRCITO', null, null, true),			
+     (44, 'ÁCIDO BENZÍLICO (ÁCIDO-ALFA-HIDROXI-ALFA-FENIL-BENZENOACÉTICO; ÁCIDO 2,2-DIFENIL-2-HIDROXIACÉTICO)', 'EXÉRCITO', null, null, true),			
+     (45, 'ÁCIDO FLUORÍDRICO (FLUORETO DE HIDROGÊNIO)', 'EXÉRCITO', null, null, true),			
+     (69, 'TRIETANOLAMINA (TRI(2-HIDROXIETIL) AMINA)', 'EXÉRCITO', null, null, true);
 
 insert into ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
    values

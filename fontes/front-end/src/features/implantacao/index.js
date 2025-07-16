@@ -14,7 +14,7 @@ const ImplantacaoList = ({ data, onChange }) => {
     if (!implantacoes[codProduto] || implantacoes[codProduto].length === 0) {
       setImplantacoes((prev) => ({
         ...prev,
-        [codProduto]: [{ qtdEstoque: "", datValidade: "", seqEmbalagem: "", txtJustificativa: "" }],
+        [codProduto]: [{ qtdEstoque: "", datValidade: "", codEmbalagem: "", txtJustificativa: "" }],
       }));
     }
   };
@@ -24,7 +24,7 @@ const ImplantacaoList = ({ data, onChange }) => {
       ...prev,
       [codProduto]: [
         ...(prev[codProduto] || []),
-        { qtdEstoque: "", datValidade: "", seqEmbalagem: "", txtJustificativa: "" },
+        { qtdEstoque: "", datValidade: "", codEmbalagem: "", txtJustificativa: "" },
       ],
     }));
   };
@@ -77,15 +77,15 @@ const ImplantacaoList = ({ data, onChange }) => {
 
             {expanded[produto.codProduto] && (
               <>
-                {implantacoes[produto.codProduto].map((item, idx) => (
+                {(implantacoes[produto.codProduto] || []).map((item, idx) => (
                   <C.ItemRow key={`${produto.codProduto}-${idx}`}>
                     <C.SublistTd>
                       Embalagem
                       <C.Input
                         type="text"
-                        value={item.seqEmbalagem}
+                        value={item.codEmbalagem}
                         onChange={(e) =>
-                          handleFieldChange(produto.codProduto, idx, "seqEmbalagem", e.target.value)
+                          handleFieldChange(produto.codProduto, idx, "codEmbalagem", e.target.value)
                         }
                       />
                     </C.SublistTd>
@@ -120,7 +120,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                       />
                     </C.SublistTd>
                     <C.SublistTd>
-                      <div class="button-container">
+                      <div className="button-container">
                         <C.Button onClick={() => handleAddSubitem(produto.codProduto)}>
                           ➕
                         </C.Button>

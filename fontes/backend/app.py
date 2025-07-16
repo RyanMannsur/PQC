@@ -7,7 +7,7 @@ from Param import Param
 cfg = Param()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:3000", "http://localhost:3001"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
 app.config["DEBUG_MODE"] = cfg.getDebug()
 portaBackend = cfg.getPortaBackend()
