@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "../../components";
 import * as C from "./styles";
 import { formatarData } from "../../helpers/dataHelper";
 
@@ -34,11 +35,15 @@ return (
             <C.Td>{produto.produto.vlrDensidade}</C.Td>
             <C.Td>{produto.qtdGeralAtual}</C.Td>
             <C.Td>
-              <C.Button onClick={() => toggleMovimentacoes(produto.produto.codProduto)}>
+              <Button 
+                variant="secondary" 
+                size="small"
+                onClick={() => toggleMovimentacoes(produto.produto.codProduto)}
+              >
                 {produtosVisiveis[produto.produto.codProduto]
                   ? "Esconder Movimentações"
                   : "Mostrar Movimentações"}
-              </C.Button>
+              </Button>
             </C.Td>
           </C.ProductRow>
 

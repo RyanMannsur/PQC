@@ -26,31 +26,6 @@ tr:hover {
 }
 `;
 
-
-export const Button = styled.button`
-  display: block; 
-  margin-left: auto;
-  margin-right: auto;
-  color: white;
-  padding: 8px 8px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-export const Input = styled.input`
-width: 100%;
-padding: 8px;
-border: 1px solid #ccc;
-border-radius: 5px;
-font-size: 16px;
-`;
-
 export const Td = styled.td`
 padding: 12px;
 border: 1px solid #ddd;

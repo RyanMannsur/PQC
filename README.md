@@ -91,6 +91,14 @@ docker-compose logs database  # Ver logs do banco
 docker-compose down -v        # Parar e limpar volumes
 ```
 
+### Migrações
+```bash
+python -m migrations.cli run     # Executar migrações pendentes
+python -m migrations.cli status  # Ver status das migrações
+run-migrations.bat               # Script Windows
+./run-migrations.sh              # Script Linux/Mac
+```
+
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
 - [Docker](https://www.docker.com/)
@@ -169,6 +177,21 @@ http://localhost:3001
 O banco de dados será inicializado automaticamente com as tabelas e dados definidos no arquivo PQC.sql.
 Certifique-se de que o arquivo PQC.sql está localizado na raiz do projeto.
 
+## 🔄 Sistema de Migrações
+
+O projeto conta com um sistema completo de migrações para gerenciar mudanças no banco de dados de forma controlada e versionada.
+
+### Características:
+- **Execução automática**: Migrações são executadas automaticamente na inicialização da aplicação
+- **Padrão de nomenclatura**: `Numero_codigo_nomepessoa.sql`
+- **Códigos válidos**: `insert`, `delete`, `create`, `alter`
+- **Controle de estado**: Tabela `applied_migrations` mantém registro das migrações aplicadas
+- **CLI integrada**: Interface de linha de comando para gerenciar migrações
+```
+
+### Documentação completa:
+- **[fontes/backend/migrations/README.md](fontes/backend/migrations/README.md)** - Documentação detalhada do sistema de migrações
+
 ## Observações Importantes
 - Durante o desenvolvimento, alterações feitas no código do backend (fontes/backend) serão refletidas automaticamente no container Docker devido à configuração de volumes no docker-compose.yml.
 - **Frontend migrado para Vite**: Use `npm run dev` ao invés de `npm start`
@@ -185,11 +208,23 @@ docker volume rm pqc_pgdata
 1. **Clone o projeto**
 2. **Execute**: `start-docker.bat` (Windows) ou `./start-docker.sh` (Linux/Mac)
 3. **Pronto!** Acesse http://localhost:3001
+   - As migrações do banco são executadas automaticamente na inicialização
 
-### 📚 Documentação completa:
+### � Usuários de Teste:
+- **Usuário Administrador (Acesso Total)**: 
+  - CPF: `333.333.333-33` 
+  - Senha: `PQC1*`
+  - **Acesso**: Todos os laboratórios do sistema
+- **Usuário Comum (Acesso Limitado)**:
+  - CPF: `123.456.789-01`
+  - Senha: `Senha@123`
+  - **Acesso**: Laboratórios específicos
+
+### �📚 Documentação completa:
 - **[SETUP-DESENVOLVEDORES.md](SETUP-DESENVOLVEDORES.md)** - Guia completo de configuração
 - **[COMANDOS-UTEIS.md](COMANDOS-UTEIS.md)** - Todos os comandos que você vai precisar
 - **[DOCKER-README.md](DOCKER-README.md)** - Específico para Docker
+- **[fontes/backend/migrations/README.md](fontes/backend/migrations/README.md)** - Sistema de migrações
 
 ### 🛠️ Ferramentas recomendadas:
 - **Docker Desktop** (essencial)

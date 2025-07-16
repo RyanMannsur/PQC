@@ -7,11 +7,15 @@ ListItemIcon,
 } from "@mui/material";
 import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd, Assessment } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { isAdmin } from "../../services/auth/service";
 
 const Sidebar = () => {
 const handleClearLabAndNavigate = () => {
   localStorage.removeItem("labId");
+  localStorage.removeItem("labName");
 };
+
+const userIsAdmin = isAdmin();
 
 return (
   <Drawer
@@ -32,7 +36,7 @@ return (
     }}
   >
     <List>
-      <ListItem button component={Link} to="/home">
+      <ListItem component={Link} to="/home">
         <ListItemIcon>
           <Home />
         </ListItemIcon>
@@ -40,7 +44,6 @@ return (
       </ListItem>
 
       <ListItem
-        button
         component={Link}
         to="/selecionar-lab"
         onClick={handleClearLabAndNavigate}
@@ -51,49 +54,51 @@ return (
         <ListItemText primary="Trocar Laboratório" />
       </ListItem>
 
-      <ListItem button component={Link} to="/inventario">
+      <ListItem component={Link} to="/inventario">
         <ListItemIcon>
           <Inventory />
         </ListItemIcon>
         <ListItemText primary="Inventário" />
       </ListItem>
 
-      <ListItem button component={Link} to="/cadastrar-produto">
+      <ListItem component={Link} to="/cadastrar-produto">
         <ListItemIcon>
           <PostAdd />
         </ListItemIcon>
         <ListItemText primary="Adicionar Produtos" />
       </ListItem>
 
-      <ListItem button component={Link} to="/transferencias">
+      <ListItem component={Link} to="/transferencias">
         <ListItemIcon>
           <SwapHoriz />
         </ListItemIcon>
         <ListItemText primary="Transferências" />
       </ListItem>
 
-      <ListItem button component={Link} to="/implantar/novos-produtos">
+      <ListItem component={Link} to="/implantar/novos-produtos">
         <ListItemIcon>
           <AddBox />
         </ListItemIcon>
         <ListItemText primary="Implantação" />
       </ListItem>
 
-      <ListItem button component={Link} to="/relatorio">
+      <ListItem component={Link} to="/relatorio">
         <ListItemIcon>
           <Assessment />
         </ListItemIcon>
         <ListItemText primary="Relatório" />
       </ListItem>
 
-      <ListItem button component={Link} to="/produto">
-        <ListItemIcon>
-          <Assessment />
-        </ListItemIcon>
-        <ListItemText primary="Cadastrar Produto" />
-      </ListItem>
+      {userIsAdmin && (
+        <ListItem component={Link} to="/produto">
+          <ListItemIcon>
+            <Assessment />
+          </ListItemIcon>
+          <ListItemText primary="Cadastrar Produto" />
+        </ListItem>
+      )}
       
-      <ListItem button component={Link} to="/consultaPQC">
+      <ListItem component={Link} to="/consultaPQC">
         <ListItemIcon>
           <Assessment />
         </ListItemIcon>

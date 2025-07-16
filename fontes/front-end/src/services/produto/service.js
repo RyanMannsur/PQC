@@ -135,9 +135,9 @@ export const obterProdutos = async () => {
   }
 };
 
-export const obterNomeLocalEstocagem = async () => {
+export const obterNomeLocalEstocagem = async (codCampus, codUnidade, codPredio, codLaboratorio) => {
   try {
-    const response = await api.get("/obterNomeLocalEstocagem");
+    const response = await api.get(`/obterNomeLocalEstocagem/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar nome do local de estocagem:", error);
@@ -206,10 +206,13 @@ export const implantarItensLaboratorio = async (dadosLaboratorio) => {
 
   export const cadastrarProdutos = async (dadosCadastro) => {
     try {
+      console.log("Enviando dados para cadastro:", dadosCadastro);
       const response = await api.post("/cadastrarProdutos", dadosCadastro);
+      console.log("Resposta recebida:", response);
       return response.data;
     } catch (error) {
       console.error("Erro ao cadastrar produtos:", error);
+      console.error("Detalhes do erro:", error.response?.data || error.message);
       throw error;
     }
     };

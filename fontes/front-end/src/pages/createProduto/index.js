@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
-import Select from "../../components/InputSelect"; 
-import { obterProdutosNaoImplantadosPorLocal, cadastrarProdutos, obterNomeLocalEstocagem } from "../../services/produto/service"; 
+import { Select, Button, FormGroup } from "../../components"; 
+import { obterProdutosNaoImplantadosPorLocal, cadastrarProdutos } from "../../services/produto/service"; 
 import { useLocal } from "../../contexts/local";
 import * as C from "./styles";
 
@@ -12,8 +12,7 @@ const [produtos, setProdutos] = useState([]);
 const [implantacoes, setImplantacoes] = useState({});
 const [tipoCadastro, setTipoCadastro] = useState(""); 
 const [loading, setLoading] = useState(true);
-const { labId } = useLocal(); 
-const [labName, setLabName] = useState(null); 
+const { labId, labName } = useLocal(); 
 const [isModalOpen, setIsModalOpen] = useState(false); 
 const navigate = useNavigate(); 
 
@@ -22,14 +21,6 @@ useEffect(() => {
     if (labId) {
       const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
       try {
-        const labDetails = await obterNomeLocalEstocagem(
-          codCampus,
-          codUnidade,
-          codPredio,
-          codLaboratorio
-        );
-        setLabName(labDetails[0].nomLocal);
-
         const produtosResponse = await obterProdutosNaoImplantadosPorLocal(
           codCampus,
           codUnidade,
@@ -37,13 +28,13 @@ useEffect(() => {
           codLaboratorio
         );
 
-        const formattedProdutos = produtosResponse.map((produto) => [
-          produto.codProduto,
-          produto.nomProduto,
-          produto.nomLista,
-          produto.perPureza,
-          produto.vlrDensidade,
-        ]);
+        const formattedProdutos = produtosResponse.map((produto) => ({
+          codProduto: produto.codProduto,
+          nomProduto: produto.nomProduto,
+          nomLista: produto.nomLista,
+          perPureza: produto.perPureza,
+          vlrDensidade: produto.vlrDensidade,
+        }));
 
         setProdutos(formattedProdutos);
       } catch (error) {
@@ -79,20 +70,23 @@ const handleConfirm = async () => {
     produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
       codProduto: parseInt(codProduto),
       items: items.map((item) => ({
-        qtd: parseFloat(item.qtd),
-        validade: item.validade,
-        embalagem: item.embalagem || "A",
+        qtd: parseFloat(item.qtdEstoque),
+        validade: item.datValidade,
+        embalagem: item.codEmbalagem,
       })),
     })),
   };
 
   try {
+    console.log("Dados enviados:", dadosParaEnvio);
     const response = await cadastrarProdutos(dadosParaEnvio);
-    if (response) {
+    console.log("Resposta recebida:", response);
+    
+    if (response && (response.message || response.tipo === "SUCESSO")) {
       console.log("Cadastro realizado com sucesso:", response);
       setIsModalOpen(true); 
     } else {
-      console.error("Erro ao realizar cadastro.");
+      console.error("Erro ao realizar cadastro - resposta inválida:", response);
       alert("Erro ao realizar cadastro.");
     }
   } catch (error) {
@@ -140,7 +134,9 @@ return (
       <p>Nenhum produto encontrado.</p>
     )}
 
-    <C.ConfirmButton onClick={handleConfirm}>Confirmar</C.ConfirmButton>
+    <FormGroup justifyContent="center">
+      <Button variant="primary" onClick={handleConfirm}>Confirmar</Button>
+    </FormGroup>
 
     <Modal
       title="Cadastro Realizado"

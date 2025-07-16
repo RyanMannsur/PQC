@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getConsultaPQC } from "../../services/produto/service";
+import { consultarProdutos } from "../../services/produto/tokenService";
+import { Button } from "../../components";
 import * as C from "./styles";
 
 function ConsultaPQC({ labId }) {
@@ -8,13 +9,8 @@ function ConsultaPQC({ labId }) {
 
   useEffect(() => {
     (async () => {
-      //salvar codSiape no context
-      const codSiape = 2418912
-      if (!codSiape) 
-        return;
-
       try {
-        const result = await getConsultaPQC(codSiape);
+        const result = await consultarProdutos();
         setData(result);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
@@ -39,9 +35,13 @@ function ConsultaPQC({ labId }) {
             <React.Fragment key={produto.id}>
                 <C.ProductRow>
                   <C.Td>
-                    <C.ToggleButton onClick={() => toggle("produto", produto.id)}>
+                    <Button 
+                      variant="outline" 
+                      size="small" 
+                      onClick={() => toggle("produto", produto.id)}
+                    >
                       {isProdutoOpen ? "−" : "+"}
-                    </C.ToggleButton>
+                    </Button>
                   </C.Td>
                   <C.Td style={{ paddingLeft: "0.5rem", display: "flex", justifyContent: "space-between", alignItems: "center"  }} >
                     <C.Td>NCM:{' '}{produto.codProduto}</C.Td>
@@ -60,11 +60,13 @@ function ConsultaPQC({ labId }) {
                       
                        <C.CampusRow>
                           <C.Td> {/* Célula para o botão */}
-                              <C.ToggleButton
-                                  onClick={() => toggle("campus", campus.id)}
+                              <Button 
+                                variant="outline" 
+                                size="small"
+                                onClick={() => toggle("campus", campus.id)}
                               >
                                   {isCampusOpen ? "−" : "+"}
-                              </C.ToggleButton>
+                              </Button>
                           </C.Td>
                           {/* Esta é a ÚNICA C.Td para o conteúdo principal, ocupando as colunas restantes */}
                           <C.Td 
@@ -95,11 +97,13 @@ function ConsultaPQC({ labId }) {
                         
                                 <C.ItemRow>
                                   <C.Td>
-                                    <C.ToggleButton
+                                    <Button 
+                                      variant="outline" 
+                                      size="small"
                                       onClick={() => toggle("item", item.id)}
                                     >
                                       {isItemOpen ? "−" : "+"}
-                                    </C.ToggleButton>
+                                    </Button>
                                   </C.Td>
                                   <C.Td 
                                       colSpan={5} 

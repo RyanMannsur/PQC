@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "../../components";
 import * as C from "./styles";
 
 const InventarioList = ({ data, onQuantityChange }) => {
@@ -32,9 +33,9 @@ return (
               <C.Td>{item.seqItem}</C.Td>
               <C.Td>{item.qtdAtual}</C.Td>
               <C.Td>
-                <C.Input
+                <Input
                   type="number"
-                  defaultValue={item.qtdNova}
+                  value={item.qtdNova}
                   onChange={(e) =>
                     onQuantityChange(produto.codProduto, item.seqItem, e.target.value)
                   }

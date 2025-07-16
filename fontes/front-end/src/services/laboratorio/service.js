@@ -32,7 +32,7 @@ export const getProdutosImplantar = async (
 ) => {
   try {
     const response = await api.get(
-      `/obterProdutosNaoImplantadosNoLocal${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
+      `/obterProdutosNaoImplantadosNoLocal/${codCampus}/${codUnidade}/${codPredio}/${codLaboratorio}`
     );
     return response.data;
   } catch (error) {

@@ -1,13 +1,12 @@
 import { useState, useContext, useEffect } from "react";
-import Select from "../../components/InputSelect";
-import Button from "../../components/Button";
+import { Button, Select, FormGroup } from "../../components";
 import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
 import { LocalContext } from "../../contexts/local";
-import { getLabs } from "../../services/laboratorio/service";
+import { obterLocaisEstoque } from "../../services/produto/tokenService";
 
 const SelecionarLocal = () => {
-  const { setLabId } = useContext(LocalContext); 
+  const { setLabId, setLabName } = useContext(LocalContext); 
   const navigate = useNavigate();
 
   const [lab, setLab] = useState(null); 
@@ -17,13 +16,19 @@ const SelecionarLocal = () => {
   useEffect(() => {
     const fetchLabs = async () => {
       try {
-        const labs = await getLabs(); 
+        const labs = await obterLocaisEstoque(); 
 
         if (labs && Array.isArray(labs)) {
           if (labs.length === 1) {
             const selectedLab = labs[0];
             setLab(selectedLab);
-            setLabId(selectedLab);
+            setLabId({
+              codCampus: selectedLab.codCampus,
+              codUnidade: selectedLab.codUnidade,
+              codPredio: selectedLab.codPredio,
+              codLaboratorio: selectedLab.codLaboratorio,
+            });
+            setLabName(selectedLab.nomLocal);
             navigate("/home");
             return;
           }
@@ -48,7 +53,6 @@ const SelecionarLocal = () => {
 
     fetchLabs();
   }, [navigate, setLabId]);
-
   const handleSelect = () => {
     if (!lab) {
       setError("Por favor, selecione um local");
@@ -61,7 +65,7 @@ const SelecionarLocal = () => {
       codPredio: lab.codPredio,
       codLaboratorio: lab.codLaboratorio,
     });
-
+    setLabName(lab.nomLocal);
     navigate("/home");
   };
 
@@ -69,22 +73,30 @@ const SelecionarLocal = () => {
     <C.Container>
       <C.Label>SELECIONE O LOCAL DE ESTOCAGEM</C.Label>
       <C.Content>
-        {labOptions.length > 1 && (
-          <Select
-            options={labOptions.map((lab) => ({
-              value: lab.codLaboratorio,
-              label: lab.nomLocal,
-              object: lab,
-            }))}
-            value={lab ? lab.codLaboratorio : ""}
-            onChange={(selectedOption) => {
-              setLab(selectedOption.object);
-              setError("");
-            }}
-          />
-        )}
-        <C.labelError>{error}</C.labelError>
-        {labOptions.length > 1 && <Button Text="Selecionar" onClick={handleSelect} />}
+        <FormGroup gap="medium" alignItems="center">
+          {labOptions.length > 1 && (
+            <Select
+              options={labOptions.map((lab) => ({
+                value: lab.codLaboratorio,
+                label: lab.nomLocal,
+                object: lab,
+              }))}
+              value={lab ? lab.codLaboratorio : ""}
+              onChange={(selectedOption) => {
+                setLab(selectedOption.object);
+                setError("");
+              }}
+              placeholder="Selecione o laboratório"
+              error={!!error}
+            />
+          )}
+          {error && <C.labelError>{error}</C.labelError>}
+          {labOptions.length > 1 && (
+            <Button onClick={handleSelect} fullWidth>
+              Selecionar
+            </Button>
+          )}
+        </FormGroup>
       </C.Content>
     </C.Container>
   );

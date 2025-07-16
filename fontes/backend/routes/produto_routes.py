@@ -2,14 +2,76 @@
 from flask import Blueprint, request, jsonify
 import calendar, datetime
 from datetime import date
-from flask import jsonify
 produto_bp = Blueprint("produto_bp", __name__)
 import sys
 from db import Db, Mode
 from valida import Valida
 import util
 
-print("Debugging informações...", file=sys.stdout)
+# Função auxiliar para validar token
+def validar_token(token):
+    """Valida se o token existe na base de dados."""
+    sql = "SELECT COUNT(*) as count FROM usuario WHERE token = %s"
+    params = (token,)
+    
+    try:
+        db = Db()
+        result = db.execSql(sql, params, Mode.SELECT)
+        return result[0][0] > 0 if result else False
+    except Exception:
+        return False
+
+# Função para obter laboratórios do usuário por token
+def obter_laboratorios_usuario(token):
+    """Obtém os laboratórios associados ao token do usuário."""
+    sql = """
+        SELECT ul.codCampus, 
+               ul.codUnidade,
+               ul.codPredio,
+               ul.codLaboratorio,
+               le.nomLocal 
+          FROM usuariolocalestocagem ul
+          JOIN LocalEstocagem le
+            ON le.codCampus = ul.codCampus
+           AND le.codUnidade = ul.codUnidade
+           AND le.codPredio = ul.codPredio
+           AND le.codLaboratorio = ul.codLaboratorio
+         WHERE ul.token = %s 
+         ORDER BY le.nomLocal           
+        """
+    params = (token,)
+    
+    try:
+        db = Db()
+        return db.execSql(sql, params, Mode.SELECT)
+    except Exception as e:
+        return []
+
+# Adicionar endpoint para monitorar migrações
+@produto_bp.route("/migrations/status", methods=["GET"])
+def get_migrations_status():
+    """Endpoint para verificar status das migrações."""
+    try:
+        import sys
+        import os
+        # Adicionar o diretório das migrações ao path
+        migrations_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'migrations')
+        sys.path.append(migrations_path)
+        
+        from auto_migrate import check_migration_status
+        
+        status = check_migration_status()
+        
+        if status is None:
+            return jsonify({"error": "Erro ao verificar status das migrações"}), 500
+        
+        return jsonify({
+            "status": "success",
+            "data": status
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
 
 # funcoes privadas
 def ultimo_dia_do_mes(mes, ano):
@@ -26,6 +88,7 @@ def get_produtos():
                perPureza,
                vlrDensidade
           FROM Produto
+         WHERE "idtAtivo"
         """
 
     try:
@@ -69,7 +132,7 @@ def obter_produto(codProduto):
         JOIN OrgaoControle C
           ON C.codOrgaoControle = B.codOrgaoControle
         WHERE A.codProduto = %s
-          AND A.idtAtivo
+          AND A."idtAtivo"
     """
     params = (codProduto,)
 
@@ -108,29 +171,18 @@ def obter_produto(codProduto):
 
     return produto_dict
 
-# Rota para obter os Locais de Estocagem que o Usuario é o responsavel
-@produto_bp.route("/obterLocaisEstoque/<int:codSiape>", methods=["GET"])
-def obter_Locais_Estoque(codSiape):
-    sql = """
-        SELECT codCampus, 
-               codUnidade,
-               codPredio,
-               codLaboratorio,
-               nomLocal 
-          FROM LocalEstocagem        
-         WHERE codSiapeResponsavel = %s 
-         ORDER BY nomLocal           
-        """
-    params = (codSiape,)
+# ROTAS BASEADAS EM TOKEN
 
-    try:
-        db = Db()
-        locais = db.execSql(sql, params, Mode.SELECT)
-    except Exception as e:
-        return db.getErro(e)
-
+# Rota para obter os Locais de Estocagem que o Usuario é o responsavel (por token)
+@produto_bp.route("/obterLocaisEstoque/token/<string:token>", methods=["GET"])
+def obter_Locais_Estoque_por_token(token):
+    if not validar_token(token):
+        return util.formataAviso("Token inválido!")
+    
+    locais = obter_laboratorios_usuario(token)
+    
     if not locais:
-        return util.formataAviso("Usuário não é responsável por nenhum Local de Estogem de Produtos Químicos Controlados!")
+        return util.formataAviso("Usuário não é responsável por nenhum Local de Estocagem de Produtos Químicos Controlados!")
         
     locais_formatado = []
     for local in locais: 
@@ -143,6 +195,69 @@ def obter_Locais_Estoque(codSiape):
         })
 
     return locais_formatado
+
+# Rota para consulta em grid (por token)
+@produto_bp.route("/consultaPQC/token/<string:token>", methods=["GET"])
+def consultarProdutos_por_token(token):
+    if not validar_token(token):
+        return util.formataAviso("Token inválido!")
+    
+    sql = """
+       SELECT A.codProduto,
+              A.nomProduto,
+              A.perPureza,
+              A.vlrDensidade,
+              E.codCampus,
+              E.nomCampus,
+              F.codUnidade,
+              F.nomUnidade,
+              G.codLaboratorio,
+              G.nomLocal,
+              B.seqItem,
+              B.seqEmbalagem,
+              B.datValidade,
+              desTipoMovto(C.idtTipoMovto) as desTipoMovto,
+              C.datMovto,
+              C.qtdEstoque
+         FROM Produto A
+         JOIN ProdutoItem B
+           ON B.codProduto = A.codProduto
+         JOIN MovtoEstoque C
+           ON C.codProduto = B.codProduto
+          AND C.seqItem = B.seqItem
+         JOIN LocalEstocagem D
+           ON D.codCampus = C.codCampus
+          AND D.codUnidade = C.codUnidade
+          AND D.codPredio = C.codPredio
+          AND D.codLaboratorio = C.codLaboratorio
+         JOIN usuariolocalestocagem UL
+           ON UL.codCampus = D.codCampus
+          AND UL.codUnidade = D.codUnidade
+          AND UL.codPredio = D.codPredio
+          AND UL.codLaboratorio = D.codLaboratorio
+         JOIN Campus E
+           ON E.codCampus = C.codCampus
+         JOIN UnidadeOrganizacional F
+           ON F.codUnidade = C.codUnidade
+         JOIN LocalEstocagem G
+           ON G.codPredio = C.codPredio
+          AND G.codLaboratorio = C.codLaboratorio
+        WHERE UL.token = %s 
+        ORDER By  A.nomProduto, E.nomCampus,  F.nomUnidade, G.nomLocal, B.seqItem
+    """
+    params = (token,) 
+
+    try:
+        db = Db()
+        produtos = db.execSql(sql, params, Mode.SELECT)
+    except Exception as e:
+        return db.getErro(e)
+
+    if not produtos:
+        return util.formataAviso("Nenhum produto encontrado no inventário!")
+        
+    return produtos
+   
    
 
 @produto_bp.route("/obterProdutosPorLaboratorio/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
@@ -156,7 +271,7 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
           FROM Produto A
           JOIN MovtoEstoque B
             ON B.codProduto = A.codProduto        
-         WHERE A.idtAtivo
+         WHERE A."idtAtivo"
            AND B.codCampus = %s 
            AND B.codUnidade = %s
            AND B.codPredio = %s
@@ -211,39 +326,28 @@ def verifica_local_estocagem_Ja_implantado(codCampus, codUnidade, codPredio, cod
 #Rota para obter os produtos de um local com o saldo de estoque atual
 @produto_bp.route("/obterEstoqueLocalEstocagem/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaboratorio):
-
-    sql = """
-        SELECT max(datMovto)
-          FROM MovtoEstoque 
+    
+    # Buscar o último movimento de inventário (IN) para cada produto/item neste local
+    sql_ultimo_inventario = """
+        SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+          FROM MovtoEstoque
          WHERE codCampus = %s
            AND codUnidade = %s
            AND codPredio = %s
            AND codLaboratorio = %s
-           AND idtTipoMovto = %s
+           AND idtTipoMovto = 'IN'
+         GROUP BY codProduto, seqItem
     """
-    params = (codCampus, codUnidade, codPredio, codLaboratorio, 'IN',)
-
+    
     try:
         db = Db()
-        datUltInventario = db.execSql(sql, params, Mode.SELECT)
+        params_inventario = (codCampus, codUnidade, codPredio, codLaboratorio,)
+        ultimos_inventarios = db.execSql(sql_ultimo_inventario, params_inventario, Mode.SELECT)
     except Exception as e:
         return db.getErro(e)
 
-    if datUltInventario:
-        datInicio = datUltInventario[0]
-    else:
-        try:
-            params = (codCampus, codUnidade, codPredio, codLaboratorio, 'IM')
-            datImplantacao = db.execSql(sql, params, Mode.SELECT)
-        except Exception as e:
-            return db.getErro(e)
-
-        if datImplantacao:
-            datInicio = datImplantacao[0]
-        else: 
-            return util.formataAviso("Local de estocagem necessita de fazer a implantação!")  
-
-    print(f"data inicio {datInicio}")
+    # Construir a consulta principal considerando o último inventário
+    # Usar uma única consulta que funciona para ambos os cenários
     sql = """
        SELECT A.codProduto,
               A.nomProduto,
@@ -258,15 +362,26 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
          JOIN MovtoEstoque C
            ON C.codProduto = B.codProduto
           AND C.seqItem = B.seqItem
-        WHERE C.datMovto >= %s 
-          AND C.codCampus = %s
+         LEFT JOIN (
+            SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+              FROM MovtoEstoque
+             WHERE codCampus = %s
+               AND codUnidade = %s
+               AND codPredio = %s
+               AND codLaboratorio = %s
+               AND idtTipoMovto = 'IN'
+             GROUP BY codProduto, seqItem
+         ) UltInv ON UltInv.codProduto = C.codProduto AND UltInv.seqItem = C.seqItem
+        WHERE C.codCampus = %s
           AND C.codUnidade = %s
           AND C.codPredio = %s
-          AND C.codLaboratorio = %s 
+          AND C.codLaboratorio = %s
+          AND (UltInv.ultimo_inventario_id IS NULL OR C.idMovtoEstoque >= UltInv.ultimo_inventario_id)
         GROUP BY 1,2,3,4,5,6
+        HAVING sum(C.qtdEstoque) > 0
         ORDER By 2, 5
     """
-    params = (datInicio, codCampus, codUnidade, codPredio, codLaboratorio,)
+    params = (codCampus, codUnidade, codPredio, codLaboratorio, codCampus, codUnidade, codPredio, codLaboratorio,)
 
     try:
         db = Db()
@@ -289,7 +404,6 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
         qtdEstoque = produto[6]
 
         if codProduto not in dictProduto:
-            # cria a entrada do produto se ainda não existir
             dictProduto[codProduto] = {
                     "codProduto": codProduto,
                     "nomProduto": nomProduto,
@@ -298,144 +412,27 @@ def obter_estoque_local_estocagem(codCampus, codUnidade, codPredio, codLaborator
                     "item": []
             }
 
-        # adiciona o item na lista do produto
         dictProduto[codProduto]["item"].append({
             "seqItem": seqItem,
             "datValidade": datValidade,
             "qtdEstoque": float(qtdEstoque),
         })
 
-    # converte para lista
     return list(dictProduto.values())
-   
-#Rota para consulta em grid
-@produto_bp.route("/consultaPQC/<int:codSiape>", methods=["GET"])
-def consultarProdutos(codSiape):
-    
-    sql = """
-       SELECT A.codProduto,
-              A.nomProduto,
-              A.perPureza,
-              A.vlrDensidade,
-              E.codCampus,
-              E.nomCampus,
-              F.codUnidade,
-              F.nomUnidade,
-              G.codLaboratorio,
-              G.nomLocal,
-              B.seqItem,
-              B.seqEmbalagem,
-              B.datValidade,
-              desTipoMovto(C.idtTipoMovto) as desTipoMovto,
-              C.datMovto,
-              C.qtdEstoque
-         FROM Produto A
-         JOIN ProdutoItem B
-           ON B.codProduto = A.codProduto
-         JOIN MovtoEstoque C
-           ON C.codProduto = B.codProduto
-          AND C.seqItem = B.seqItem
-         JOIN LocalEstocagem D
-           ON D.codCampus = C.codCampus
-          AND D.codUnidade = C.codUnidade
-          AND D.codPredio = C.codPredio
-          AND D.codLaboratorio = C.codLaboratorio
-         JOIN Campus E
-           ON E.codCampus = C.codCampus
-         JOIN UnidadeOrganizacional F
-           ON F.codUnidade = C.codUnidade
-         JOIN LocalEstocagem G
-           ON G.codPredio = C.codPredio
-          AND G.codLaboratorio = C.codLaboratorio
-        WHERE D.codSiapeResponsavel = %s 
-        ORDER By  A.nomProduto, E.nomCampus,  F.nomUnidade, G.nomLocal, B.seqItem
-    """
-    params = (codSiape,) 
-
-    try:
-        db = Db()
-        produtos = db.execSql(sql, params, Mode.SELECT)
-    except Exception as e:
-        return db.getErro(e)
-
-    if not produtos:
-         return util.formataAviso("Nenhum produto encontrado no local corrente de estocagem do usuário!")  
-
-    print(produtos)
-    produtos_map = {}
-    
-    for r in produtos:
-        (codProduto, nomProduto, perPureza, vlrDensidade,
-         codCampus, nomCampus, codUnidade, nomUnidade,
-         codLaboratorio, nomLocal, seqItem, seqEmbalagem,
-         datValidade, desTipoMovto, datMovto, qtdEstoque) = r
-        
-        pr = produtos_map.setdefault(codProduto, {
-            "id": f"prod-{codProduto}",
-            "codProduto": codProduto,
-            "nomProduto": nomProduto,
-            "perPureza": perPureza,
-            "vlrDensidade": vlrDensidade,
-            "totProduto": 0,
-            "local": {}
-        })
-
-        pr["totProduto"] += qtdEstoque
-
-        local_map = pr["local"].setdefault(codLaboratorio, {
-            "id": f"loc-{codCampus}-{codUnidade}-{codLaboratorio}",
-            "codCampus": codCampus,
-            "nomCampus": nomCampus,
-            "nomUnidade": nomUnidade,
-            "nomLaboratorio": nomLocal,
-            "totalLocais": 0,
-            "items": {}
-        })
-
-        local_map["totalLocais"] += qtdEstoque
-
-        item_map = local_map["items"].setdefault(seqItem, {
-            "id": f"item-{codProduto}-{seqItem}",
-            "seqItem": seqItem,
-            "nomEmbalagem": seqEmbalagem,
-            "datValidade": datValidade.strftime("%d-%m-%Y") if hasattr(datValidade, "strftime") else datValidade,
-            "totalItem": 0,
-            "movtos": []
-        })
-
-        item_map["totalItem"] += qtdEstoque
-
-        item_map["movtos"].append({
-            "id": f"mov-{codProduto}-{seqItem}-{desTipoMovto}",
-            "idtTipoMovto": desTipoMovto,
-            "datMovto": datMovto.strftime("%d-%m-%Y") if hasattr(datMovto, "strftime") else datMovto,
-            "qtdMovto": qtdEstoque
-        })
-
-    result = []
-    for prod in produtos_map.values():
-        prod_out = {**prod, "local": []}
-        for loc in prod["local"].values():
-            camp_out = {**loc, "items": []}
-            for item in loc["items"].values():
-                camp_out["items"].append(item)
-            prod_out["local"].append(camp_out)
-        result.append(prod_out)
-
-    return result
    
 #Rota para obter os produtos de um local
 @produto_bp.route("/buscarProdutos", methods=["GET"])
 def buscar_produtos_local_estocagem():
-    data = request.get_json() 
-    codCampus = data.get("codCampus")
-    codUnidade = data.get("codUnidade")
-    codPredio = data.get("codPredio")
-    codLaboratorio = data.get("codLaboratorio")
-    nomProduto = data.get("nomProduto")
-    perPureza = data.get("perPureza")
-    vlrDensidade = data.get("vlrDensidade")
+    # Ler parâmetros da query string em vez do JSON body
+    codCampus = request.args.get("codCampus")
+    codUnidade = request.args.get("codUnidade")
+    codPredio = request.args.get("codPredio")
+    codLaboratorio = request.args.get("codLaboratorio")
+    nomProduto = request.args.get("nomProduto")
+    perPureza = request.args.get("perPureza")
+    vlrDensidade = request.args.get("vlrDensidade")
 
+    # Construir filtros dinâmicos
     filtro = ''
     if nomProduto:
          filtro += f" AND A.nomProduto like '%{nomProduto}%'"
@@ -446,6 +443,7 @@ def buscar_produtos_local_estocagem():
     if vlrDensidade:
          filtro += f" AND A.vlrDensidade = {vlrDensidade}"
 
+    # Usar a mesma lógica do inventário para considerar o último 'IN' como marco
     sql = f"""
        SELECT A.codProduto,
               A.nomProduto,
@@ -453,30 +451,35 @@ def buscar_produtos_local_estocagem():
               A.vlrDensidade,
               B.seqItem,
               B.datValidade,
-              sum(C.qtdEstoque)
+              sum(C.qtdEstoque) as estoque_total
          FROM Produto A
          JOIN ProdutoItem B
            ON B.codProduto = A.codProduto
          JOIN MovtoEstoque C
            ON C.codProduto = B.codProduto
           AND C.seqItem = B.seqItem
-        WHERE C.datMovto >= (SELECT max(datMovto) FROM MovtoEstoque D
-                              WHERE D.codProduto = A.codProduto
-                                AND D.seqItem = B.seqItem
-                                AND D.codCampus = C.codCampus
-                                AND D.codUnidade = C.codUnidade
-                                AND D.codPredio = C.codPredio
-                                AND D.codLaboratorio = C.codLaboratorio
-                                AND D.idtTipoMovto = 'IN') 
+         LEFT JOIN (
+            SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+              FROM MovtoEstoque
+             WHERE codCampus = %s
+               AND codUnidade = %s
+               AND codPredio = %s
+               AND codLaboratorio = %s
+               AND idtTipoMovto = 'IN'
+             GROUP BY codProduto, seqItem
+         ) UltInv ON UltInv.codProduto = C.codProduto AND UltInv.seqItem = C.seqItem
+        WHERE A."idtAtivo" = true
           AND C.codCampus = %s
           AND C.codUnidade = %s
           AND C.codPredio = %s
-          AND C.codLaboratorio = %s 
+          AND C.codLaboratorio = %s
+          AND (UltInv.ultimo_inventario_id IS NULL OR C.idMovtoEstoque >= UltInv.ultimo_inventario_id)
           {filtro}
         GROUP BY 1,2,3,4,5,6
+        HAVING sum(C.qtdEstoque) > 0
         ORDER By 2, 6
     """
-    params = (codCampus, codUnidade, codPredio, codLaboratorio,)
+    params = (codCampus, codUnidade, codPredio, codLaboratorio, codCampus, codUnidade, codPredio, codLaboratorio,)
 
     try:
         db = Db()
@@ -488,26 +491,22 @@ def buscar_produtos_local_estocagem():
          return util.formataAviso("Nenhum produto encontrado no local corrente de estocagem do usuário!")  
 
     resultado = []
-    itens = []
     for produto in produtos:
         resultado.append({
               "codProduto": produto[0],
               "nomProduto": produto[1],
               "perPureza": produto[2],
               "vlrDensidade": produto[3],
-              "item": []})
-
-        itens.append({
-            "seqItem": produto[4],
-            "datValidade": produto[5],
-            "qtdEstoque": float(produto[6])
+              "seqItem": produto[4],
+              "datValidade": produto[5].strftime("%Y-%m-%d") if hasattr(produto[5], 'strftime') else str(produto[5]),
+              "qtdEstoque": float(produto[6])
         })
 
-    resultado["item"] = itens
     return resultado
 
 @produto_bp.route("/ObterProdutoBYCodigoAndSequencia/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>/<int:codProduto>/<int:seqItem>", methods=["GET"])
 def obter_produto_por_codigo_e_sequencia(codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem):
+    # Usar a mesma lógica das outras funções para considerar o último 'IN' como marco
     sql = """
        SELECT A.codProduto,
               A.nomProduto,
@@ -522,24 +521,29 @@ def obter_produto_por_codigo_e_sequencia(codCampus, codUnidade, codPredio, codLa
          JOIN MovtoEstoque C
            ON C.codProduto = B.codProduto
           AND C.seqItem = B.seqItem
-        WHERE C.datMovto >= (SELECT max(datMovto) FROM MovtoEstoque D
-                              WHERE D.codProduto = A.codProduto
-                                AND D.seqItem = B.seqItem
-                                AND D.codCampus = C.codCampus
-                                AND D.codUnidade = C.codUnidade
-                                AND D.codPredio = C.codPredio
-                                AND D.codLaboratorio = C.codLaboratorio
-                                AND D.idtTipoMovto = 'IN') 
-          AND A.codProduto = %s
+         LEFT JOIN (
+            SELECT codProduto, seqItem, MAX(idMovtoEstoque) as ultimo_inventario_id
+              FROM MovtoEstoque
+             WHERE codCampus = %s
+               AND codUnidade = %s
+               AND codPredio = %s
+               AND codLaboratorio = %s
+               AND idtTipoMovto = 'IN'
+               AND codProduto = %s
+               AND seqItem = %s
+             GROUP BY codProduto, seqItem
+         ) UltInv ON UltInv.codProduto = C.codProduto AND UltInv.seqItem = C.seqItem
+        WHERE A.codProduto = %s
           AND B.seqItem = %s
           AND C.codCampus = %s
           AND C.codUnidade = %s
           AND C.codPredio = %s
-          AND C.codLaboratorio = %s 
+          AND C.codLaboratorio = %s
+          AND (UltInv.ultimo_inventario_id IS NULL OR C.idMovtoEstoque >= UltInv.ultimo_inventario_id)
         GROUP BY 1,2,3,4,5,6
         ORDER By 2, 6
     """
-    params = (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,)
+    params = (codCampus, codUnidade, codPredio, codLaboratorio, codProduto, seqItem, codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,)
 
     try:
         db = Db()
@@ -757,7 +761,7 @@ def relatorio_produtos():
            AND C.SeqItem = B.SeqItem
           JOIN LocalEstocagem D
             ON D.codLaboratorio = C.codLaboratorio
-         WHERE A.idtAtivo
+         WHERE A."idtAtivo"
          ORDER BY 1, 6
     """
     params = None
@@ -843,15 +847,15 @@ def produtos_implantados_por_laboratorio(codCampus, codUnidade, codPredio, codLa
                A.perPureza,
                A.vlrDensidade
           FROM Produto A
-         WHERE A.idtAtivo
-           AND codProduto not in (SELECT distinct codProduto 
+         WHERE A."idtAtivo" = true
+           AND A.codProduto not in (SELECT distinct codProduto 
                                     FROM MovtoEstoque B
                                    WHERE B.codProduto = A.codProduto
                                      AND B.codCampus = %s
                                      AND B.codUnidade = %s
                                      AND B.codPredio = %s
                                      AND B.codLaboratorio = %s)
-                                 ;
+         ORDER BY A.nomProduto
     """
     params = (codCampus, codUnidade, codPredio, codLaboratorio,)
     
@@ -862,7 +866,7 @@ def produtos_implantados_por_laboratorio(codCampus, codUnidade, codPredio, codLa
         return db.getErro(e)
    
     if not produtos:
-         return util.formataAviso("Nenhum produto encontrado!") 
+        return util.formataAviso("Nenhum produto encontrado!") 
 
     produto_formatado = [
           {
@@ -1076,13 +1080,13 @@ def atualizar_estoque():
                     # Inserir no MovtoEstoque
                 sql = """
                         INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
-                                                  codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificatica)
+                                                  codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ON CONFLICT (codProduto, seqItem, codUnidade, codPredio, codLaboratorio) DO UPDATE
                         SET datMovto = EXCLUDED.datMovto,
                             idtTipoMovto = EXCLUDED.idtTipoMovto,
                             qtdEstoque = EXCLUDED.qtdEstoque,
-                            txtJustificatica = EXCLUDED.txtJustificatica
+                            txtJustificativa = EXCLUDED.txtJustificativa
                     ", (codProduto, seqItem, codCampus, codUnidade, codPredio, 
                           codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa))
                     """
@@ -1166,9 +1170,16 @@ def atualizar_inventario_by_sequencia():
     idtTipoMovto = data.get("idtTipoMovto")  # Agora é dinâmico e recebido pelo JSON
     txtJustificativa = data.get("txtJustificativa", "Atualização de inventário") 
 
+    # Converter tipos de dados se necessário
+    try:
+        codProduto = int(codProduto)
+        seqItem = int(seqItem)
+        qtdEstoque = float(qtdEstoque)
+    except (ValueError, TypeError):
+        return util.formataAviso("Erro: codProduto, seqItem e qtdEstoque devem ser números válidos")
+
     valida = Valida()
     valida.codProduto(codProduto)
-    valida.ano(qtdEstoque)
     valida.codCampus(codCampus)
     valida.codUnidade(codUnidade)
     valida.codPredio(codPredio)
@@ -1179,7 +1190,7 @@ def atualizar_inventario_by_sequencia():
 
     
     # Define a data do movimento como a data atual
-    datMovto = datetime.now()
+    datMovto = datetime.datetime.now()
 
     sql = """
         INSERT INTO MovtoEstoque
@@ -1203,7 +1214,6 @@ def adicionar_produto(codProduto):
     data = request.get_json()
 
     codProduto = data.get('codProduto')
-    #seqItem = data.get('seqItem)
     codCampus = data.get('codCampus')
     codUnidade = data.get('codUnidade')
     codLaboratorio = data.get('codLaboratorio')
@@ -1221,73 +1231,49 @@ def adicionar_produto(codProduto):
     valida.codLaboratorio(codLaboratorio)
     valida.codPredio(codPredio)
     valida.datMovto(datMovto)
-    #valida.qtdEstoque(datEstoque)
     valida.idtTipoMovto(idtTipoMovto)
     valida.seqEmbalagem(seqEmbalagem)
-    #valida.datuniMedida(uniMedida)
     if valida.temMensagem():
         return valida.getMensagens()
 
-    sql = """  
-        INSERT INTO ProdutoItem
-           (codProduto, seqItem, idNFe, datValidade, seqEmbalagem)
-          VALUES
-            (%s, %s, %s, %s, %s)
+    # Buscar o próximo seqItem disponível
+    sql_ultimo_seq = """
+        SELECT COALESCE(MAX(seqItem), 0) + 1
+          FROM ProdutoItem
+         WHERE codProduto = %s
     """
-    params = (codProduto, seqItem, None, datValidade, seqEmbalagem)
-
     
-
-    sql = """
-        INSERT INTO MovtoEstoque
-           (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, 
-            datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    params = (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,
-              datMovto, idtTipoMovto, qtdEstoque, txtJustificativa,)
-
-
-    """
-
-        SELECT 1 FROM Produto WHERE codProduto = %s", (codProduto,))
-        produto_existe = cursor.fetchone()
-        if not produto_existe:
-            return jsonify({"error": f"Produto com código {codProduto} não encontrado."}), 404
-
-        # Buscar o próximo seqItem disponível
-        cursor.execute("SELECT COALESCE(MAX(seqItem), 0) + 1 FROM ProdutoItem WHERE codProduto = %s", (codProduto,))
-        seqItem = cursor.fetchone()[0]
-        print(f"Próximo seqItem calculado para o Produto {codProduto}: {seqItem}")
-
-        # Inserir no ProdutoItem
-        cursor.execute(
+    try:
+        db = Db()
+        resultado_seq = db.execSql(sql_ultimo_seq, (codProduto,), Mode.SELECT)
+        if isinstance(resultado_seq, list) and resultado_seq:
+            seqItem = resultado_seq[0][0]
+        else:
+            seqItem = 1
+            
+        # Inserir item do produto
+        sql_insert_item = """
             INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, seqEmbalagem)
-            VALUES (%s, %s, %s, %s, %s)
-         
-        params = (codProduto,  None, data["datValidade"], data["seqEmbalagem"]))
-        
+            VALUES (%s, %s, NULL, %s, %s)
+        """
+        resultado_item = db.execSql(sql_insert_item, (codProduto, seqItem, datValidade, seqEmbalagem))
+        if not isinstance(resultado_item, tuple) or resultado_item[1] != 200:
+            return resultado_item
 
-        # Inserir no MovtoEstoque
-        cursor.execute(
+        # Inserir movimento de estoque
+        sql_insert_movto = """
             INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, 
                                       datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        , (codProduto, seqItem, data["codCampus"], data["codUnidade"], data["codPredio"],
-              data["codLaboratorio"], data["datMovto"], data["idtTipoMovto"], data["qtdEstoque"], data["txtJustificativa"]))
-        print(f"MovtoEstoque inserido: codProduto={codProduto}, seqItem={seqItem}")
-
-        # Finalizar transação
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print("Conexão com o banco de dados fechada.")
+        """
+        resultado_movto = db.execSql(sql_insert_movto, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa))
+        if not isinstance(resultado_movto, tuple) or resultado_movto[1] != 200:
+            return resultado_movto
+            
         return jsonify({"message": "Produto adicionado com sucesso"}), 201
 
     except Exception as e:
-        print(f"Erro durante a execução: {str(e)}")
         return jsonify({"error": str(e)}), 500
-    """
 
 #Rota para atualizar um inventario
 @produto_bp.route("/atualizarQuantidadeProdutosLaboratorio", methods=["POST"])
@@ -1324,12 +1310,7 @@ def atualizar_quantidade_produtos_laboratorio():
             qtdNova = produto.get('qtdNova')  # Nova quantidade fornecida pelo usuário
         
             # Calcula a diferença entre a nova quantidade e a quantidade atual
-            diferenca = qtdNova - qtdEstoque 
-
-            print(f"codProduto {codProduto}")
-            print(f"seqItem  {seqItem}")
-            print(f"qtdEstoque {qtdEstoque}")
-            print(f"qtdNova {qtdNova}")
+            diferenca = qtdNova - qtdEstoque
 
             # Determina o tipo de ajuste com base na diferença
             if diferenca > 0:
@@ -1350,24 +1331,14 @@ def atualizar_quantidade_produtos_laboratorio():
                         datMovto, idtTipoMovto_ajuste, qtdNova, txtJustificativa])
             movto.append("(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     
-            print(f"params  {params}")
-            print(f"movto  {movto}")
-    
-        print("salvar")
         # 2. Inserção em lote para MovtoEstoque
-        #if len(params) != len(movto):
-        #    print(f"Número de placeholders {len(movto)} e params {len(params)} diferem")
-        #    return util.formataAviso(f"Número de placeholders {len(movto)} e params {len(params)} diferem")
-
         sql = f"""
             INSERT INTO MovtoEstoque (
                 codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,
                 datMovto, idtTipoMovto, qtdEstoque, txtJustificativa
             ) VALUES {', '.join(movto)};
         """
-        print(f"SQL  {sql}")
     except Exception as e:
-        print(f"Erro ao preparar SQL de bloco -> {e}")
         return util.formataAviso(f"Erro ao preparar SQL de bloco -> {e}")
 
 
@@ -1382,18 +1353,12 @@ def atualizar_quantidade_produtos_laboratorio():
 @produto_bp.route("/implantarItensLaboratorio", methods=["POST"])
 def implantar_itens_laboratorio():
     data = request.get_json()
-
+    
     produtos = data.get("produtos")  # Lista de produtos com codProduto e seus itens
     codCampus = data.get("codCampus")
     codUnidade = data.get("codUnidade")
     codPredio = data.get("codPredio")
     codLaboratorio = data.get("codLaboratorio")
-
-    print(f"codigo campus {codCampus}")
-    print(f"codigo unidade {codUnidade}")
-    print(f"codigo Predio {codPredio}")
-    print(f"codigo Laboratorio {codLaboratorio}")
- 
 
     valida = Valida()
     valida.codCampus(codCampus)
@@ -1403,135 +1368,247 @@ def implantar_itens_laboratorio():
     if valida.temMensagem():
         return valida.getMensagens()
 
-    sqlProduto = """
-        INSERT INTO ProdutoItem (codProduto, datValidade, seqEmbalagem)
-        VALUES (%s, %s, %s)
-        RETURNING codProduto, seqItem
-    """
-
-    sqlMovto = """
-        INSERT INTO MovtoEstoque (
-            codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,
-            datMovto, idtTipoMovto, qtdEstoque, txtJustificativa
-        ) VALUES
-    """
-    
-    params_movto = []
-    values_movto = []
-
-    db = Db()
-
-    primeiro = True
-    modo = Mode.BEGIN
-    datMovto = date.today().strftime('%Y-%m-%d')
-
-    # 1. Inserir cada ProdutoItem individualmente e capturar seqItem
-    for produto in produtos:
-        codProduto = produto.get("codProduto")
-        
-        for item in produto.get("items", []):
-            datValidade = item.get("datValidade")
-            seqEmbalagem = item.get("seqdEmbalagem")
-            qtdEstoque = item.get("qtdEstoque")
-            txtJustificativa = item.get("txtJustificativa")
-
-            if qtdEstoque is None or datValidade is None or seqEmbalagem is None:
-                continue
-
-            params = (codProduto, datValidade, seqEmbalagem,)
-            try:
-                if primeiro:
-                    primeiro = False
-                else:
-                    modo = Mode.DEFAULT
-
-                resultado = db.execSql(sqlProduto, params, modo, True)
-                seqItem = db.getIdInsert(1)
-            except Exception as e:
-                print(db.getErro(e))
-                return db.getErro(e)
-        
-            print(f"seqitem {seqItem}")
-            print(f"resultado {resultado}")
-            
-
-            params_movto.append((codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio,
-                                 datMovto, qtdEstoque, txtJustificativa,))
-            values_movto.append("(%s, %s, %s, %s, %s, %s, %s, 'IM', %s, %s)")
-            print(f"movto  {params_movto}  - {values_movto}")
-
-    # 2. Inserção em lote para MovtoEstoque
     try:
-        # Monta SQL final com placeholders
-        movto_sql_final = sqlMovto + ", ".join(values_movto)
+        db = Db()
+        datMovto = date.today().strftime('%Y-%m-%d')
+        itens_processados = 0  # Contador de itens realmente inseridos
 
+        # Processar cada produto individualmente sem transação global
+        for produto in produtos:
+            codProduto = produto.get("codProduto")
+            
+            # Buscar o último seqItem para este produto
+            sql_ultimo_seq = """
+                SELECT COALESCE(MAX(seqItem), 0)
+                  FROM ProdutoItem
+                 WHERE codProduto = %s
+            """
+            resultado_seq = db.execSql(sql_ultimo_seq, (codProduto,), Mode.SELECT)
+            if isinstance(resultado_seq, list) and resultado_seq:
+                ultimo_seq_item = resultado_seq[0][0]
+            else:
+                ultimo_seq_item = 0
+            
+            items = produto.get("items", [])
+            
+            for item in items:
+                
+                datValidade = item.get("datValidade")
+                codEmbalagem = item.get("codEmbalagem")
+                qtdEstoque = item.get("qtdEstoque")
+                txtJustificativa = item.get("txtJustificativa", "Implantação")
 
-        print(f"movto  {movto_sql_final}  - {sum(params_movto, ())}")
-        return db.execSql(movto_sql_final, sum(params_movto, ()), Mode.COMMIT)
+                # Validar campos obrigatórios
+                if qtdEstoque is None or qtdEstoque == 0:
+                    continue
+                    
+                if datValidade is None or datValidade == "":
+                    continue
+                    
+                if codEmbalagem is None or codEmbalagem == "":
+                    return jsonify({"error": "Campo codEmbalagem é obrigatório e deve ser enviado pelo frontend"}), 400
+
+                # Incrementar seqItem
+                seqItem = ultimo_seq_item + 1
+                ultimo_seq_item = seqItem
+                
+                # Inserir item do produto
+                sql_insert_item = """
+                    INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+                    VALUES (%s, %s, NULL, %s, %s)
+                """
+                resultado_item = db.execSql(sql_insert_item, (codProduto, seqItem, datValidade, codEmbalagem))
+                if not isinstance(resultado_item, tuple) or resultado_item[1] != 200:
+                    return resultado_item
+
+                # Inserir movimento de estoque
+                sql_insert_movto = """
+                    INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                              codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                resultado_movto = db.execSql(sql_insert_movto, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, 'IM', qtdEstoque, txtJustificativa))
+                if not isinstance(resultado_movto, tuple) or resultado_movto[1] != 200:
+                    return resultado_movto
+                
+                # Incrementar contador de itens processados
+                itens_processados += 1
+
+        # Validar se pelo menos um item foi processado
+        if itens_processados == 0:
+            return jsonify({"error": "Nenhum item foi processado. Verifique os dados enviados."}), 400
+        
+        return jsonify({"message": f"Itens implantados com sucesso! Total: {itens_processados}"}), 200
+
     except Exception as e:
-        return db.getErro(e)
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
 
 @produto_bp.route("/cadastrarProdutos", methods=["POST"])
 def cadastrar_produtos():
- data = request.get_json()
+    data = request.get_json()
 
- # Validação dos dados recebidos
- if not data or "tipoCadastro" not in data or "codCampus" not in data or "codUnidade" not in data or "codPredio" not in data or "codLaboratorio" not in data or "produtos" not in data:
-     return jsonify({"error": "JSON inválido. Deve conter 'tipoCadastro', 'codCampus', 'codUnidade', 'codPredio', 'codLaboratorio' e 'produtos'."}), 400
+    # Validação dos dados recebidos
+    if not data or "tipoCadastro" not in data or "codCampus" not in data or "codUnidade" not in data or "codPredio" not in data or "codLaboratorio" not in data or "produtos" not in data:
+        return jsonify({"error": "JSON inválido. Deve conter 'tipoCadastro', 'codCampus', 'codUnidade', 'codPredio', 'codLaboratorio' e 'produtos'."}), 400
 
- tipo_cadastro = data["tipoCadastro"] 
- codCampus = data["codCampus"]
- codUnidade = data["codUnidade"]
- codPredio = data["codPredio"]
- codLaboratorio = data["codLaboratorio"]
- produtos = data["produtos"]  
+    tipo_cadastro = data["tipoCadastro"] 
+    codCampus = data["codCampus"]
+    codUnidade = data["codUnidade"]
+    codPredio = data["codPredio"]
+    codLaboratorio = data["codLaboratorio"]
+    produtos = data["produtos"]  
 
- try:
-     conn = get_connection()
-     cursor = conn.cursor()
+    try:
+        db = Db()
+        
+        # Data atual para o movimento
+        datMovto = datetime.datetime.now().date()
+        itens_processados = 0  # Contador de itens realmente inseridos
 
-     
-     datMovto = datetime.now().date()
+        # Processar cada produto individualmente sem transação global
+        for produto in produtos:
+            codProduto = produto["codProduto"]
+            items = produto["items"]  
 
-     for produto in produtos:
-         codProduto = produto["codProduto"]
-         items = produto["items"]  
+            # Buscar o último seqItem para este produto
+            sql_ultimo_seq = """
+                SELECT COALESCE(MAX(seqItem), 0)
+                  FROM ProdutoItem
+                 WHERE codProduto = %s
+            """
+            resultado_seq = db.execSql(sql_ultimo_seq, (codProduto,), Mode.SELECT)
+            if isinstance(resultado_seq, list) and resultado_seq:
+                ultimo_seq_item = resultado_seq[0][0]
+            else:
+                ultimo_seq_item = 0
 
-         
-         cursor.execute("""
-             SELECT COALESCE(MAX(seqItem), 0)
-               FROM ProdutoItem
-              WHERE codProduto = %s
-         """, (codProduto,))
-         ultimo_seq_item = cursor.fetchone()[0]
+            for item in items:
+                qtd = item["qtd"]
+                datValidade = item.get("validade")
+                codEmbalagem = item.get("embalagem")
 
-         for item in items:
-             qtd = item["qtd"]
-             datValidade = item["validade"]
-             seqEmbalagem = item["embalagem"]
+                # Pular itens com dados inválidos
+                if qtd is None or qtd == 0 or codEmbalagem is None:
+                    continue
 
-             
-             seqItem = ultimo_seq_item + 1
-             ultimo_seq_item = seqItem
+                # Incrementar seqItem
+                seqItem = ultimo_seq_item + 1
+                ultimo_seq_item = seqItem
 
-             cursor.execute("""
-                 INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, seqEmbalagem)
-                 VALUES (%s, %s, NULL, %s, %s)
-             """, (codProduto, seqItem, datValidade, seqEmbalagem))
+                # Inserir item do produto
+                sql_insert_item = """
+                    INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+                    VALUES (%s, %s, NULL, %s, %s)
+                """
+                resultado_item = db.execSql(sql_insert_item, (codProduto, seqItem, datValidade, codEmbalagem))
+                if not isinstance(resultado_item, tuple) or resultado_item[1] != 200:
+                    return resultado_item
 
-             cursor.execute("""
-                 INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
-                                           codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
-                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-             """, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, tipo_cadastro, qtd, "Cadastro de produto"))
+                # Inserir movimento de estoque
+                sql_insert_movto = """
+                    INSERT INTO MovtoEstoque (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                                              codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                resultado_movto = db.execSql(sql_insert_movto, (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, tipo_cadastro, qtd, "Cadastro de produto"))
+                if not isinstance(resultado_movto, tuple) or resultado_movto[1] != 200:
+                    return resultado_movto
+                
+                # Incrementar contador de itens processados
+                itens_processados += 1
 
-     conn.commit()
-     cursor.close()
-     conn.close()
+        # Validar se pelo menos um item foi processado
+        if itens_processados == 0:
+            return jsonify({"error": "Nenhum item foi processado. Verifique os dados enviados."}), 400
 
-     return jsonify({"message": "Produtos cadastrados com sucesso!"}), 200
+        return jsonify({"message": f"Produtos cadastrados com sucesso! Total: {itens_processados}"}), 200
 
- except Exception as e:
-     return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
+# ROTAS DE AUTENTICAÇÃO
 
+@produto_bp.route("/auth/login", methods=["POST"])
+def login():
+    """Rota para autenticação de usuários."""
+    data = request.get_json()
+    
+    if not data or 'cpf' not in data or 'senha' not in data:
+        return jsonify({"error": "CPF e senha são obrigatórios"}), 400
+    
+    cpf = data['cpf']
+    senha = data['senha']
+    
+    sql = """
+        SELECT token, cpf, id, isADM 
+        FROM usuario 
+        WHERE cpf = %s AND senha = %s
+    """
+    params = (cpf, senha)
+    
+    try:
+        db = Db()
+        result = db.execSql(sql, params, Mode.SELECT)
+        
+        if not result:
+            return jsonify({"error": "Credenciais inválidas"}), 401
+        
+        usuario = result[0]
+        
+        # Buscar laboratórios do usuário
+        laboratorios = obter_laboratorios_usuario(usuario[0])  # usuario[0] é o token
+        
+        return jsonify({
+            "token": usuario[0],
+            "cpf": usuario[1],
+            "id": usuario[2],
+            "isADM": usuario[3],
+            "laboratorios": laboratorios
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@produto_bp.route("/auth/validate", methods=["POST"])
+def validate_token():
+    """Rota para validar token."""
+    data = request.get_json()
+    
+    if not data or 'token' not in data:
+        return jsonify({"error": "Token é obrigatório"}), 400
+    
+    token = data['token']
+    
+    if not validar_token(token):
+        return jsonify({"error": "Token inválido"}), 401
+    
+    # Buscar dados do usuário
+    sql = """
+        SELECT token, cpf, id, isADM 
+        FROM usuario 
+        WHERE token = %s
+    """
+    params = (token,)
+    
+    try:
+        db = Db()
+        result = db.execSql(sql, params, Mode.SELECT)
+        
+        if not result:
+            return jsonify({"error": "Token inválido"}), 401
+        
+        usuario = result[0]
+        
+        # Buscar laboratórios do usuário
+        laboratorios = obter_laboratorios_usuario(token)
+        
+        return jsonify({
+            "token": usuario[0],
+            "cpf": usuario[1],
+            "id": usuario[2],
+            "isADM": usuario[3],
+            "laboratorios": laboratorios
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

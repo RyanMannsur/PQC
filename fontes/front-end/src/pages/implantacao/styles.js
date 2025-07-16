@@ -1,37 +1,26 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-max-width: 1200px;
-margin: 0 auto;
-padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 `;
 
 export const Title = styled.h1`
-font-size: 24px;
-font-weight: bold;
-color: #333;
-margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+  line-height: 1.2;
 `;
 
 export const Loading = styled.div`
-font-size: 18px;
-color: #666;
-text-align: center;
-margin-top: 50px;
-`;
-
-export const ConfirmButton = styled.button`
-background-color: #007bff;
-color: white;
-padding: 10px 20px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-font-size: 16px;
-margin-top: 20px;
-transition: background 0.3s;
-
-&:hover {
-  background-color: #0056b3;
-}
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 `;

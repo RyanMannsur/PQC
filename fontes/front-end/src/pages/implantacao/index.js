@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
-import { obterProdutosNaoImplantadosPorLocal, implantarItensLaboratorio, obterNomeLocalEstocagem } from "../../services/produto/service";
+import { Button, FormGroup } from "../../components";
+import { obterProdutosNaoImplantadosPorLocal, implantarItensLaboratorio } from "../../services/produto/service";
 import { useLocal } from "../../contexts/local";
 import * as C from "./styles";
 
@@ -10,31 +11,14 @@ const Implantacao = () => {
 const [produtos, setProdutos] = useState([]);
 const [implantacoes, setImplantacoes] = useState({});
 const [loading, setLoading] = useState(true);
-const { labId } = useLocal();
-const [labName, setLabName] = useState(null);
+const { labId, labName } = useLocal();
 const [isModalOpen, setIsModalOpen] = useState(false); 
 const navigate = useNavigate(); 
 
 useEffect(() => {
-  const fetchLabDetails = async () => {
-    console.log("LabId carregado:", labId);
-    if (labId) {
-      const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-      try {
-        const labDetails = await obterNomeLocalEstocagem(
-          codCampus,
-          codUnidade,
-          codPredio,
-          codLaboratorio
-        );
-        setLabName(labDetails[0].nomLocal);
-      } catch (error) {
-        console.error("Erro ao buscar detalhes do laboratório:", error);
-      }
-    }
-  };
-
   const fetchProdutos = async () => {
+    if (!labId) return;
+    
     const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
     try {
       const produtosResponse = await obterProdutosNaoImplantadosPorLocal(codCampus, codUnidade, codPredio, codLaboratorio,);
@@ -46,7 +30,6 @@ useEffect(() => {
     }
   };
 
-  fetchLabDetails();
   fetchProdutos();
 }, [labId]);
 
@@ -70,7 +53,7 @@ const handleConfirm = async () => {
     produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
       codProduto: parseInt(codProduto),
       items: items.map((item) => ({
-        seqEmbalagem: item.seqEmbalagem,
+        codEmbalagem: item.codEmbalagem,  // ✅ CORRIGIDO: era seqEmbalagem
         qtdEstoque: parseFloat(item.qtdEstoque),
         datValidade: item.datValidade,
         txtJustificativa: item.txtJustificativa,
@@ -99,14 +82,20 @@ const handleCloseModal = () => {
 };
 
 if (loading) {
-  return <C.Loading>Carregando produtos...</C.Loading>;
+  return (
+    <C.Loading>
+      Carregando produtos...
+    </C.Loading>
+  );
 }
 
 return (
   <C.Container>
     <C.Title>Implantação de Produtos no {labName}</C.Title>
     <ImplantacaoList data={produtos} onChange={handleChange} />
-    <C.ConfirmButton onClick={handleConfirm}>Confirmar</C.ConfirmButton>
+    <FormGroup justifyContent="center">
+      <Button variant="primary" onClick={handleConfirm}>Confirmar</Button>
+    </FormGroup>
 
     <Modal
       title="Implantação Realizada"
