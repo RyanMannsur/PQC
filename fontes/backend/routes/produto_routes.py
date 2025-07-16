@@ -8,6 +8,32 @@ from db import Db, Mode
 from valida import Valida
 import util
 
+# Adicionar endpoint para monitorar migrações
+@produto_bp.route("/migrations/status", methods=["GET"])
+def get_migrations_status():
+    """Endpoint para verificar status das migrações."""
+    try:
+        import sys
+        import os
+        # Adicionar o diretório das migrações ao path
+        migrations_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'migrations')
+        sys.path.append(migrations_path)
+        
+        from auto_migrate import check_migration_status
+        
+        status = check_migration_status()
+        
+        if status is None:
+            return jsonify({"error": "Erro ao verificar status das migrações"}), 500
+        
+        return jsonify({
+            "status": "success",
+            "data": status
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+
 # funcoes privadas
 def ultimo_dia_do_mes(mes, ano):
     ultimo_dia = calendar.monthrange(ano, mes)[1]

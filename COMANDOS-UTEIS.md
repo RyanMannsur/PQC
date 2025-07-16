@@ -1,6 +1,50 @@
 # 🛠️ Comandos Úteis - PQC
 
-## 🐳 Docker
+## � Sistema de Migrações
+
+### Executar migrações
+```bash
+# Windows
+run-migrations.bat
+
+# Linux/Mac
+./run-migrations.sh
+
+# Ou via Python
+cd fontes/backend
+python -m migrations.cli run
+```
+
+### Criar nova migração
+```bash
+cd fontes/backend
+python -m migrations.cli create codigo_nomepessoa --description "Descrição"
+
+# Exemplos:
+python -m migrations.cli create insert_joao --description "Adiciona dados iniciais"
+python -m migrations.cli create create_maria --description "Cria nova tabela"
+python -m migrations.cli create alter_pedro --description "Modifica estrutura"
+python -m migrations.cli create delete_ana --description "Remove dados obsoletos"
+```
+
+### Ver status das migrações
+```bash
+cd fontes/backend
+python -m migrations.cli status
+```
+
+### Testar sistema de migrações
+```bash
+cd fontes/backend
+python test_migrations.py
+```
+
+### Monitorar via API
+```bash
+GET /api/migrations/status
+```
+
+## �🐳 Docker
 
 ```bash
 # ===== INICIO RÁPIDO =====

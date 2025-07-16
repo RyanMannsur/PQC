@@ -4,6 +4,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 app.log
+migrations.log
+fontes/backend/app.log
+fontes/backend/migrations.log
 
 # Runtime data
 pids
@@ -199,3 +202,38 @@ ehthumbs.db
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.backup
+
+# Arquivos de teste temporários
+test_*.py
+*_test.py
+test_simple.py
+test_migrations.py
+
+# Arquivos de migração de teste
+migrations/scripts/000_*
+migrations/scripts/*_test_*
+
+# Arquivos de configuração local
+config.local.py
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Arquivos de database local
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de certificados
+*.pem
+*.key
+*.crt
+*.cert
+
+# Arquivos de configuração sensíveis
+secrets.py
+.secrets
+credentials.json
