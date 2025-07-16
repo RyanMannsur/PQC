@@ -1,13 +1,5 @@
 # PQC - Execução com Docker
 
-## Problemas Resolvidos
-
-1. **Arquivo SQL não estava sendo carregado**: O docker-compose estava apontando para `./database/PQC.sql` (que era um diretório), agora aponta para `./PQC.sql` (arquivo correto)
-
-2. **Configuração de conexão**: O backend estava configurado para conectar em `localhost`, agora usa variáveis de ambiente que funcionam no Docker
-
-3. **Sincronização de serviços**: Adicionado health check no PostgreSQL e dependência correta no backend
-
 ## Como usar
 
 ### Opção 1: Script automatizado (Windows)
