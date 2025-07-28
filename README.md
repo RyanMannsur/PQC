@@ -2,231 +2,223 @@
 
 Sistema para controle e gerenciamento de produtos químicos do CEFET-MG.
 
-## 🚀 Como Configurar o Projeto
+## 🚀 Pré-requisitos
 
-### Pré-requisitos
-- **Docker** (recomendado) OU
-- **Node.js** (versão 18+) e **PostgreSQL** (para execução local)
+### Opção 1 - Com Docker (RECOMENDADO):
+- **Docker Desktop** instalado e funcionando
+- **Git** para clonar o repositório
+
+### Opção 2 - Sem Docker (Desenvolvimento):
+- **Node.js** (versão 18+)
+- **PostgreSQL** (versão 12+)
+- **Python** (versão 3.8+)
+- **Git** para clonar o repositório
 
 ---
 
-## 🐳 Opção 1: Execução com Docker (RECOMENDADO)
+## 🐳 OPÇÃO 1: Execução com Docker (RECOMENDADO)
 
-### Para Windows:
-1. Clone o repositório
-2. Execute o script automatizado:
-   ```bash
-   start-docker.bat
-   ```
-
-### Para Linux/Mac ou comandos manuais:
+### 1. Clonar o Repositório
 ```bash
-# Construir e iniciar todos os serviços
-docker-compose up --build -d
-
-# Ver logs em tempo real
-docker-compose logs -f
-
-# Parar os serviços
-docker-compose down
+git clone <url-do-repositorio>
+cd PQC
 ```
 
-### Acesso:
+### 2. Iniciar os Containers
+```bash
+docker-compose up --build -d
+```
+
+Este comando irá:
+- **Baixar** e construir as imagens necessárias
+- **Iniciar** o PostgreSQL na porta 5432
+- **Iniciar** o backend Flask na porta 8088
+- **Carregar** a estrutura inicial do banco (PQC.sql)
+- **Executar** as migrações automaticamente
+
+### 3. Iniciar o Frontend
+```bash
+cd fontes/front-end
+npm install
+npm run dev
+```
+
+### 4. Acessar o Sistema
 - **Frontend**: http://localhost:3001
 - **Backend**: http://localhost:8088
-- **Banco de dados**: localhost:5432 (usuário: postgres, senha: postgres)
+- **Banco**: localhost:5432 (usuário: postgres, senha: postgres)
 
 ---
 
-## 💻 Opção 2: Execução Local (Desenvolvimento)
+## 💻 OPÇÃO 2: Execução Local (Sem Docker)
 
-### 1. Configurar o Banco de Dados
-```sql
--- No PostgreSQL, executar o arquivo PQC.sql
+### 1. Configurar o Banco de Dados PostgreSQL
+
+#### 1.1. Instalar PostgreSQL
+- **Windows**: Baixe do site oficial do PostgreSQL
+- **Linux**: `sudo apt install postgresql postgresql-contrib`
+- **Mac**: `brew install postgresql`
+
+#### 1.2. Criar o Banco de Dados
+```bash
+# Conectar ao PostgreSQL
+psql -U postgres
+
+# Criar o banco
+CREATE DATABASE PQC;
+
+# Sair do psql
+\q
+
+# Executar o script inicial
 psql -U postgres -d PQC -f PQC.sql
 ```
 
-### 2. Backend (Python/Flask)
+### 2. Clonar o Repositório
+```bash
+git clone <url-do-repositorio>
+cd PQC
+```
+
+### 3. Configurar o Backend (Python/Flask)
+
+#### 3.1. Instalar Dependências
 ```bash
 cd fontes/backend
 
+# Criar ambiente virtual (recomendado)
+python -m venv venv
+
+# Ativar ambiente virtual
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+
 # Instalar dependências
 pip install -r requirements.txt
+```
 
-# Executar
+#### 3.2. Configurar Variáveis de Ambiente
+Crie um arquivo `.env` em `fontes/backend/` com:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=PQC
+DB_USER=postgres
+DB_PASSWORD=postgres
+```
+
+#### 3.3. Iniciar o Backend
+```bash
 python app.py
 ```
 
-### 3. Frontend (React/Vite)
+O backend estará disponível em: http://localhost:8088
+*As migrações são executadas automaticamente na inicialização*
+
+### 4. Configurar o Frontend (React/Vite)
+
+#### 4.1. Instalar Dependências
 ```bash
 cd fontes/front-end
-
-# Instalar dependências
-npm install
-
-# Executar em modo desenvolvimento
-npm run dev
-
-# Build para produção
-npm run build
-```
-
----
-
-## 🛠️ Comandos Úteis
-
-### Frontend (Vite)
-```bash
-npm run dev        # Servidor de desenvolvimento (porta 3001)
-npm run build      # Build para produção
-npm run preview    # Preview do build
-npm run test       # Executar testes
-```
-
-### Docker
-```bash
-docker-compose up -d          # Iniciar em background
-docker-compose logs backend   # Ver logs do backend
-docker-compose logs database  # Ver logs do banco
-docker-compose down -v        # Parar e limpar volumes
-```
-
-### Migrações
-```bash
-python -m migrations.cli run     # Executar migrações pendentes
-python -m migrations.cli status  # Ver status das migrações
-run-migrations.bat               # Script Windows
-./run-migrations.sh              # Script Linux/Mac
-```
-
-- [Node.js](https://nodejs.org/)
-- [npm](https://www.npmjs.com/)
-- [Docker](https://www.docker.com/)
-
----
-
-## Executando o Projeto com Docker
-
-### Configuração do Docker
-
-1. Certifique-se de que o Docker está instalado e em execução.
-2. Abra um terminal e vá para o diretório do projeto.
-3. Execute os seguintes comandos para construir e iniciar os containers Docker:
-
-```bash
-docker-compose up --build
-```
-
-Isso iniciará os seguintes serviços:
-- **Backend**: Flask rodando na porta 8088
-- **Banco de Dados**: PostgreSQL rodando na porta 5432
-
-### Testando o Backend
-Após iniciar os containers, você pode acessar o backend no navegador ou Postman:
-http://localhost:8088/api/produtos
-
-### Testando a Conexão com o Banco de Dados
-Você pode se conectar ao banco de dados PostgreSQL usando uma ferramenta como DBeaver ou psql.
-
-**Credenciais:**
-- Host: localhost
-- Porta: 5432
-- Banco de Dados: PQC
-- Usuário: postgres
-- Senha: postgres
-
-**Usando psql:**
-```bash
-docker exec -it pqc_postgres psql -U postgres -d PQC
-```
-
-Liste as tabelas para verificar se o banco de dados foi criado corretamente:
-```sql
-\dt
-```
-
-## Executando o Frontend (Vite)
-
-Vá para o diretório fontes/front-end:
-```bash
-cd fontes/front-end
-```
-
-### Instale as dependências:
-```bash
 npm install
 ```
 
-### Execute o servidor de desenvolvimento:
+#### 4.2. Iniciar o Frontend
 ```bash
 npm run dev
 ```
 
-**⚠️ IMPORTANTE:** Com a migração para Vite, **NÃO USE MAIS** `npm start`. Use `npm run dev` para desenvolvimento.
+O frontend estará disponível em: http://localhost:3001
 
-### Comandos disponíveis:
-- `npm run dev` - Servidor de desenvolvimento (porta 3001)
-- `npm run build` - Build para produção  
-- `npm run preview` - Preview do build de produção
-- `npm run test` - Executar testes
+---
 
-O servidor de desenvolvimento Vite estará disponível em:
-http://localhost:3001
+## 🔐 Sistema de Autenticação
 
-## Estrutura do Banco de Dados
-O banco de dados será inicializado automaticamente com as tabelas e dados definidos no arquivo PQC.sql.
-Certifique-se de que o arquivo PQC.sql está localizado na raiz do projeto.
+O sistema utiliza autenticação baseada em tokens com controle de acesso administrativo.
 
+### Usuários de Teste Disponíveis:
+
+#### **Usuário Administrador:**
+- **CPF**: 333.333.333-33
+- **Senha**: senha123
+- **Privilégios**: Acesso completo ao sistema, incluindo cadastro de produtos
+- **Laboratórios**: Acesso a todos os laboratórios
+
+#### **Usuário Normal:**
+- **CPF**: 111.111.111-11  
+- **Senha**: senha123
+- **Privilégios**: Acesso limitado (inventário, transferências, consultas)
+- **Laboratórios**: Laboratório de Química Geral (Campus I)
+
+---
 ## 🔄 Sistema de Migrações
 
-O projeto conta com um sistema completo de migrações para gerenciar mudanças no banco de dados de forma controlada e versionada.
+O projeto conta com um sistema completo de migrações para gerenciar mudanças no banco de dados.
 
 ### Características:
-- **Execução automática**: Migrações são executadas automaticamente na inicialização da aplicação
+- **Execução automática**: As migrações são executadas automaticamente na inicialização da aplicação
 - **Padrão de nomenclatura**: `Numero_codigo_nomepessoa.sql`
 - **Códigos válidos**: `insert`, `delete`, `create`, `alter`
 - **Controle de estado**: Tabela `applied_migrations` mantém registro das migrações aplicadas
-- **CLI integrada**: Interface de linha de comando para gerenciar migrações
+
+### O que as Migrações Criam:
+- Tabelas do sistema de usuários e autenticação com tokens
+- Usuários de teste pré-configurados
+- Sistema de controle de acesso administrativo
+- Estrutura completa do banco de dados
+
+### Documentação Completa:
+- **[fontes/backend/migrations/README.md](fontes/backend/migrations/README.md)**
+
+---
+
+## 🛠️ Comandos de Referência
+
+### Docker:
+```bash
+docker-compose up --build -d     # Iniciar containers
+docker-compose down              # Parar containers
 ```
 
-### Documentação completa:
-- **[fontes/backend/migrations/README.md](fontes/backend/migrations/README.md)** - Documentação detalhada do sistema de migrações
-
-## Observações Importantes
-- Durante o desenvolvimento, alterações feitas no código do backend (fontes/backend) serão refletidas automaticamente no container Docker devido à configuração de volumes no docker-compose.yml.
-- **Frontend migrado para Vite**: Use `npm run dev` ao invés de `npm start`
-- Para garantir que o script PQC.sql seja executado novamente, remova o volume associado ao banco de dados:
+### Frontend (Vite):
 ```bash
-docker volume rm pqc_pgdata
+npm run dev        # Servidor de desenvolvimento
+npm run build      # Build para produção
 ```
 
 ---
 
-## 👥 Para Novos Desenvolvedores
+## ⚡ Setup Rápido para Desenvolvedores
 
-### ⚡ Setup em 2 minutos:
-1. **Clone o projeto**
-2. **Execute**: `start-docker.bat` (Windows) ou `./start-docker.sh` (Linux/Mac)
-3. **Pronto!** Acesse http://localhost:3001
-   - As migrações do banco são executadas automaticamente na inicialização
+### Com Docker (2 minutos):
+```bash
+git clone <url-do-repositorio>
+cd PQC
+docker-compose up --build -d
+cd fontes/front-end && npm install && npm run dev
+# Acessar: http://localhost:3001
+```
 
-### � Usuários de Teste:
-- **Usuário Administrador (Acesso Total)**: 
-  - CPF: `333.333.333-33` 
-  - Senha: `PQC1*`
-  - **Acesso**: Todos os laboratórios do sistema
-- **Usuário Comum (Acesso Limitado)**:
-  - CPF: `123.456.789-01`
-  - Senha: `Senha@123`
-  - **Acesso**: Laboratórios específicos
+### Sem Docker (5 minutos):
+```bash
+# 1. Configurar PostgreSQL primeiro
+psql -U postgres -c "CREATE DATABASE PQC;"
+psql -U postgres -d PQC -f PQC.sql
 
-### �📚 Documentação completa:
-- **[SETUP-DESENVOLVEDORES.md](SETUP-DESENVOLVEDORES.md)** - Guia completo de configuração
-- **[COMANDOS-UTEIS.md](COMANDOS-UTEIS.md)** - Todos os comandos que você vai precisar
-- **[DOCKER-README.md](DOCKER-README.md)** - Específico para Docker
-- **[fontes/backend/migrations/README.md](fontes/backend/migrations/README.md)** - Sistema de migrações
+# 2. Configurar projeto
+git clone <url-do-repositorio>
+cd PQC
 
-### 🛠️ Ferramentas recomendadas:
-- **Docker Desktop** (essencial)
-- **VS Code** (editor recomendado)
-- **Git** (controle de versão)
+# 3. Backend
+cd fontes/backend
+pip install -r requirements.txt
+python app.py &
+
+# 4. Frontend (novo terminal)
+cd fontes/front-end
+npm install
+npm run dev
+# Acessar: http://localhost:3001
+```
