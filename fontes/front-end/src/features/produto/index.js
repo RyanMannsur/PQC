@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button, Input, Checkbox } from '../../components';
 import { Form, Row } from './styles';
 
-const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
+const ProdutoForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCancel }) => {
   const [formData, setFormData] = useState({
     codProduto: '',
     nomProduto: '',
@@ -33,6 +33,14 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
     onSubmit({ ...formData, idtAtivo: false });
   };
 
+  const handleDelete = () => {
+    if (window.confirm('Deseja realmente excluir?')) {
+      if (typeof onSubmit === 'function') {
+        onSubmit({ ...formData, excluir: true });
+      }
+    }
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <Row>
@@ -59,11 +67,16 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
         <label>NCM:</label>
         <Input name="ncm" value={formData.ncm} onChange={handleChange} maxLength={8} placeholder="NCM (8 dígitos)" />
       </Row>
-      <div style={{ maxWidth: 350, minWidth: 220, marginTop: 8 }}>
-        <Button variant="primary" type="submit" style={{ width: '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
+      <div style={{ maxWidth: 350, minWidth: 220, marginTop: 8, display: 'flex', gap: 8 }}>
+        <Button variant="primary" type="submit" style={{ width: isADM ? '50%' : '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
+        {isEditing && (
+          <Button variant="secondary" type="button" onClick={onCancel} style={{ width: isADM ? '25%' : '50%' }}>Cancelar</Button>
+        )}
+        {isADM && isEditing && (
+          <Button variant="danger" type="button" onClick={handleDelete} style={{ width: '25%' }}>Excluir</Button>
+        )}
       </div>
     </Form>
   );
 };
-
 export default ProdutoForm;

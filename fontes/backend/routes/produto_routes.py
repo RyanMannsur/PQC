@@ -87,9 +87,10 @@ def get_produtos():
                nomLista,
                perPureza,
                vlrDensidade,
-               ncm
+               ncm,
+               "idtAtivo"
           FROM Produto
-         WHERE "idtAtivo"
+         WHERE "idtAtivo" = true
         """
 
     try:
@@ -112,7 +113,8 @@ def get_produtos():
             "nomLista": produto[2],
             "perPureza": produto[3],
             "vlrDensidade": produto[4],
-            "ncm": produto[5]
+            "ncm": produto[5],
+            "idtAtivo": produto[6]
         })
 
     return produto_formatado
@@ -135,7 +137,7 @@ def obter_produto(codProduto):
         JOIN OrgaoControle C
           ON C.codOrgaoControle = B.codOrgaoControle
         WHERE A.codProduto = %s
-          AND A."idtAtivo"
+          AND A."idtAtivo" = true
     """
     params = (codProduto,)
 
@@ -273,11 +275,12 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
                A.nomLista,
                A.perPureza,
                A.vlrDensidade,
-               A.ncm
+               A.ncm,
+               A."idtAtivo"
           FROM Produto A
           JOIN MovtoEstoque B
             ON B.codProduto = A.codProduto        
-         WHERE A."idtAtivo"
+         WHERE A."idtAtivo" = true
            AND B.codCampus = %s 
            AND B.codUnidade = %s
            AND B.codPredio = %s
@@ -303,7 +306,8 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
             "nomLista": produto[2],
             "perPureza": produto[3],
             "vlrDensidade": produto[4],
-            "ncm": produto[5]
+            "ncm": produto[5],
+            "idtAtivo": produto[6]
         })
 
     return produtos_formatado
@@ -459,7 +463,8 @@ def buscar_produtos_local_estocagem():
               A.vlrDensidade,
               B.seqItem,
               B.datValidade,
-              sum(C.qtdEstoque) as estoque_total
+              sum(C.qtdEstoque) as estoque_total,
+              A."idtAtivo"
          FROM Produto A
          JOIN ProdutoItem B
            ON B.codProduto = A.codProduto
@@ -483,7 +488,7 @@ def buscar_produtos_local_estocagem():
           AND C.codLaboratorio = %s
           AND (UltInv.ultimo_inventario_id IS NULL OR C.idMovtoEstoque >= UltInv.ultimo_inventario_id)
           {filtro}
-        GROUP BY 1,2,3,4,5,6
+        GROUP BY 1,2,3,4,5,6,8
         HAVING sum(C.qtdEstoque) > 0
         ORDER By 2, 6
     """
@@ -507,7 +512,8 @@ def buscar_produtos_local_estocagem():
               "vlrDensidade": produto[3],
               "seqItem": produto[4],
               "datValidade": produto[5].strftime("%Y-%m-%d") if hasattr(produto[5], 'strftime') else str(produto[5]),
-              "qtdEstoque": float(produto[6])
+              "qtdEstoque": float(produto[6]),
+              "idtAtivo": produto[7]
         })
 
     return resultado
@@ -726,20 +732,19 @@ def obter_produto_pelo_codigo(codProduto):
         produto = db.execSql(sql, params, Mode.SELECT)
     except Exception as e:
         return db.getErro(e)
-   
-    if not produto:
-         return util.formataAviso("Nenhum produto encontrado!")  
 
-    produto_formatado = []
-    
-    produto_formatado.append({
-              "codProduto": produto[0],
-              "nomProduto": produto[1],
-              "nomLista": produto[2],
-              "perPureza": float(produto[3]) if produto[3] is not None else None,
-              "vlrDensidade": float(produto[4]) if produto[4] is not None else None
-          })
-    
+    if not produto or len(produto) == 0:
+        return {"mensagem": "Nenhum produto encontrado!", "tipo": "AVISO"}
+
+    # produto é uma lista de tuplas, pega o primeiro
+    p = produto[0]
+    produto_formatado = {
+        "codProduto": p[0],
+        "nomProduto": p[1],
+        "nomLista": p[2],
+        "perPureza": float(p[3]) if p[3] is not None else None,
+        "vlrDensidade": float(p[4]) if p[4] is not None else None
+    }
     return produto_formatado
     
 # Consulta para obter todos os produtos com movimentações
@@ -966,9 +971,9 @@ def update_produto(codProduto):
     codProduto = data.get("codProduto")
     nomProduto = data.get("nomProduto")
     nomLista = data.get("nomLista")
-    perPureza = data.get("perPureza"),
-    vlrDensidade = data.get("vlrDensidade"), 
-    uniMedida = data.get("uniMedida")
+    perPureza = data.get("perPureza")
+    vlrDensidade = data.get("vlrDensidade")
+    #uniMedida = data.get("uniMedida")
  
     valida = Valida()
     valida.codProduto(codProduto)  
@@ -976,63 +981,53 @@ def update_produto(codProduto):
     valida.nomLista(nomLista)
     valida.perPureza(perPureza)
     valida.vlrDensidade(vlrDensidade)
-    valida.uniMedida(uniMedida)
     if valida.temMensagem():
         return valida.getMensagens()
 
-    sql = """
-        UPDATE Produto 
-            SET nomProduto = %s,
-                nomLista = %s,
-                perPureza = %s,
-                vlrDensidade = %s,
-                uniMedida = %
-          WHERE codProduto = %s
-    """
-    params = (nomProduto, nomLista, perPureza, vlrDensidade, uniMedida, codProduto,)
-
     db = Db()
-    try:   
-        resultado = db.execSql(sql, params, Mode.BEGIN)
-    except Exception as e:
-        return db.getErro(e)
-    if resultado != '':
-        return resultado
-        
-    sql = """
-        "DELETE FROM ProdutoOrgaoControle
-          WHERE codProduto = %s
-    """
-    params = (codProduto,)
-            
-    try:   
-        resultado = db.execSql(sql, params, Mode.DEFAULT)
-    except Exception as e:
-        return db.getErro(e)
-    if resultado != '':
-        return resultado
+    try:
+        # UPDATE Produto
+        sql_update = """
+            UPDATE Produto 
+                SET nomProduto = %s,
+                    nomLista = %s,
+                    perPureza = %s,
+                    vlrDensidade = %s
+              WHERE codProduto = %s
+        """
+        params_update = (nomProduto, nomLista, perPureza, vlrDensidade, codProduto)
+        db.execSql(sql_update, params_update, Mode.BEGIN)
 
-    sql = """
-        INSERT INTO ProdutoOrgaoControle
-          (codProduto, codOrgaoControle)
-                    VALUES
-    """
-    
-    valores = [] 
-    params = []
-    # juntando todos os orgaos para fazer insert único
-    for orgaoControle in data["orgaosControle"]:
-        codOrgaoControle = orgaoControle.get('codOrgaoControle')
-       
-        valores.append('(%s, %s,)')
-        params += [codProduto, codOrgaoControle]        
+        # DELETE órgãos de controle
+        sql_delete = """
+            DELETE FROM ProdutoOrgaoControle
+              WHERE codProduto = %s
+        """
+        params_delete = (codProduto,)
+        db.execSql(sql_delete, params_delete, Mode.DEFAULT)
 
-    sql += ', '.join(valores)
-    
-    try:   
-        return db.execSql(sql, params, Mode.COMMIT)
+        # INSERT órgãos de controle (se houver)
+        if data.get("orgaosControle"):
+            sql_insert = """
+                INSERT INTO ProdutoOrgaoControle
+                  (codProduto, codOrgaoControle)
+                VALUES
+            """
+            valores = []
+            params_insert = []
+            for orgaoControle in data["orgaosControle"]:
+                codOrgaoControle = orgaoControle.get('codOrgaoControle')
+                valores.append('(%s, %s)')
+                params_insert += [codProduto, codOrgaoControle]
+            sql_insert += ', '.join(valores)
+            db.execSql(sql_insert, params_insert, Mode.DEFAULT)
+
+        # Commit ao final
+        db.execSql("COMMIT;", None, Mode.COMMIT)
+        return jsonify({"mensagem": "Produto atualizado com sucesso!", "tipo": "SUCESSO"}), 200
     except Exception as e:
-        return db.getErro(e)
+        db.execSql("ROLLBACK;", None, Mode.DEFAULT)
+        return jsonify({"mensagem": f"Erro ao atualizar produto: {str(e)}", "tipo": "ERRO"}), 500
    
 
 # Rota para excluir um produto

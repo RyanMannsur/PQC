@@ -18,12 +18,8 @@ export const login = async (cpf, senha) => {
 
     const data = await response.json();
     
-    // Salvar token no localStorage
+    // Salvar apenas o token no localStorage
     localStorage.setItem("userToken", data.token);
-    localStorage.setItem("userCpf", data.cpf);
-    localStorage.setItem("userId", data.id);
-    localStorage.setItem("userIsADM", data.isADM);
-    
     return data;
   } catch (error) {
     console.error("Erro no login:", error);
@@ -48,12 +44,8 @@ export const validateToken = async (token) => {
 
     const data = await response.json();
     
-    // Atualizar dados no localStorage
+    // Atualizar apenas o token no localStorage
     localStorage.setItem("userToken", data.token);
-    localStorage.setItem("userCpf", data.cpf);
-    localStorage.setItem("userId", data.id);
-    localStorage.setItem("userIsADM", data.isADM);
-    
     return data;
   } catch (error) {
     console.error("Erro na validação do token:", error);
@@ -63,9 +55,6 @@ export const validateToken = async (token) => {
 
 export const logout = () => {
   localStorage.removeItem("userToken");
-  localStorage.removeItem("userCpf");
-  localStorage.removeItem("userId");
-  localStorage.removeItem("userIsADM");
   localStorage.removeItem("labId");
 };
 
@@ -75,15 +64,10 @@ export const getCurrentToken = () => {
 
 export const getCurrentUser = () => {
   const token = localStorage.getItem("userToken");
-  const cpf = localStorage.getItem("userCpf");
-  const id = localStorage.getItem("userId");
-  const isADM = localStorage.getItem("userIsADM") === "true";
-  
-  if (!token || !cpf || !id) {
+  if (!token) {
     return null;
   }
-  
-  return { token, cpf, id, isADM };
+  return { token };
 };
 
 export const isAuthenticated = () => {
@@ -92,6 +76,6 @@ export const isAuthenticated = () => {
 };
 
 export const isAdmin = () => {
-  const user = getCurrentUser();
-  return user && user.isADM === true;
+  // Não é mais possível saber se é admin pelo localStorage, deve ser validado via API/contexto
+  return false;
 };
