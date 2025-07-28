@@ -86,7 +86,8 @@ def get_produtos():
                nomProduto,
                nomLista,
                perPureza,
-               vlrDensidade
+               vlrDensidade,
+               ncm
           FROM Produto
          WHERE "idtAtivo"
         """
@@ -110,7 +111,8 @@ def get_produtos():
             "nomProduto": produto[1],
             "nomLista": produto[2],
             "perPureza": produto[3],
-            "vlrDensidade": produto[4]
+            "vlrDensidade": produto[4],
+            "ncm": produto[5]
         })
 
     return produto_formatado
@@ -123,7 +125,8 @@ def obter_produto(codProduto):
                A.nomProduto, 
                A.nomLista, 
                A.perPureza,
-               A.vlrDensidade, 
+               A.vlrDensidade,
+               A.ncm,
                B.codOrgaoControle,
                C.nomOrgaoControle
         FROM Produto A
@@ -157,13 +160,14 @@ def obter_produto(codProduto):
                 "nomLista": produto[2],
                 "perPureza": float(produto[3]),
                 "vlrDensidade": float(produto[4]),
+                "ncm": produto[5],
                 "orgaosControle": []
             }
             
         # Adicionar órgãos de controle à lista
         orgaoControle.append({
-            "codOrgaoControle": produto[5],
-            "nomOrgaoControle": produto[6]
+            "codOrgaoControle": produto[6],
+            "nomOrgaoControle": produto[7]
         })
 
     # Adicionar a lista de órgãos de controle ao dicionário principal
@@ -207,6 +211,7 @@ def consultarProdutos_por_token(token):
               A.nomProduto,
               A.perPureza,
               A.vlrDensidade,
+              A.ncm,
               E.codCampus,
               E.nomCampus,
               F.codUnidade,
@@ -267,7 +272,8 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
                A.nomProduto,
                A.nomLista,
                A.perPureza,
-               A.vlrDensidade  
+               A.vlrDensidade,
+               A.ncm
           FROM Produto A
           JOIN MovtoEstoque B
             ON B.codProduto = A.codProduto        
@@ -296,7 +302,8 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
             "nomProduto": produto[1],
             "nomLista": produto[2],
             "perPureza": produto[3],
-            "vlrDensidade": produto[4]
+            "vlrDensidade": produto[4],
+            "ncm": produto[5]
         })
 
     return produtos_formatado

@@ -10,6 +10,7 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
     perPureza: '',
     vlrDensidade: '',
     idtAtivo: false,
+    ncm: '',
   });
 
   useEffect(() => {
@@ -28,7 +29,8 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit(formData);
+    // Sempre criar com idtAtivo = false
+    onSubmit({ ...formData, idtAtivo: false });
   };
 
   return (
@@ -54,15 +56,12 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing }) => {
         <Input name="vlrDensidade" type="number" value={formData.vlrDensidade} onChange={handleChange} />
       </Row>
       <Row>
-        <label>Ativo:</label>
-        <input 
-          type="checkbox" 
-          name="idtAtivo" 
-          checked={formData.idtAtivo} 
-          onChange={handleChange} 
-        />
+        <label>NCM:</label>
+        <Input name="ncm" value={formData.ncm} onChange={handleChange} maxLength={8} placeholder="NCM (8 dígitos)" />
       </Row>
-      <Button variant="primary" type="submit">{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
+      <div style={{ maxWidth: 350, minWidth: 220, marginTop: 8 }}>
+        <Button variant="primary" type="submit" style={{ width: '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
+      </div>
     </Form>
   );
 };

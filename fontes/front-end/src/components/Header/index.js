@@ -19,8 +19,8 @@ return (
     style={{
       display: "flex",
       flexDirection: "column",
-      height: "100vh",
-      overflow: "hidden",
+      height: "100vh"
+      // Removido overflow: hidden para permitir scroll global
     }}
   >
     <AppBar position="fixed" style={{ width: "100%", zIndex: 1201 }}>

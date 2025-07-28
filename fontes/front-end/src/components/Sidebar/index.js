@@ -82,13 +82,6 @@ return (
         <ListItemText primary="Implantação" />
       </ListItem>
 
-      <ListItem component={Link} to="/relatorio">
-        <ListItemIcon>
-          <Assessment />
-        </ListItemIcon>
-        <ListItemText primary="Relatório" />
-      </ListItem>
-
       {userIsAdmin && (
         <ListItem component={Link} to="/produto">
           <ListItemIcon>

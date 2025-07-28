@@ -16,7 +16,7 @@ const GlobalStyle = createGlobalStyle`
     height: 100vh;
     background-color: #f0f2f5;
     font-family: Arial, Helvetica, sans-serif;
-    overflow-y: hidden;
+    /* Removido overflow-y: hidden para permitir scroll */
   }
 `;
 
