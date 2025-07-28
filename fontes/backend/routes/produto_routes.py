@@ -263,7 +263,7 @@ def consultarProdutos_por_token(token):
 @produto_bp.route("/obterProdutosPorLaboratorio/<string:codCampus>/<string:codUnidade>/<string:codPredio>/<string:codLaboratorio>", methods=["GET"])
 def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaboratorio):
     sql = """
-        SELECT A.codProduto,
+        SELECT DISTINCT A.codProduto,
                A.nomProduto,
                A.nomLista,
                A.perPureza,
@@ -276,6 +276,7 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
            AND B.codUnidade = %s
            AND B.codPredio = %s
            AND B.codLaboratorio = %s
+         ORDER BY A.nomProduto
         """
     params = (codCampus, codUnidade, codPredio, codLaboratorio,)
 

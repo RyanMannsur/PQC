@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ImplantacaoList from "../../features/implantacao";
 import Modal from "../../components/Modal"; 
 import { Select, Button, FormGroup } from "../../components"; 
-import { obterProdutosNaoImplantadosPorLocal, cadastrarProdutos } from "../../services/produto/service"; 
+import { obterProdutosPorLaboratorio, cadastrarProdutos } from "../../services/produto/service"; 
 import { useLocal } from "../../contexts/local";
 import * as C from "./styles";
 
@@ -21,7 +21,7 @@ useEffect(() => {
     if (labId) {
       const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
       try {
-        const produtosResponse = await obterProdutosNaoImplantadosPorLocal(
+        const produtosResponse = await obterProdutosPorLaboratorio(
           codCampus,
           codUnidade,
           codPredio,

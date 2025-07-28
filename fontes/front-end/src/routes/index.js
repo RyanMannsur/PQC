@@ -13,8 +13,6 @@ import AppLayout from "../layout/App";
 import PublicoLayout from "../layout/publico";
 import Traferencia from "../pages/Transferencia";
 import Implantacao from "../pages/implantacao";
-import Relatorio from "../pages/relatorio";
-import Produto from "../pages/produto"
 import ConsultaPQCPage from "../pages/consultaPQC";
 import ProdutoPage from "../pages/produto";
 
@@ -107,17 +105,6 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <Implantacao />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/relatorio"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <Relatorio />
               </AppLayout>
             </PrivateRoute>
           }
