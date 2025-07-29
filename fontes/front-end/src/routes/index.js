@@ -13,6 +13,8 @@ import Traferencia from "../pages/Transferencia";
 import Implantacao from "../pages/implantacao";
 import ConsultaPQCPage from "../pages/consultaPQC";
 import ProdutoPage from "../pages/produto";
+import CampusPage from "../pages/campus";
+        
 
 const RoutesApp = () => {
   return (
@@ -118,6 +120,18 @@ const RoutesApp = () => {
             </PrivateRoute>
           }
         />
+
+        <Route
+          path="/campus"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <CampusPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
         <Route
           path="/ConsultaPQC"
           element={

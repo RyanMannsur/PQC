@@ -87,6 +87,13 @@ return (
           </ListItemIcon>
           <ListItemText primary="Cadastrar Produto" />
         </ListItem>
+        
+      <ListItem component={Link} to="/campus">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Campus" />
+      </ListItem>
       
       <ListItem component={Link} to="/consultaPQC">
         <ListItemIcon>
