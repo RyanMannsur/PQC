@@ -1022,10 +1022,10 @@ def update_produto(codProduto):
 
         # Commit ao final
         db.execSql("COMMIT;", None, Mode.COMMIT)
-        return jsonify({"mensagem": "Produto atualizado com sucesso!", "tipo": "SUCESSO"}), 200
+        return {"mensagem": "Produto atualizado com sucesso!", "tipo": "SUCESSO"}, 200
     except Exception as e:
         db.execSql("ROLLBACK;", None, Mode.DEFAULT)
-        return jsonify({"mensagem": f"Erro ao atualizar produto: {str(e)}", "tipo": "ERRO"}), 500
+        return {"mensagem": f"Erro ao atualizar produto: {str(e)}", "tipo": "ERRO"}, 500
    
 
 # Rota para excluir um produto

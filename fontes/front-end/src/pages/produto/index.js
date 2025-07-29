@@ -61,9 +61,13 @@ const ProdutoPage = () => {
 
   const handleUpdate = async (produto) => {
     try {
-      const res = await produtoService.atualizar(produto);
-      setModalMessage(TEXTOS.PRODUTO_ATUALIZADO_SUCESSO);
-      setIsModalOpen(true);
+      const payload = { ...produto };
+      if (!payload.codProduto && editing?.codProduto) {
+        payload.codProduto = editing.codProduto;
+      }
+      await produtoService.atualizar(payload);
+      setEditing(null);
+      window.location.reload();
     } catch (error) {
       const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_ATUALIZAR_PRODUTO;
       setTooltip({ visible: true, message: msg });
