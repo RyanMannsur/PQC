@@ -52,6 +52,7 @@ const ProdutoPage = () => {
       await produtoService.cadastrar(produto);
       setModalMessage(TEXTOS.PRODUTO_CADASTRADO_SUCESSO);
       setIsModalOpen(true);
+      // O reload será feito ao fechar o modal
     } catch (error) {
       const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_CADASTRAR_PRODUTO;
       setTooltip({ visible: true, message: msg });
@@ -67,7 +68,6 @@ const ProdutoPage = () => {
       }
       await produtoService.atualizar(payload);
       setEditing(null);
-      window.location.reload();
     } catch (error) {
       const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_ATUALIZAR_PRODUTO;
       setTooltip({ visible: true, message: msg });
@@ -77,10 +77,8 @@ const ProdutoPage = () => {
 
 
   const handleDelete = async (codProduto) => {
-    if (window.confirm(TEXTOS.CONFIRMA_EXCLUSAO)) {
-      await produtoService.excluir(codProduto);
-      fetchProdutos();
-    }
+    await produtoService.excluir(codProduto);
+    window.location.reload();
   };
 
   const handleModalClose = () => {
@@ -105,6 +103,7 @@ const ProdutoPage = () => {
         initialData={editing}
         isEditing={!!editing}
         isADM={usuario?.isADM}
+        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codProduto) : undefined}
       />
       <h2 style={{ marginTop: 40 }}>Lista de Produtos</h2>
       <Table>

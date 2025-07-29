@@ -47,14 +47,11 @@ def obter_laboratorios_usuario(token):
     except Exception as e:
         return []
 
-# Adicionar endpoint para monitorar migrações
 @produto_bp.route("/migrations/status", methods=["GET"])
 def get_migrations_status():
-    """Endpoint para verificar status das migrações."""
     try:
         import sys
         import os
-        # Adicionar o diretório das migrações ao path
         migrations_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'migrations')
         sys.path.append(migrations_path)
         
