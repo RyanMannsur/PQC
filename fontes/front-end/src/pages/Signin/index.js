@@ -25,7 +25,6 @@ const Signin = () => {
     try {
       const userData = await login(cpf, senha);
       
-      // Se o usuário tem laboratórios, definir o primeiro como padrão
       if (userData.laboratorios && userData.laboratorios.length > 0) {
         const firstLab = userData.laboratorios[0];
         localStorage.setItem("labId", JSON.stringify({

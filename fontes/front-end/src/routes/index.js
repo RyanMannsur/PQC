@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signin from "../pages/Signin";
 import SelecionarLocal from "../pages/SelecionarLocal";
@@ -7,7 +6,6 @@ import Inventario from "../pages/Inventario";
 import TransferirProduto from "../pages/Transferencia/tranferirProduto";
 import CreateProdutos from "../pages/createProduto";
 import PrivateRoute from "./private";
-import AdminRoute from "./admin";
 import AppNotSidebar from "../layout/AppNotSidebar";
 import AppLayout from "../layout/App";
 import PublicoLayout from "../layout/publico";
@@ -113,11 +111,11 @@ const RoutesApp = () => {
         <Route
           path="/produto"
           element={
-            <AdminRoute>
+            <PrivateRoute>
               <AppLayout>
                 <ProdutoPage />
               </AppLayout>
-            </AdminRoute>
+            </PrivateRoute>
           }
         />
         <Route

@@ -76,10 +76,6 @@ class Valida:
         if vlrDensidade is None:
             self.mensagem.append("Densidade do produto não pode ser nula!")
 
-    def uniMedida(self, uniMedida):
-        if uniMedida is None:
-            self.mensagem.append("Unidade de medida do produto não pode ser nula!")
-
     def datMovto(self, datMovto):
         if datMovto is None:
             self.mensagem.append("Data do movimento não pode ser nula!")

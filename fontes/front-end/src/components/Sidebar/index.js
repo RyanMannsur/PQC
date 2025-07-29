@@ -7,8 +7,6 @@ ListItemIcon,
 } from "@mui/material";
 import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd, Assessment } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../../contexts/auth";
 
 const Sidebar = () => {
 const handleClearLabAndNavigate = () => {
@@ -16,8 +14,6 @@ const handleClearLabAndNavigate = () => {
   localStorage.removeItem("labName");
 };
 
-const { usuario } = useContext(AuthContext);
-const userIsAdmin = usuario?.isADM;
 
 return (
   <Drawer
@@ -84,14 +80,13 @@ return (
         <ListItemText primary="Implantação" />
       </ListItem>
 
-      {userIsAdmin && (
+
         <ListItem component={Link} to="/produto">
           <ListItemIcon>
             <Assessment />
           </ListItemIcon>
           <ListItemText primary="Cadastrar Produto" />
         </ListItem>
-      )}
       
       <ListItem component={Link} to="/consultaPQC">
         <ListItemIcon>

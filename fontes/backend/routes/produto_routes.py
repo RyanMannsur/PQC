@@ -933,29 +933,27 @@ def obter_todos_laboratorios():
 def add_produto():
     data = request.get_json()
 
-    codProduto = data.get("codProduto")
     nomProduto = data.get("nomProduto")
     nomLista = data.get("nomLista")
-    perPureza = data.get("perPureza"),
-    vlrDensidade = data.get("vlrDensidade"), 
-    uniMedida = data.get("uniMedida")
+    perPureza = data.get("perPureza") if data.get("perPureza") not in [None, "", "null"] else None
+    vlrDensidade = data.get("vlrDensidade") if data.get("vlrDensidade") not in [None, "", "null"] else None
+    idtAtivo = data.get("idtAtivo", False)
+    ncm = data.get("ncm") if data.get("ncm") not in [None, "", "null"] else None
   
     valida = Valida()
-    valida.codProduto(codProduto)
     valida.nomProduto(nomProduto)
     valida.nomLista(nomLista)
     valida.perPureza(perPureza)
     valida.vlrDensidade(vlrDensidade)
-    valida.uniMedida(uniMedida)
   
     if valida.temMensagem():
         return valida.getMensagens()
 
     sql = """
-        INSERT INTO Produto (codProduto, nomProduto, nomLista, perPureza, vlrDensidade, uniMedida) 
+        INSERT INTO Produto (nomProduto, nomLista, perPureza, vlrDensidade, "idtAtivo", ncm) 
             VALUES (%s, %s, %s, %s, %s, %s)
     """
-    params = (codProduto, nomProduto, nomLista, perPureza, vlrDensidade, uniMedida, )
+    params = (nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo, ncm)
 
     db = Db()
     try: 

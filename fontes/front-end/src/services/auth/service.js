@@ -1,60 +1,39 @@
 // services/auth/service.js
 const API_BASE_URL = "http://localhost:8088/api";
-
+// Login via API
 export const login = async (cpf, senha) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ cpf, senha }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Erro no login");
-    }
-
-    const data = await response.json();
-    
-    // Salvar apenas o token no localStorage
-    localStorage.setItem("userToken", data.token);
-    return data;
-  } catch (error) {
-    console.error("Erro no login:", error);
-    throw error;
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cpf, senha }),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Usuário não cadastrado ou senha incorreta");
   }
+  const userData = await response.json();
+  localStorage.setItem("userToken", userData.token);
+  localStorage.setItem("user_data", JSON.stringify(userData));
+  return userData;
 };
 
+// Validação de token via API
 export const validateToken = async (token) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/validate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ token }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Token inválido");
-    }
-
-    const data = await response.json();
-    
-    // Atualizar apenas o token no localStorage
-    localStorage.setItem("userToken", data.token);
-    return data;
-  } catch (error) {
-    console.error("Erro na validação do token:", error);
-    throw error;
+  const response = await fetch(`${API_BASE_URL}/auth/validate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Token inválido");
   }
+  return await response.json();
 };
 
 export const logout = () => {
   localStorage.removeItem("userToken");
+  localStorage.removeItem("user_data");
   localStorage.removeItem("labId");
 };
 
@@ -63,19 +42,16 @@ export const getCurrentToken = () => {
 };
 
 export const getCurrentUser = () => {
-  const token = localStorage.getItem("userToken");
-  if (!token) {
-    return null;
-  }
-  return { token };
+  const userData = localStorage.getItem("user_data");
+  return userData ? JSON.parse(userData) : null;
 };
 
 export const isAuthenticated = () => {
   const token = getCurrentToken();
-  return token !== null;
+  return !!token;
 };
 
 export const isAdmin = () => {
-  // Não é mais possível saber se é admin pelo localStorage, deve ser validado via API/contexto
-  return false;
+  const user = getCurrentUser();
+  return user && (user.isADM === true || user.isADM === 1);
 };

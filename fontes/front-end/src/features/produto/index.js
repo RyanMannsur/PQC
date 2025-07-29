@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Button, Input, Checkbox } from '../../components';
+import { Button, Input } from '../../components';
 import { Form, Row } from './styles';
 
 const ProdutoForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCancel }) => {
   const [formData, setFormData] = useState({
-    codProduto: '',
     nomProduto: '',
     nomLista: '',
     perPureza: '',
     vlrDensidade: '',
     idtAtivo: false,
-    ncm: '',
+    ncm: ''
   });
 
   useEffect(() => {
@@ -29,8 +28,8 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCa
 
   const handleSubmit = e => {
     e.preventDefault();
-    // Sempre criar com idtAtivo = false
-    onSubmit({ ...formData, idtAtivo: false });
+    const { nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo, ncm } = formData;
+    onSubmit({ nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo: false, ncm });
   };
 
   const handleDelete = () => {
@@ -42,11 +41,7 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCa
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Row>
-        <label>Código:</label>
-        <Input name="codProduto" value={formData.codProduto} onChange={handleChange} disabled={isEditing} required />
-      </Row>
+    <form className={Form.styledComponentId ? Form.styledComponentId : ''} onSubmit={handleSubmit}>
       <Row>
         <label>Nome:</label>
         <Input name="nomProduto" value={formData.nomProduto} onChange={handleChange} required />
@@ -67,16 +62,26 @@ const ProdutoForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCa
         <label>NCM:</label>
         <Input name="ncm" value={formData.ncm} onChange={handleChange} maxLength={8} placeholder="NCM (8 dígitos)" />
       </Row>
+      {/* Campo unidade de medida removido */}
       <div style={{ maxWidth: 350, minWidth: 220, marginTop: 8, display: 'flex', gap: 8 }}>
         <Button variant="primary" type="submit" style={{ width: isADM ? '50%' : '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
         {isEditing && (
-          <Button variant="secondary" type="button" onClick={onCancel} style={{ width: isADM ? '25%' : '50%' }}>Cancelar</Button>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={() => {
+              console.log('Botão Cancelar clicado');
+              if (typeof onCancel === 'function') onCancel();
+              window.location.reload();
+            }}
+            style={{ width: isADM ? '25%' : '50%' }}
+          >Cancelar</Button>
         )}
-        {isADM && isEditing && (
+        {isADM && isEditing ? (
           <Button variant="danger" type="button" onClick={handleDelete} style={{ width: '25%' }}>Excluir</Button>
-        )}
+        ) : null}
       </div>
-    </Form>
+    </form>
   );
 };
 export default ProdutoForm;

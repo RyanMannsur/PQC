@@ -1,8 +1,10 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
 import ProdutoForm from '../../features/produto';
-import { Container, Table, Td, Th, Tr } from './styles';
+import { Container, Table, Td, Th, Tr, TitleBottom, TitleTop, ModalOverlay, ModalContent, TooltipError } from './styles';
 import produtoService from '../../services/produto/service';
+import { TEXTOS, CAMPOS } from './constantes';
 
 
 const ProdutoPage = () => {
@@ -17,7 +19,7 @@ const ProdutoPage = () => {
 
   useEffect(() => {
     fetchProdutos();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('userToken');
     if (token) {
       fetchUsuario(token);
     }
@@ -25,37 +27,33 @@ const ProdutoPage = () => {
 
   const fetchUsuario = async (token) => {
     try {
-      const response = await fetch('/auth/validate', {
+      const response = await fetch('http://localhost:8088/api/auth/validate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
       });
-      if (response.ok) {
-        const data = await response.json();
-        setUsuario(data);
-      } else {
-        setUsuario({});
-      }
-    } catch {
+      if (!response.ok) throw new Error('Erro ao buscar usuário');
+      const data = await response.json();
+      setUsuario(data);
+    } catch (error) {
       setUsuario({});
     }
   };
 
-  // Removido efeito de scroll para o topo ao editar
-
   const fetchProdutos = async () => {
     const res = await produtoService.listar();
-    // Ordena por nome
     setProdutos(res.sort((a, b) => a.nomProduto.localeCompare(b.nomProduto)));
   };
 
   const handleCreate = async (produto) => {
     try {
-      const res = await produtoService.cadastrar(produto);
-      setModalMessage("Produto cadastrado com sucesso!");
+      await produtoService.cadastrar(produto);
+      setModalMessage(TEXTOS.PRODUTO_CADASTRADO_SUCESSO);
       setIsModalOpen(true);
     } catch (error) {
-      const msg = error?.response?.data?.error || error.message || "Erro ao cadastrar produto.";
+      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_CADASTRAR_PRODUTO;
       setTooltip({ visible: true, message: msg });
       setTimeout(() => setTooltip({ visible: false, message: "" }), 4000);
     }
@@ -64,10 +62,10 @@ const ProdutoPage = () => {
   const handleUpdate = async (produto) => {
     try {
       const res = await produtoService.atualizar(produto);
-      setModalMessage("Produto atualizado com sucesso!");
+      setModalMessage(TEXTOS.PRODUTO_ATUALIZADO_SUCESSO);
       setIsModalOpen(true);
     } catch (error) {
-      const msg = error?.response?.data?.error || error.message || "Erro ao atualizar produto.";
+      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_ATUALIZAR_PRODUTO;
       setTooltip({ visible: true, message: msg });
       setTimeout(() => setTooltip({ visible: false, message: "" }), 4000);
     }
@@ -75,7 +73,7 @@ const ProdutoPage = () => {
 
 
   const handleDelete = async (codProduto) => {
-    if (window.confirm('Deseja realmente excluir?')) {
+    if (window.confirm(TEXTOS.CONFIRMA_EXCLUSAO)) {
       await produtoService.excluir(codProduto);
       fetchProdutos();
     }
@@ -87,7 +85,6 @@ const ProdutoPage = () => {
   };
 
 
-  // Scrolla para a div âncora ao clicar em Editar
   const handleEdit = (produto) => {
     setEditing(produto);
     if (anchorRef.current) {
@@ -98,7 +95,7 @@ const ProdutoPage = () => {
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
-      <h2 style={{ marginBottom: 32 }}>{editing ? 'Editar Produto' : 'Cadastrar Produto'}</h2>
+      <TitleBottom>{editing ? TEXTOS.EDITAR_PRODUTO : TEXTOS.CADASTRAR_PRODUTO}</TitleBottom>
       <ProdutoForm
         onSubmit={editing ? handleUpdate : handleCreate}
         initialData={editing}
@@ -109,13 +106,13 @@ const ProdutoPage = () => {
       <Table>
         <thead>
           <Tr>
-            <Th>NCM</Th>
-            <Th>Nome</Th>
-            <Th>Lista</Th>
-            <Th>Pureza</Th>
-            <Th>Densidade</Th>
-            <Th>Ativo</Th>
-            <Th>Ações</Th>
+            <Th>{CAMPOS.NCM}</Th>
+            <Th>{CAMPOS.NOME}</Th>
+            <Th>{CAMPOS.LISTA}</Th>
+            <Th>{CAMPOS.PUREZA}</Th>
+            <Th>{CAMPOS.DENSIDADE}</Th>
+            <Th>{CAMPOS.ATIVO}</Th>
+            <Th>{CAMPOS.ACOES}</Th>
           </Tr>
         </thead>
         <tbody>
@@ -126,36 +123,32 @@ const ProdutoPage = () => {
               <Td>{prod.nomLista}</Td>
               <Td>{prod.perPureza}</Td>
               <Td>{prod.vlrDensidade}</Td>
-              <Td>{prod.idtAtivo ? 'Sim' : 'Não'}</Td>
+              <Td>{prod.idtAtivo ? TEXTOS.SIM : TEXTOS.NAO}</Td>
               <Td>
                 <Button
                   variant="secondary"
                   size="small"
                   onClick={() => handleEdit(prod)}
-                >Editar</Button>
-                {usuario?.isADM && (
-                  <Button variant="danger" size="small" onClick={() => handleDelete(prod.codProduto)} style={{ marginLeft: '8px' }}>Excluir</Button>
-                )}
+                >{TEXTOS.EDITAR}</Button>
+                {/* Botão de excluir removido da tabela, permanece apenas no formulário de edição */}
               </Td>
             </Tr>
           ))}
         </tbody>
       </Table>
-      {/* Modal de sucesso */}
       {isModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div style={{ background: '#fff', padding: 32, borderRadius: 8, minWidth: 320, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
-            <h3>Sucesso</h3>
+        <ModalOverlay>
+          <ModalContent>
+            <h3>{TEXTOS.SUCESSO}</h3>
             <p>{modalMessage}</p>
-            <Button variant="primary" onClick={handleModalClose}>OK</Button>
-          </div>
-        </div>
+            <Button variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
+          </ModalContent>
+        </ModalOverlay>
       )}
-      {/* Tooltip de erro */}
       {tooltip.visible && (
-        <div style={{ position: 'fixed', top: 24, right: 24, background: '#e74c3c', color: '#fff', padding: '12px 24px', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', zIndex: 9999 }}>
-          <strong>Erro:</strong> {tooltip.message}
-        </div>
+        <TooltipError>
+          <strong>{TEXTOS.ERRO}</strong> {tooltip.message}
+        </TooltipError>
       )}
     </Container>
   );
