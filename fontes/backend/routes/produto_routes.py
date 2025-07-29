@@ -90,7 +90,6 @@ def get_produtos():
                ncm,
                "idtAtivo"
           FROM Produto
-         WHERE "idtAtivo" = true
         """
 
     try:
