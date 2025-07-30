@@ -5,8 +5,8 @@ import { Form, Row } from '../../pages/campus/styles';
 const CampusForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCancel, onDelete }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({
-    codCampus: '',
-    nomCampus: ''
+    codcampus: '',
+    nomcampus: ''
   });
 
   useEffect(() => {
@@ -36,11 +36,11 @@ const CampusForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCan
     <form className={Form.styledComponentId ? Form.styledComponentId : ''} onSubmit={handleSubmit}>
       <Row>
         <label>Código Campus:</label>
-        <Input name="codCampus" value={formData.codCampus} onChange={handleChange} required maxLength={2} />
+        <Input name="codcampus" value={formData.codcampus} onChange={handleChange} required maxLength={2} />
       </Row>
       <Row>
         <label>Nome Campus:</label>
-        <Input name="nomCampus" value={formData.nomCampus} onChange={handleChange} required maxLength={30} />
+        <Input name="nomcampus" value={formData.nomcampus} onChange={handleChange} required maxLength={30} />
       </Row>
       <div style={{ maxWidth: 350, minWidth: 220, marginTop: 8, display: 'flex', gap: 8 }}>
         <Button variant="primary" type="submit" style={{ width: isADM ? '50%' : '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>

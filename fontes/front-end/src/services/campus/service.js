@@ -8,17 +8,17 @@ const campusService = {
   },
   cadastrar: async (campus) => {
     // Envia apenas os campos corretos
-    const payload = { codCampus: campus.codCampus, nomCampus: campus.nomCampus };
+    const payload = { codcampus: campus.codcampus, nomcampus: campus.nomcampus };
     const response = await api.post('/campus', payload);
     return response.data;
   },
   atualizar: async (campus) => {
-    const payload = { codCampus: campus.codCampus, nomCampus: campus.nomCampus };
-    const response = await api.put(`/campus/${campus.codCampus}`, payload);
+    const payload = { codcampus: campus.codcampus, nomcampus: campus.nomcampus };
+    const response = await api.put(`/campus/${campus.codcampus}`, payload);
     return response.data;
   },
-  excluir: async (codCampus) => {
-    const response = await api.delete(`/campus/${codCampus}`);
+  excluir: async (codcampus) => {
+    const response = await api.delete(`/campus/${codcampus}`);
     return response.data;
   }
 };
