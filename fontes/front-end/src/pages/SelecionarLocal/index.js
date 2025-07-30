@@ -79,11 +79,11 @@ const SelecionarLocal = () => {
               options={labOptions.map((lab) => ({
                 value: lab.codLaboratorio,
                 label: lab.nomLocal,
-                object: lab,
               }))}
               value={lab ? lab.codLaboratorio : ""}
-              onChange={(selectedOption) => {
-                setLab(selectedOption.object);
+              onChange={value => {
+                const selectedLab = labOptions.find(l => l.codLaboratorio === value);
+                setLab(selectedLab);
                 setError("");
               }}
               placeholder="Selecione o laboratório"

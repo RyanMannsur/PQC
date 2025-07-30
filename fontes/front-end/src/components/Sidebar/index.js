@@ -94,6 +94,13 @@ return (
         </ListItemIcon>
         <ListItemText primary="Campus" />
       </ListItem>
+
+      <ListItem component={Link} to="/unidadeorganizacional">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Unidades" />
+      </ListItem>
       
       <ListItem component={Link} to="/consultaPQC">
         <ListItemIcon>

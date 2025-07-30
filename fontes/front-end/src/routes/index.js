@@ -14,6 +14,7 @@ import Implantacao from "../pages/implantacao";
 import ConsultaPQCPage from "../pages/consultaPQC";
 import ProdutoPage from "../pages/produto";
 import CampusPage from "../pages/campus";
+import UnidadePage from "../pages/unidadeorganizacional";
         
 
 const RoutesApp = () => {
@@ -127,6 +128,18 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <CampusPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+
+        <Route
+          path="/unidadeorganizacional"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <UnidadePage />
               </AppLayout>
             </PrivateRoute>
           }

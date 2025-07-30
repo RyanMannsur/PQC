@@ -1,4 +1,4 @@
-// Componentes padronizados do projeto PQC
+export { default as InputSelect } from './InputSelect';
 export { default as Button } from './Button';
 export { default as Input } from './Input';
 export { default as Select } from './InputSelect';

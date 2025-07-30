@@ -1,7 +1,7 @@
 import React from "react";
 import * as C from "./styles";
 
-const Select = ({
+const InputSelect = ({
   options = [],
   value,
   onChange,
@@ -12,19 +12,6 @@ const Select = ({
   required = false,
   ...props
 }) => {
-  const handleChange = (e) => {
-    const selectedValue = e.target.value;
-    if (selectedValue === "") {
-      onChange(null);
-      return;
-    }
-    
-    const selectedOption = options.find(
-      (option) => option.value === selectedValue
-    );
-    onChange(selectedOption);
-  };
-
   return (
     <C.Container>
       {label && (
@@ -35,7 +22,7 @@ const Select = ({
       )}
       <C.Select 
         value={value || ""} 
-        onChange={handleChange}
+        onChange={e => onChange(e.target.value)}
         disabled={disabled}
         error={error}
         {...props}
@@ -53,4 +40,4 @@ const Select = ({
   );
 };
 
-export default Select;
+export default InputSelect;
