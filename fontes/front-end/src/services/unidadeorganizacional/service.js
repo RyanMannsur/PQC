@@ -1,13 +1,13 @@
-import api from '../api';
+import api from '../../services/api';
 
 const unidadeService = {
   listar: async () => {
     const response = await api.get('/unidadeorganizacional');
     return response.data.map(u => ({
-      codcampus: u[0],
-      codunidade: u[1],
-      sglunidade: u[2],
-      nomunidade: u[3]
+      codunidade: u[0],
+      nomunidade: u[1],
+      codcampus: u[2],
+      sglunidade: u[3]
     }));
   },
   cadastrar: async (unidade) => {
@@ -32,6 +32,14 @@ const unidadeService = {
   excluir: async (codunidade) => {
     const response = await api.delete(`/unidadeorganizacional/${codunidade}`);
     return response.data;
+  },
+  listarPorCampus: async (codcampus) => {
+    const response = await api.get(`/api/unidadeorganizacional/campus/${codcampus}`);
+    return response.data.map(u => ({
+      codunidade: u[0],
+      nomunidade: u[1],
+      codcampus: u[2]
+    }));
   }
 };
 

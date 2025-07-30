@@ -15,7 +15,7 @@ import ConsultaPQCPage from "../pages/consultaPQC";
 import ProdutoPage from "../pages/produto";
 import CampusPage from "../pages/campus";
 import UnidadePage from "../pages/unidadeorganizacional";
-        
+import LocalEstocagemPage from "../pages/localestocagem";
 
 const RoutesApp = () => {
   return (
@@ -151,6 +151,17 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <ConsultaPQCPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/localestocagem"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <LocalEstocagemPage />
               </AppLayout>
             </PrivateRoute>
           }

@@ -101,6 +101,13 @@ return (
         </ListItemIcon>
         <ListItemText primary="Unidades" />
       </ListItem>
+
+      <ListItem component={Link} to="/localestocagem">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Locais de Estocagem" />
+      </ListItem>
       
       <ListItem component={Link} to="/consultaPQC">
         <ListItemIcon>

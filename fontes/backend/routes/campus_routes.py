@@ -68,3 +68,53 @@ def excluir_unidade(codunidade):
     params = (codunidade,)
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
+
+@campus_bp.route('/localestocagem', methods=['GET'])
+def listar_locais():
+    db = Db()
+    sql = 'SELECT codcampus, codunidade, codpredio, codlaboratorio, nomlocal FROM localestocagem'
+    result = db.execSql(sql, None, Mode.SELECT)
+    return result
+
+@campus_bp.route('/localestocagem', methods=['POST'])
+def cadastrar_local():
+    data = request.get_json()
+    db = Db()
+    sql = 'INSERT INTO localestocagem (codcampus, codunidade, codpredio, codlaboratorio, nomlocal) VALUES (%s, %s, %s, %s, %s)'
+    params = (data['codcampus'], data['codunidade'], data['codpredio'], data['codlaboratorio'], data['nomlocal'])
+    result = db.execSql(sql, params, Mode.COMMIT)
+    return result
+
+@campus_bp.route('/localestocagem/<codcampus>/<codunidade>/<codpredio>/<codlaboratorio>', methods=['PUT'])
+def atualizar_local(codcampus, codunidade, codpredio, codlaboratorio):
+    data = request.get_json()
+    db = Db()
+    sql = '''
+        UPDATE localestocagem
+        SET codcampus=%s, codunidade=%s, codpredio=%s, nomlocal=%s
+        WHERE codcampus=%s AND codunidade=%s AND codpredio=%s AND codlaboratorio=%s
+    '''
+    params = (
+        data['codcampus'], data['codunidade'], data['codpredio'], data['nomlocal'],
+        codcampus, codunidade, codpredio, codlaboratorio
+    )
+    result = db.execSql(sql, params, Mode.COMMIT)
+    return result
+
+@campus_bp.route('/localestocagem/<codcampus>/<codunidade>/<codpredio>/<codlaboratorio>', methods=['DELETE'])
+def excluir_local(codcampus, codunidade, codpredio, codlaboratorio):
+    db = Db()
+    sql = '''
+        DELETE FROM localestocagem
+        WHERE codcampus=%s AND codunidade=%s AND codpredio=%s AND codlaboratorio=%s
+    '''
+    params = (codcampus, codunidade, codpredio, codlaboratorio)
+    result = db.execSql(sql, params, Mode.COMMIT)
+    return result
+
+@campus_bp.route('/api/unidadeorganizacional/campus/<codcampus>', methods=['GET'])
+def unidades_por_campus(codcampus):
+    db = Db()
+    sql = 'SELECT codunidade, nomunidade, codcampus FROM unidadeorganizacional WHERE codcampus = %s'
+    result = db.execSql(sql, (codcampus,), Mode.SELECT)
+    return result
