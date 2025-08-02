@@ -4,10 +4,10 @@ const unidadeService = {
   listar: async () => {
     const response = await api.get('/unidadeorganizacional');
     return response.data.map(u => ({
-      codunidade: u[0],
-      nomunidade: u[1],
-      codcampus: u[2],
-      sglunidade: u[3]
+      codcampus: u[0],
+      codunidade: u[1],
+      sglunidade: u[2],
+      nomunidade: u[3]
     }));
   },
   cadastrar: async (unidade) => {
@@ -20,25 +20,28 @@ const unidadeService = {
     const response = await api.post('/unidadeorganizacional', payload);
     return response.data;
   },
-  atualizar: async (unidade) => {
+  atualizar: async (codcampus, codunidade, unidade) => {
+    // Apenas trim nos códigos, padding é responsabilidade do backend
+    const codUnidadeStr = typeof codunidade === 'string' ? codunidade.trim() : codunidade;
+    const codCampusStr = typeof codcampus === 'string' ? codcampus.trim() : codcampus;
     const payload = {
-      codcampus: unidade.codcampus,
+      codcampus: codCampusStr,
+      codunidade: codUnidadeStr,
       sglunidade: unidade.sglunidade,
       nomunidade: unidade.nomunidade
     };
-    const response = await api.put(`/unidadeorganizacional/${unidade.codunidade}`, payload);
-    return response.data;
+    const response = await api.put(`/unidadeorganizacional/${codUnidadeStr}/${codCampusStr}`, payload);
   },
-  excluir: async (codunidade) => {
-    const response = await api.delete(`/unidadeorganizacional/${codunidade}`);
+  excluir: async (codcampus, codunidade) => {
+    const response = await api.delete(`/unidadeorganizacional/${codcampus.trim()}/${codunidade.trim()}`);
     return response.data;
   },
   listarPorCampus: async (codcampus) => {
-    const response = await api.get(`/api/unidadeorganizacional/campus/${codcampus}`);
+    const response = await api.get(`/api/unidadeorganizacional/campus/${codcampus.trim()}`);
     return response.data.map(u => ({
-      codunidade: u[0],
+      codunidade: u[0]?.trim(),
       nomunidade: u[1],
-      codcampus: u[2]
+      codcampus: u[2]?.trim()
     }));
   }
 };

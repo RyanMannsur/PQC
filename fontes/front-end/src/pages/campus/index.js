@@ -4,26 +4,7 @@ import { Button } from '../../components';
 import CampusForm from '../../features/campus';
 import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import campusService from '../../services/campus/service';
-
-const TEXTOS = {
-  CAMPUS_CADASTRADO_SUCESSO: 'Campus cadastrado com sucesso!',
-  ERRO_CADASTRAR_CAMPUS: 'Erro ao cadastrar campus.',
-  CAMPUS_ATUALIZADO_SUCESSO: 'Campus atualizado com sucesso!',
-  ERRO_ATUALIZAR_CAMPUS: 'Erro ao atualizar campus.',
-  CONFIRMA_EXCLUSAO: 'Tem certeza que deseja excluir este campus?',
-  SUCESSO: 'Sucesso',
-  OK: 'OK',
-  ERRO: 'Erro',
-  EDITAR_CAMPUS: 'Editar Campus',
-  CADASTRAR_CAMPUS: 'Cadastrar Campus',
-  EXCLUIR: 'Excluir',
-};
-
-const CAMPOS = {
-  CODCAMPUS: 'Código Campus',
-  NOMCAMPUS: 'Nome Campus',
-  ACOES: 'Ações',
-};
+import { TEXTOS, CAMPOS } from './constantes';
 
 const CampusPage = () => {
   const [campi, setCampi] = useState([]);
@@ -48,7 +29,6 @@ const CampusPage = () => {
       await campusService.cadastrar(campus);
       setModalMessage(TEXTOS.CAMPUS_CADASTRADO_SUCESSO);
       setIsModalOpen(true);
-      window.location.reload();
     } catch (error) {
       const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_CADASTRAR_CAMPUS;
       setTooltip({ visible: true, message: msg });
@@ -59,9 +39,7 @@ const CampusPage = () => {
   const handleUpdate = async (campus) => {
     try {
       await campusService.atualizar(campus);
-      setTooltip({ visible: true, message: TEXTOS.CAMPUS_ATUALIZADO_SUCESSO });
       setEditing(null);
-      window.location.reload();
     } catch (error) {
       const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_ATUALIZAR_CAMPUS;
       setTooltip({ visible: true, message: msg });

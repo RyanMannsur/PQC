@@ -23,16 +23,18 @@ def cadastrar_campus():
 def atualizar_campus(codcampus):
     data = request.get_json()
     db = Db()
+    codcampus_padded = codcampus if len(codcampus) == 2 else codcampus.ljust(2)
     sql = 'UPDATE campus SET nomcampus=%s WHERE codcampus=%s'
-    params = (data['nomcampus'], codcampus)
+    params = (data['nomcampus'], codcampus_padded)
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
 
 @campus_bp.route('/campus/<codcampus>', methods=['DELETE'])
 def excluir_campus(codcampus):
     db = Db()
+    codcampus_padded = codcampus if len(codcampus) == 2 else codcampus.ljust(2)
     sql = 'DELETE FROM campus WHERE codcampus=%s'
-    params = (codcampus,)
+    params = (codcampus_padded,)
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
 
@@ -49,23 +51,29 @@ def cadastrar_unidade():
     db = Db()
     sql = 'INSERT INTO unidadeorganizacional (codcampus, codunidade, sglunidade, nomunidade) VALUES (%s, %s, %s, %s)'
     params = (data['codcampus'], data['codunidade'], data['sglunidade'], data['nomunidade'])
+    print(f"[DEBUG] INSERT unidadeorganizacional params: {params}")
+    print(f"[DEBUG] SQL: {sql}")
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
 
-@campus_bp.route('/unidadeorganizacional/<codunidade>', methods=['PUT'])
-def atualizar_unidade(codunidade):
+@campus_bp.route('/unidadeorganizacional/<codcampus>/<codunidade>', methods=['PUT'])
+def atualizar_unidade(codcampus, codunidade):
     data = request.get_json()
     db = Db()
-    sql = 'UPDATE unidadeorganizacional SET codcampus=%s, sglunidade=%s, nomunidade=%s WHERE codunidade=%s'
-    params = (data['codcampus'], data['sglunidade'], data['nomunidade'], codunidade)
+    codcampus_padded = data['codcampus'] if len(data['codcampus']) == 2 else data['codcampus'].ljust(2)
+    codunidade_padded = data['codunidade'] if len(data['codunidade']) == 8 else data['codunidade'].ljust(8)
+    sql = 'UPDATE unidadeorganizacional SET codcampus=%s, sglunidade=%s, nomunidade=%s WHERE codcampus=%s AND codunidade=%s'
+    params = (codcampus_padded, data['sglunidade'], data['nomunidade'], codcampus_padded, codunidade_padded)
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
 
-@campus_bp.route('/unidadeorganizacional/<codunidade>', methods=['DELETE'])
-def excluir_unidade(codunidade):
+@campus_bp.route('/unidadeorganizacional/<codcampus>/<codunidade>', methods=['DELETE'])
+def excluir_unidade(codcampus, codunidade):
     db = Db()
-    sql = 'DELETE FROM unidadeorganizacional WHERE codunidade=%s'
-    params = (codunidade,)
+    codcampus_padded = codcampus if len(codcampus) == 2 else codcampus.ljust(2)
+    codunidade_padded = codunidade if len(codunidade) == 8 else codunidade.ljust(8)
+    sql = 'DELETE FROM unidadeorganizacional WHERE codcampus=%s AND codunidade=%s'
+    params = (codcampus_padded, codunidade_padded)
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
 
@@ -89,6 +97,10 @@ def cadastrar_local():
 def atualizar_local(codcampus, codunidade, codpredio, codlaboratorio):
     data = request.get_json()
     db = Db()
+    codcampus_padded = codcampus if len(codcampus) == 2 else codcampus.ljust(2)
+    codunidade_padded = codunidade if len(codunidade) == 8 else codunidade.ljust(8)
+    codpredio_padded = codpredio if len(codpredio) == 2 else codpredio.ljust(2)
+    codlaboratorio_padded = codlaboratorio if len(codlaboratorio) == 3 else codlaboratorio.ljust(3)
     sql = '''
         UPDATE localestocagem
         SET codcampus=%s, codunidade=%s, codpredio=%s, nomlocal=%s
@@ -96,7 +108,7 @@ def atualizar_local(codcampus, codunidade, codpredio, codlaboratorio):
     '''
     params = (
         data['codcampus'], data['codunidade'], data['codpredio'], data['nomlocal'],
-        codcampus, codunidade, codpredio, codlaboratorio
+        codcampus_padded, codunidade_padded, codpredio_padded, codlaboratorio_padded
     )
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
@@ -104,17 +116,22 @@ def atualizar_local(codcampus, codunidade, codpredio, codlaboratorio):
 @campus_bp.route('/localestocagem/<codcampus>/<codunidade>/<codpredio>/<codlaboratorio>', methods=['DELETE'])
 def excluir_local(codcampus, codunidade, codpredio, codlaboratorio):
     db = Db()
+    codcampus_padded = codcampus if len(codcampus) == 2 else codcampus.ljust(2)
+    codunidade_padded = codunidade if len(codunidade) == 8 else codunidade.ljust(8)
+    codpredio_padded = codpredio if len(codpredio) == 2 else codpredio.ljust(2)
+    codlaboratorio_padded = codlaboratorio if len(codlaboratorio) == 3 else codlaboratorio.ljust(3)
     sql = '''
         DELETE FROM localestocagem
         WHERE codcampus=%s AND codunidade=%s AND codpredio=%s AND codlaboratorio=%s
     '''
-    params = (codcampus, codunidade, codpredio, codlaboratorio)
+    params = (codcampus_padded, codunidade_padded, codpredio_padded, codlaboratorio_padded)
     result = db.execSql(sql, params, Mode.COMMIT)
     return result
 
 @campus_bp.route('/api/unidadeorganizacional/campus/<codcampus>', methods=['GET'])
 def unidades_por_campus(codcampus):
     db = Db()
+    codcampus_padded = codcampus if len(codcampus) == 2 else codcampus.ljust(2)
     sql = 'SELECT codunidade, nomunidade, codcampus FROM unidadeorganizacional WHERE codcampus = %s'
-    result = db.execSql(sql, (codcampus,), Mode.SELECT)
+    result = db.execSql(sql, (codcampus_padded,), Mode.SELECT)
     return result

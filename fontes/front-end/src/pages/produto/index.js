@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
 import ProdutoForm from '../../features/produto';
-import { Container, Table, Td, Th, Tr, TitleBottom, TitleTop, ModalOverlay, ModalContent, TooltipError } from './styles';
+import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import produtoService from '../../services/produto/service';
 import { TEXTOS, CAMPOS } from './constantes';
 
@@ -52,7 +52,6 @@ const ProdutoPage = () => {
       await produtoService.cadastrar(produto);
       setModalMessage(TEXTOS.PRODUTO_CADASTRADO_SUCESSO);
       setIsModalOpen(true);
-      // O reload será feito ao fechar o modal
     } catch (error) {
       const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_CADASTRAR_PRODUTO;
       setTooltip({ visible: true, message: msg });
@@ -133,7 +132,6 @@ const ProdutoPage = () => {
                   size="small"
                   onClick={() => handleEdit(prod)}
                 >{TEXTOS.EDITAR}</Button>
-                {/* Botão de excluir removido da tabela, permanece apenas no formulário de edição */}
               </Td>
             </Tr>
           ))}

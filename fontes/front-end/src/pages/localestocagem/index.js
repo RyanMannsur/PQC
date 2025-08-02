@@ -1,31 +1,5 @@
 
-import { useEffect, useState, useRef } from 'react';
-import { Button } from '../../components';
-import LocalEstocagemForm from '../../features/localestocagem';
-import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent } from '../../features/localestocagem/styles';
-import { getLocais, createLocal, updateLocal, deleteLocal } from '../../services/localService';
-
-const TEXTOS = {
-  LOCAL_CADASTRADO_SUCESSO: 'Local cadastrado com sucesso!',
-  ERRO_CADASTRAR_LOCAL: 'Erro ao cadastrar local.',
-  LOCAL_ATUALIZADO_SUCESSO: 'Local atualizado com sucesso!',
-  ERRO_ATUALIZAR_LOCAL: 'Erro ao atualizar local.',
-  CONFIRMA_EXCLUSAO: 'Tem certeza que deseja excluir este local?',
-  SUCESSO: 'Sucesso',
-  OK: 'OK',
-  EDITAR_LOCAL: 'Editar Local de Estocagem',
-  CADASTRAR_LOCAL: 'Cadastrar Local de Estocagem',
-  EXCLUIR: 'Excluir',
-};
-
-const CAMPOS = {
-  CODCAMPUS: 'Campus',
-  CODUNIDADE: 'Unidade',
-  CODPREDIO: 'Prédio',
-  CODLAB: 'Cód. Laboratório',
-  NOMLOCAL: 'Nome Local',
-  ACOES: 'Ações',
-};
+import { TEXTOS, CAMPOS } from './constants';
 
 const LocalEstocagemPage = () => {
   const [locais, setLocais] = useState([]);

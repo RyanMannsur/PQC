@@ -1,30 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
-import { Button } from '../../components';
+import React, { useState, useEffect, useRef } from 'react';
 import UnidadeForm from '../../features/unidadeorganizacional';
-import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import unidadeService from '../../services/unidadeorganizacional/service';
-
-const TEXTOS = {
-  UNIDADE_CADASTRADA_SUCESSO: 'Unidade cadastrada com sucesso!',
-  ERRO_CADASTRAR_UNIDADE: 'Erro ao cadastrar unidade.',
-  UNIDADE_ATUALIZADA_SUCESSO: 'Unidade atualizada com sucesso!',
-  ERRO_ATUALIZAR_UNIDADE: 'Erro ao atualizar unidade.',
-  CONFIRMA_EXCLUSAO: 'Tem certeza que deseja excluir esta unidade?',
-  SUCESSO: 'Sucesso',
-  OK: 'OK',
-  ERRO: 'Erro',
-  EDITAR_UNIDADE: 'Editar Unidade',
-  CADASTRAR_UNIDADE: 'Cadastrar Unidade',
-  EXCLUIR: 'Excluir',
-};
-
-const CAMPOS = {
-  CODCAMPUS: 'Campus',
-  CODUNIDADE: 'Código Unidade',
-  SGLUNIDADE: 'Sigla Unidade',
-  NOMUNIDADE: 'Nome Unidade',
-  ACOES: 'Ações',
-};
+import { Button } from '../../components';
+import { TEXTOS, CAMPOS } from './constants';
+import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 
 const UnidadePage = () => {
   const [unidades, setUnidades] = useState([]);
@@ -59,7 +38,7 @@ const UnidadePage = () => {
 
   const handleUpdate = async (unidade) => {
     try {
-      await unidadeService.atualizar(unidade);
+      await unidadeService.atualizar(unidade.codcampus, unidade.codunidade, unidade);
       setTooltip({ visible: true, message: TEXTOS.UNIDADE_ATUALIZADA_SUCESSO });
       setEditing(null);
       window.location.reload();
@@ -70,8 +49,8 @@ const UnidadePage = () => {
     }
   };
 
-  const handleDelete = async (codunidade) => {
-    await unidadeService.excluir(codunidade);
+  const handleDelete = async (codcampus, codunidade) => {
+    await unidadeService.excluir(codcampus, codunidade);
     window.location.reload();
   };
 
@@ -96,14 +75,14 @@ const UnidadePage = () => {
         initialData={editing}
         isEditing={!!editing}
         isADM={true}
-        onDelete={editing ? () => handleDelete(editing.codunidade) : undefined}
+        onDelete={editing ? () => handleDelete(editing.codcampus, editing.codunidade) : undefined}
       />
       <h2 style={{ marginTop: 40 }}>Lista de Unidades</h2>
       <Table>
         <thead>
           <Tr>
-            <Th>{CAMPOS.CODCAMPUS}</Th>
             <Th>{CAMPOS.CODUNIDADE}</Th>
+            <Th>{CAMPOS.CODCAMPUS}</Th>
             <Th>{CAMPOS.SGLUNIDADE}</Th>
             <Th>{CAMPOS.NOMUNIDADE}</Th>
             <Th>{CAMPOS.ACOES}</Th>
@@ -111,9 +90,9 @@ const UnidadePage = () => {
         </thead>
         <tbody>
           {unidades.map(unidade => (
-            <Tr key={unidade.codunidade}>
-              <Td>{unidade.codcampus}</Td>
+            <Tr key={unidade.codunidade + '-' + unidade.codcampus}>
               <Td>{unidade.codunidade}</Td>
+              <Td>{unidade.codcampus}</Td>
               <Td>{unidade.sglunidade}</Td>
               <Td>{unidade.nomunidade}</Td>
               <Td>
