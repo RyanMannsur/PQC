@@ -1,5 +1,10 @@
 
+import React, { useState, useEffect, useRef } from 'react';
+import LocalEstocagemForm from '../../features/localestocagem';
+import { Button } from '../../components';
+import { getLocais, createLocal, updateLocal, deleteLocal } from '../../services/localService';
 import { TEXTOS, CAMPOS } from './constants';
+import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent } from './styles';
 
 const LocalEstocagemPage = () => {
   const [locais, setLocais] = useState([]);
