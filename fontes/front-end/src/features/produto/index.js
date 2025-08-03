@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react';
 import FormGenerator from '../../components/FormGenerator';
 
 const ProdutoForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCancel, onDelete }) => {
+  useEffect(() => {
+    if (!isEditing) {
+      setFormData({
+        nomProduto: '',
+        nomLista: '',
+        perPureza: '',
+        vlrDensidade: '',
+        idtAtivo: false,
+        ncm: ''
+      });
+    }
+  }, [isEditing]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({
     nomProduto: '',

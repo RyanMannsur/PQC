@@ -2,6 +2,14 @@ import { useState, useEffect } from 'react';
 import FormGenerator from '../../components/FormGenerator';
 
 const CampusForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCancel, onDelete }) => {
+  useEffect(() => {
+    if (!isEditing) {
+      setFormData({
+        codcampus: '',
+        nomcampus: ''
+      });
+    }
+  }, [isEditing]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({
     codcampus: '',
@@ -55,7 +63,7 @@ const CampusForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCan
       isEditing={isEditing}
       isADM={isADM}
       onCancel={onCancel}
-      onDelete={handleDelete}
+      onDelete={isADM ? handleDelete : undefined}
       showDeleteModal={showDeleteModal}
       setShowDeleteModal={setShowDeleteModal}
       onConfirmDelete={handleConfirmDelete}

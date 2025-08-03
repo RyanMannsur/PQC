@@ -3,6 +3,16 @@ import FormGenerator from '../../components/FormGenerator';
 import campusService from '../../services/campus/service';
 
 const UnidadeForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCancel, onDelete }) => {
+  useEffect(() => {
+    if (!isEditing) {
+      setFormData({
+        codcampus: '',
+        codunidade: '',
+        sglunidade: '',
+        nomunidade: ''
+      });
+    }
+  }, [isEditing]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({
     codcampus: '',
@@ -97,7 +107,7 @@ const UnidadeForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCa
       isEditing={isEditing}
       isADM={isADM}
       onCancel={onCancel}
-      onDelete={handleDelete}
+      onDelete={isADM ? handleDelete : undefined}
       showDeleteModal={showDeleteModal}
       setShowDeleteModal={setShowDeleteModal}
       onConfirmDelete={handleConfirmDelete}

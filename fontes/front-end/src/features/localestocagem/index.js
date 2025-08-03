@@ -116,7 +116,7 @@ const LocalEstocagemForm = ({ onSubmit, initialData = {}, isEditing, isADM = tru
       isEditing={isEditing}
       isADM={isADM}
       onCancel={onCancel}
-      onDelete={handleDelete}
+      onDelete={isADM ? handleDelete : undefined}
       showDeleteModal={showDeleteModal}
       setShowDeleteModal={setShowDeleteModal}
       onConfirmDelete={handleConfirmDelete}

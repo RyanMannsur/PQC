@@ -7,7 +7,9 @@ import campusService from '../../services/campus/service';
 import { TEXTOS, CAMPOS } from './constantes';
 
 const CampusPage = () => {
+  const [formKey, setFormKey] = useState(0);
   const [campi, setCampi] = useState([]);
+  const [usuario, setUsuario] = useState({});
   const [editing, setEditing] = useState(null);
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
@@ -17,7 +19,28 @@ const CampusPage = () => {
 
   useEffect(() => {
     fetchCampi();
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      fetchUsuario(token);
+    }
   }, []);
+
+  const fetchUsuario = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8088/api/auth/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+      if (!response.ok) throw new Error('Erro ao buscar usuário');
+      const data = await response.json();
+      setUsuario(data);
+    } catch (error) {
+      setUsuario({});
+    }
+  };
 
   const fetchCampi = async () => {
     const res = await campusService.listar();
@@ -64,16 +87,23 @@ const CampusPage = () => {
     }
   };
 
+  const handleCancel = () => {
+    setEditing(null);
+    setFormKey(prev => prev + 1);
+  };
+
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
       <TitleBottom>{editing ? TEXTOS.EDITAR_CAMPUS : TEXTOS.CADASTRAR_CAMPUS}</TitleBottom>
       <CampusForm
+        key={formKey}
         onSubmit={editing ? handleUpdate : handleCreate}
         initialData={editing}
         isEditing={!!editing}
-        isADM={true}
-        onDelete={editing ? () => handleDelete(editing.codcampus) : undefined}
+        isADM={usuario?.isADM}
+        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus) : undefined}
+        onCancel={handleCancel}
       />
       <h2 style={{ marginTop: 40 }}>Lista de Campi</h2>
       <Table>

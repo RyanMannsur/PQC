@@ -8,6 +8,7 @@ import { TEXTOS, CAMPOS } from './constantes';
 
 
 const ProdutoPage = () => {
+  const [formKey, setFormKey] = useState(0);
   const [produtos, setProdutos] = useState([]);
   const [usuario, setUsuario] = useState({});
   const [editing, setEditing] = useState(null);
@@ -93,16 +94,23 @@ const ProdutoPage = () => {
     }
   }
 
+  const handleCancel = () => {
+    setEditing(null);
+    setFormKey(prev => prev + 1);
+  };
+
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
       <TitleBottom>{editing ? TEXTOS.EDITAR_PRODUTO : TEXTOS.CADASTRAR_PRODUTO}</TitleBottom>
       <ProdutoForm
+        key={formKey}
         onSubmit={editing ? handleUpdate : handleCreate}
         initialData={editing}
         isEditing={!!editing}
         isADM={usuario?.isADM}
         onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codProduto) : undefined}
+        onCancel={handleCancel}
       />
       <h2 style={{ marginTop: 40 }}>Lista de Produtos</h2>
       <Table>

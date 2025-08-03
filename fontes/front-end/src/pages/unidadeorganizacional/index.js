@@ -6,7 +6,9 @@ import { TEXTOS, CAMPOS } from './constants';
 import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 
 const UnidadePage = () => {
+  const [formKey, setFormKey] = useState(0);
   const [unidades, setUnidades] = useState([]);
+  const [usuario, setUsuario] = useState({});
   const [editing, setEditing] = useState(null);
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
@@ -16,7 +18,28 @@ const UnidadePage = () => {
 
   useEffect(() => {
     fetchUnidades();
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      fetchUsuario(token);
+    }
   }, []);
+
+  const fetchUsuario = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8088/api/auth/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+      if (!response.ok) throw new Error('Erro ao buscar usuário');
+      const data = await response.json();
+      setUsuario(data);
+    } catch (error) {
+      setUsuario({});
+    }
+  };
 
   const fetchUnidades = async () => {
     const res = await unidadeService.listar();
@@ -66,16 +89,23 @@ const UnidadePage = () => {
     }
   };
 
+  const handleCancel = () => {
+    setEditing(null);
+    setFormKey(prev => prev + 1);
+  };
+
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
       <TitleBottom>{editing ? TEXTOS.EDITAR_UNIDADE : TEXTOS.CADASTRAR_UNIDADE}</TitleBottom>
       <UnidadeForm
+        key={formKey}
         onSubmit={editing ? handleUpdate : handleCreate}
         initialData={editing}
         isEditing={!!editing}
-        isADM={true}
-        onDelete={editing ? () => handleDelete(editing.codcampus, editing.codunidade) : undefined}
+        isADM={usuario?.isADM}
+        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus, editing.codunidade) : undefined}
+        onCancel={handleCancel}
       />
       <h2 style={{ marginTop: 40 }}>Lista de Unidades</h2>
       <Table>
