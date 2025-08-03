@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import UnidadeForm from '../../features/unidadeorganizacional';
 import unidadeService from '../../services/unidadeorganizacional/service';
 import { Button } from '../../components';
+import CrudTable from '../../components/CrudTable';
 import { TEXTOS, CAMPOS } from './constants';
-import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
+import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 
 const UnidadePage = () => {
   const [formKey, setFormKey] = useState(0);
@@ -107,35 +108,19 @@ const UnidadePage = () => {
         onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus, editing.codunidade) : undefined}
         onCancel={handleCancel}
       />
-      <h2 style={{ marginTop: 40 }}>Lista de Unidades</h2>
-      <Table>
-        <thead>
-          <Tr>
-            <Th>{CAMPOS.CODUNIDADE}</Th>
-            <Th>{CAMPOS.CODCAMPUS}</Th>
-            <Th>{CAMPOS.SGLUNIDADE}</Th>
-            <Th>{CAMPOS.NOMUNIDADE}</Th>
-            <Th>{CAMPOS.ACOES}</Th>
-          </Tr>
-        </thead>
-        <tbody>
-          {unidades.map(unidade => (
-            <Tr key={unidade.codunidade + '-' + unidade.codcampus}>
-              <Td>{unidade.codunidade}</Td>
-              <Td>{unidade.codcampus}</Td>
-              <Td>{unidade.sglunidade}</Td>
-              <Td>{unidade.nomunidade}</Td>
-              <Td>
-                <Button
-                  variant="secondary"
-                  size="small"
-                  onClick={() => handleEdit(unidade)}
-                >{TEXTOS.EDITAR_UNIDADE}</Button>
-              </Td>
-            </Tr>
-          ))}
-        </tbody>
-      </Table>
+      <CrudTable
+        title="Lista de Unidades"
+        columns={[
+          { label: CAMPOS.CODUNIDADE, field: 'codunidade' },
+          { label: CAMPOS.CODCAMPUS, field: 'codcampus' },
+          { label: CAMPOS.SGLUNIDADE, field: 'sglunidade' },
+          { label: CAMPOS.NOMUNIDADE, field: 'nomunidade' }
+        ]}
+        data={unidades}
+        onEdit={handleEdit}
+        editText={TEXTOS.EDITAR_UNIDADE}
+        getRowKey={item => item.codunidade + '-' + item.codcampus}
+      />
       {isModalOpen && (
         <ModalOverlay>
           <ModalContent>

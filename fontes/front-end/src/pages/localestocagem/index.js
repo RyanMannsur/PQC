@@ -2,9 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LocalEstocagemForm from '../../features/localestocagem';
 import { Button } from '../../components';
+import CrudTable from '../../components/CrudTable';
 import { getLocais, createLocal, updateLocal, deleteLocal } from '../../services/localService';
 import { TEXTOS, CAMPOS } from './constants';
-import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent } from './styles';
+import { Container, TitleBottom, ModalOverlay, ModalContent } from './styles';
 
 const LocalEstocagemPage = () => {
   const [locais, setLocais] = useState([]);
@@ -94,7 +95,7 @@ const LocalEstocagemPage = () => {
 
   const handleCancel = () => {
     setEditing(null);
-    setFormKey(prev => prev + 1); // força o reset do form
+    setFormKey(prev => prev + 1); 
   };
 
   return (
@@ -110,37 +111,20 @@ const LocalEstocagemPage = () => {
         onDelete={editing && usuario?.isADM ? () => handleDelete(editing) : undefined}
         onCancel={handleCancel}
       />
-      <h2 style={{ marginTop: 40 }}>Lista de Locais</h2>
-      <Table>
-        <thead>
-          <Tr>
-            <Th>{CAMPOS.CODCAMPUS}</Th>
-            <Th>{CAMPOS.CODUNIDADE}</Th>
-            <Th>{CAMPOS.CODPREDIO}</Th>
-            <Th>{CAMPOS.CODLAB}</Th>
-            <Th>{CAMPOS.NOMLOCAL}</Th>
-            <Th>{CAMPOS.ACOES}</Th>
-          </Tr>
-        </thead>
-        <tbody>
-          {locais.map(local => (
-            <Tr key={local.codlaboratorio}>
-              <Td>{local.codcampus}</Td>
-              <Td>{local.codunidade}</Td>
-              <Td>{local.codpredio}</Td>
-              <Td>{local.codlaboratorio}</Td>
-              <Td>{local.nomlocal}</Td>
-              <Td>
-                <Button
-                  variant="secondary"
-                  size="small"
-                  onClick={() => handleEdit(local)}
-                >{TEXTOS.EDITAR_LOCAL}</Button>
-              </Td>
-            </Tr>
-          ))}
-        </tbody>
-      </Table>
+      <CrudTable
+        title="Lista de Locais"
+        columns={[
+          { label: CAMPOS.CODCAMPUS, field: 'codcampus' },
+          { label: CAMPOS.CODUNIDADE, field: 'codunidade' },
+          { label: CAMPOS.CODPREDIO, field: 'codpredio' },
+          { label: CAMPOS.CODLAB, field: 'codlaboratorio' },
+          { label: CAMPOS.NOMLOCAL, field: 'nomlocal' }
+        ]}
+        data={locais}
+        onEdit={handleEdit}
+        editText={TEXTOS.EDITAR_LOCAL}
+        getRowKey={item => item.codlaboratorio}
+      />
       {isModalOpen && (
         <ModalOverlay>
           <ModalContent>

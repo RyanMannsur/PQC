@@ -1,8 +1,8 @@
-// ...existing code...
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
+import CrudTable from '../../components/CrudTable';
 import CampusForm from '../../features/campus';
-import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
+import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import campusService from '../../services/campus/service';
 import { TEXTOS, CAMPOS } from './constantes';
 
@@ -105,31 +105,14 @@ const CampusPage = () => {
         onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus) : undefined}
         onCancel={handleCancel}
       />
-      <h2 style={{ marginTop: 40 }}>Lista de Campi</h2>
-      <Table>
-        <thead>
-          <Tr>
-            <Th>{CAMPOS.CODCAMPUS}</Th>
-            <Th>{CAMPOS.NOMCAMPUS}</Th>
-            <Th>{CAMPOS.ACOES}</Th>
-          </Tr>
-        </thead>
-        <tbody>
-          {campi.map(campus => (
-            <Tr key={campus.codcampus}>
-              <Td>{campus.codcampus}</Td>
-              <Td>{campus.nomcampus}</Td>
-              <Td>
-                <Button
-                  variant="secondary"
-                  size="small"
-                  onClick={() => handleEdit(campus)}
-                >{TEXTOS.EDITAR_CAMPUS}</Button>
-              </Td>
-            </Tr>
-          ))}
-        </tbody>
-      </Table>
+      <CrudTable
+        title="Lista de Campi"
+        columns={[{ label: CAMPOS.CODCAMPUS, field: 'codcampus' }, { label: CAMPOS.NOMCAMPUS, field: 'nomcampus' }]}
+        data={campi}
+        onEdit={handleEdit}
+        editText={TEXTOS.EDITAR_CAMPUS}
+        getRowKey={item => item.codcampus}
+      />
       {isModalOpen && (
         <ModalOverlay>
           <ModalContent>

@@ -85,7 +85,7 @@ return (
           <ListItemIcon>
             <Assessment />
           </ListItemIcon>
-          <ListItemText primary="Cadastrar Produto" />
+          <ListItemText primary="Produtos" />
         </ListItem>
         
       <ListItem component={Link} to="/campus">
@@ -109,12 +109,6 @@ return (
         <ListItemText primary="Locais de Estocagem" />
       </ListItem>
       
-      <ListItem component={Link} to="/consultaPQC">
-        <ListItemIcon>
-          <Assessment />
-        </ListItemIcon>
-        <ListItemText primary="Consulta PQC" />
-      </ListItem>
     </List>
   </Drawer>
 );

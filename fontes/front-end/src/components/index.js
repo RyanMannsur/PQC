@@ -10,3 +10,4 @@ export { default as Sidebar } from './Sidebar';
 export { default as ItemList } from './ItemList';
 export { default as Tooltip } from './Tooltip';
 export { default as FormGenerator } from './FormGenerator';
+export {default as CrudTable} from './CrudTable/index';

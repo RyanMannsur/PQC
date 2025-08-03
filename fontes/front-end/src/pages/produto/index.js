@@ -1,8 +1,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
+import CrudTable from '../../components/CrudTable';
 import ProdutoForm from '../../features/produto';
-import { Container, Table, Td, Th, Tr, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
+import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import produtoService from '../../services/produto/service';
 import { TEXTOS, CAMPOS } from './constantes';
 
@@ -112,39 +113,22 @@ const ProdutoPage = () => {
         onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codProduto) : undefined}
         onCancel={handleCancel}
       />
-      <h2 style={{ marginTop: 40 }}>Lista de Produtos</h2>
-      <Table>
-        <thead>
-          <Tr>
-            <Th>{CAMPOS.NCM}</Th>
-            <Th>{CAMPOS.NOME}</Th>
-            <Th>{CAMPOS.LISTA}</Th>
-            <Th>{CAMPOS.PUREZA}</Th>
-            <Th>{CAMPOS.DENSIDADE}</Th>
-            <Th>{CAMPOS.ATIVO}</Th>
-            <Th>{CAMPOS.ACOES}</Th>
-          </Tr>
-        </thead>
-        <tbody>
-          {produtos.map(prod => (
-            <Tr key={prod.codProduto}>
-              <Td>{prod.ncm || '-'}</Td>
-              <Td>{prod.nomProduto}</Td>
-              <Td>{prod.nomLista}</Td>
-              <Td>{prod.perPureza}</Td>
-              <Td>{prod.vlrDensidade}</Td>
-              <Td>{prod.idtAtivo ? TEXTOS.SIM : TEXTOS.NAO}</Td>
-              <Td>
-                <Button
-                  variant="secondary"
-                  size="small"
-                  onClick={() => handleEdit(prod)}
-                >{TEXTOS.EDITAR}</Button>
-              </Td>
-            </Tr>
-          ))}
-        </tbody>
-      </Table>
+      <CrudTable
+        title="Lista de Produtos"
+        columns={[
+          { label: CAMPOS.NCM, field: 'ncm' },
+          { label: CAMPOS.NOME, field: 'nomProduto' },
+          { label: CAMPOS.LISTA, field: 'nomLista' },
+          { label: CAMPOS.PUREZA, field: 'perPureza' },
+          { label: CAMPOS.DENSIDADE, field: 'vlrDensidade' },
+          { label: CAMPOS.ATIVO, field: 'idtAtivo', render: v => v ? TEXTOS.SIM : TEXTOS.NAO }
+        ]}
+        data={produtos}
+        onEdit={handleEdit}
+        editText={TEXTOS.EDITAR}
+        getRowKey={item => item.codProduto}
+        renderActions={undefined}
+      />
       {isModalOpen && (
         <ModalOverlay>
           <ModalContent>
