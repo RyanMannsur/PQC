@@ -177,8 +177,9 @@ return (
         label="Selecionar Laboratório de Destino"
         options={labs}
         value={novoLab ? novoLab.value : ""}
-        onChange={(selectedOption) => {
-          setNovoLab(selectedOption);
+        onChange={value => {
+          const selectedLab = labs.find(lab => lab.value === value);
+          setNovoLab(selectedLab);
           setMensagem("");
         }}
         placeholder="Selecione um laboratório"
