@@ -9,6 +9,17 @@ import { TEXTOS, CAMPOS } from './constantes';
 
 
 const ProdutoPage = () => {
+  const handleAtivar = async (produto) => {
+    try {
+      const payload = { ...produto, idtAtivo: true };
+      await produtoService.atualizar(payload);
+      setEditing(null);
+      fetchProdutos();
+    } catch (error) {
+      setTooltip({ visible: true, message: 'Erro ao ativar produto' });
+      setTimeout(() => setTooltip({ visible: false, message: '' }), 4000);
+    }
+  };
   const [formKey, setFormKey] = useState(0);
   const [produtos, setProdutos] = useState([]);
   const [usuario, setUsuario] = useState({});
@@ -121,13 +132,28 @@ const ProdutoPage = () => {
           { label: CAMPOS.LISTA, field: 'nomLista' },
           { label: CAMPOS.PUREZA, field: 'perPureza' },
           { label: CAMPOS.DENSIDADE, field: 'vlrDensidade' },
-          { label: CAMPOS.ATIVO, field: 'idtAtivo', render: v => v ? TEXTOS.SIM : TEXTOS.NAO }
+          {
+            label: CAMPOS.ATIVO,
+            field: 'idtAtivo',
+            render: (item) => {
+              if (item.idtAtivo) return TEXTOS.SIM;
+              if (usuario?.isADM) {
+                return (
+                  <Button
+                    variant="primary"
+                    size="small"
+                    onClick={() => handleAtivar(item)}
+                  >Ativar</Button>
+                );
+              }
+              return TEXTOS.NAO;
+            }
+          }
         ]}
         data={produtos}
         onEdit={handleEdit}
         editText={TEXTOS.EDITAR}
         getRowKey={item => item.codProduto}
-        renderActions={undefined}
       />
       {isModalOpen && (
         <ModalOverlay>

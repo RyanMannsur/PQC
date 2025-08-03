@@ -285,7 +285,16 @@ const produtoService = {
 
   atualizar: async (produto) => {
     try {
-      const response = await api.put(`/produtos/${produto.codProduto}`, produto);
+      // Monta payload apenas com campos definidos
+      const payload = {};
+      if (produto.codProduto !== undefined) payload.codProduto = produto.codProduto;
+      if (produto.nomProduto !== undefined) payload.nomProduto = produto.nomProduto;
+      if (produto.nomLista !== undefined) payload.nomLista = produto.nomLista;
+      if (produto.perPureza !== undefined) payload.perPureza = produto.perPureza;
+      if (produto.vlrDensidade !== undefined) payload.vlrDensidade = produto.vlrDensidade;
+      if (produto.idtAtivo !== undefined) payload.idtAtivo = produto.idtAtivo;
+      if (produto.orgaosControle !== undefined) payload.orgaosControle = produto.orgaosControle;
+      const response = await api.put(`/produtos/${produto.codProduto}`, payload);
       return response.data;
     } catch (error) {
       console.error("Erro ao atualizar produto:", error);

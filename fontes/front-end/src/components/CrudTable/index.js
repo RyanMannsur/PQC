@@ -25,7 +25,9 @@ const CrudTable = ({
         {data.map(item => (
           <Tr key={getRowKey(item)}>
             {columns.map(col => (
-              <Td key={col.field}>{item[col.field]}</Td>
+              <Td key={col.field}>
+                {col.render ? col.render(item) : item[col.field]}
+              </Td>
             ))}
             <Td>
               {renderActions ? (

@@ -967,6 +967,7 @@ def update_produto(codProduto):
     nomLista = data.get("nomLista")
     perPureza = data.get("perPureza")
     vlrDensidade = data.get("vlrDensidade")
+    idtAtivo = data.get("idtAtivo") if "idtAtivo" in data else None
     #uniMedida = data.get("uniMedida")
  
     valida = Valida()
@@ -981,15 +982,27 @@ def update_produto(codProduto):
     db = Db()
     try:
         # UPDATE Produto
-        sql_update = """
-            UPDATE Produto 
-                SET nomProduto = %s,
-                    nomLista = %s,
-                    perPureza = %s,
-                    vlrDensidade = %s
-              WHERE codProduto = %s
-        """
-        params_update = (nomProduto, nomLista, perPureza, vlrDensidade, codProduto)
+        if idtAtivo is not None:
+            sql_update = """
+                UPDATE Produto 
+                    SET nomProduto = %s,
+                        nomLista = %s,
+                        perPureza = %s,
+                        vlrDensidade = %s,
+                        "idtAtivo" = %s
+                  WHERE codProduto = %s
+            """
+            params_update = (nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo, codProduto)
+        else:
+            sql_update = """
+                UPDATE Produto 
+                    SET nomProduto = %s,
+                        nomLista = %s,
+                        perPureza = %s,
+                        vlrDensidade = %s
+                  WHERE codProduto = %s
+            """
+            params_update = (nomProduto, nomLista, perPureza, vlrDensidade, codProduto)
         db.execSql(sql_update, params_update, Mode.BEGIN)
 
         # DELETE órgãos de controle
