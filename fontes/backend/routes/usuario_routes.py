@@ -31,7 +31,7 @@ def modificar_locais_usuario(id):
     codUnidade = data['codUnidade']
     codPredio = data['codPredio']
     codLaboratorio = data['codLaboratorio']
-    action = data['action'] # 'add' ou 'remove'
+    action = data['action']
     try:
         db = Db()
         if action == 'add':

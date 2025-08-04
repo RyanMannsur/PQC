@@ -5,7 +5,7 @@ ListItem,
 ListItemText,
 ListItemIcon,
 } from "@mui/material";
-import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd, Assessment } from "@mui/icons-material";
+import { Home, Settings, Inventory, SwapHoriz, AddBox, PostAdd, Assessment, People, TableChart, Business, Store } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
@@ -83,14 +83,14 @@ return (
 
         <ListItem component={Link} to="/produto">
           <ListItemIcon>
-            <Assessment />
+            <TableChart />
           </ListItemIcon>
           <ListItemText primary="Produtos" />
         </ListItem>
         
       <ListItem component={Link} to="/campus">
         <ListItemIcon>
-          <Assessment />
+          <Business />
         </ListItemIcon>
         <ListItemText primary="Campus" />
       </ListItem>
@@ -104,16 +104,16 @@ return (
 
       <ListItem component={Link} to="/localestocagem">
         <ListItemIcon>
-          <Assessment />
+          <Store />
         </ListItemIcon>
         <ListItemText primary="Locais de Estocagem" />
       </ListItem>
 
-            <ListItem component={Link} to="/usuarios">
+      <ListItem component={Link} to="/usuarios">
         <ListItemIcon>
-          <Assessment />
+          <People />
         </ListItemIcon>
-        <ListItemText primary="Usuarios" />
+        <ListItemText primary="Usuários" />
       </ListItem>
       
     </List>
