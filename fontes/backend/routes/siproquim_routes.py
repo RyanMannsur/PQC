@@ -8,6 +8,12 @@ import sys
 from db import Db, Mode
 import util
 
+# Passo 0 - Executando o arquivo
+# Abra um novo terminal, execute os seguintes comandos:
+# docker exec -it backend sh
+# python siproquim_routes.py
+# ver bd:   docker exec -it bd-postgres psql -U postgres -d PQC
+
 print("Debugging informações...", file=sys.stdout)
 """
 3.1.1. Seção de Identificação da Empresa/Mapa (EM): 
@@ -39,16 +45,37 @@ denominada Identificação do Resíduo Controlado (RC) caso o declarante trabalh
 químicos controlados. 
 """
 def secaoDemonstrativoGeral(codProduto, nomProduto, perPureza, vlrDensidade):
-   tipo  = 'DG'   
-   NCM = codProduto            # 11 Alfanumerico
-   nomeComercial = rpad(trunc(nomProduto, 70), 70 '')  # 70 Alfanumerico
-   concentracao = perPureza    #
-   densidade = vlrDensidade    #
-      file.write(f'{produto[1]}{int(round(float(perpureza), 0)):03d}') # nomproduto e perpureza
-            file.write(f'{round(float(vlrDensidade), 2):05.2f}\n'.replace('.', ',')) # vlrdensidade
-         
+    tipo  = 'DG'   
+    NCM = codProduto            # 11 Alfanumerico
+    nomeComercial = rpad(trunc(nomProduto, 70), 70 '')  # 70 Alfanumerico
+    concentracao = f'{int(round(float(perPureza), 0)):03d}'    
+    densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')   
+   
+    return tipo + NCM + nomeComercial + concentracao + densidade
 
-   return tipo + NCM + nomeComercial + concentracao + densidade
+"""
+3.1.3. Seção Movimentação Nacional de Produtos Químicos (MVN): 
+Descreverá as operações de entrada e saída em função de 
+compra (COM), venda (VEN), doação (DOA), remessa (REM), retorno (RET) e transferência (TRA) 
+de PQC. 
+"""
+def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoNfe, armazenagemNfe, transporteNfe)
+    tipo = 'MVN'
+    if(operacao == 'EC' or operacao == 'ED' or operacao == 'TE' or operacao == 'AE'):
+        entradaSaida = 'E'  # Movimentação de Entrada
+    else:
+        entradaSaida = 'S'  # Movimentação de Saída
+    if(operac == 'TE'): operacao = 'ET'; #formatação da norma
+    elif(operac == 'AE'): operacao = 'EF'; #formatação da norma
+    elif(operac == 'TS'): operacao = 'ST'
+    else operacao = operac
+
+    cnpjFornecedor = rpad(trunc(cnpj, 14), 14 '')
+    razaoSocialFornecedor = rpad(trunc(razaoSocial, 69), 69 '')
+    numero = rpad(trunc(nomProduto, 10), 10 '')
+    data = dataEmissaoNfe.split('-')
+    dataEmissao = f'{produto[2]}/{produto[1]}/{produto[0]}'  # Formato DD/MM/AAAA
+    return tipo + entradaSaida + operacao + cnpjFornecedor + razaoSocialFornecedor + numero + dataEmissao + armazenagemNfe + transporteNfe
 
 # Rota para listar todos os produtos
 @produto_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -92,21 +119,23 @@ def gerar_arquivo():
     if not produtos:
          return util.formataAviso("Nenhum produto encontrado!")  
 
-   
+    arquivoDeMapas = "M"
+    date = datetime.now()
+    mesesPt = [
+        "JAN", "FEV", "MAR", "ABR", "MAI", "JUN",
+        "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"
+    ]
+    mes = mesesPt[date.month-1] # mostra JAN, FEB, etc.
+    ano = date.year
+    cnpj = "17220203000196" #14 caracteres
     nomeArquivo = f'{arquivoDeMapas}{ano}{mes}{cnpj}.txt'
-
   
     with open(nomeArquivo, 'w', encoding='utf-8') as file:
         file.write(secaoIdentificacao(mmm, aaaa))
-     
-
-        # TODO: identificar diferença entre produtos compostos e produtos controlados para fazer a 
-        # distinção no documento. Por hora, assume-se que tudo é produto controlado(PR)
-        
         
         for produto in produtos:
             file.write(secaoDemonstrativoGeral(produto[0], produto[1], produto[2], produto[3]))
-           
-            file.write(f'{produto[1]}{int(round(float(perpureza), 0)):03d}') # nomproduto e perpureza
-            file.write(f'{round(float(vlrDensidade), 2):05.2f}\n'.replace('.', ',')) # vlrdensidade
-           
+        for produto in produtos:
+            file.write(secaoMovimentacaoNacional(produto[4], "cnpj-fornecedo", "razao-social-fornecedor"))
+        
+gerar_arquivo()
