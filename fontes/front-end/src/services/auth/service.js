@@ -1,3 +1,4 @@
+
 // services/auth/service.js
 const API_BASE_URL = "http://localhost:8088/api";
 // Login via API
@@ -54,4 +55,39 @@ export const isAuthenticated = () => {
 export const isAdmin = () => {
   const user = getCurrentUser();
   return user && (user.isADM === true || user.isADM === 1);
+};
+
+
+export const listarUsuarios = async () => {
+  const res = await fetch("http://localhost:8088/api/usuarios");
+  if (!res.ok) throw new Error("Erro ao listar usuários");
+  return await res.json();
+};
+
+// Transformar usuário em ADM
+export const transformarUsuarioAdm = async (id) => {
+  const res = await fetch(`http://localhost:8088/api/usuarios/${id}/adm`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error("Erro ao transformar usuário em ADM");
+  return await res.json();
+};
+
+// Adicionar ou remover local de estocagem de um usuário
+export const modificarLocalEstocagemUsuario = async (token, codCampus, codUnidade, codPredio, codLaboratorio, action) => {
+  const res = await fetch(`http://localhost:8088/usuarios/${token}/localestocagem`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ codCampus, codUnidade, codPredio, codLaboratorio, action })
+  });
+  if (!res.ok) throw new Error("Erro ao modificar local de estocagem");
+  return await res.json();
+};
+
+// Listar todos os locais de estocagem de um usuário
+export const listarLocaisEstocagemUsuario = async (token) => {
+  const res = await fetch(`http://localhost:8088/usuarios/${token}/localestocagem`);
+  if (!res.ok) throw new Error("Erro ao listar locais de estocagem do usuário");
+  return await res.json();
 };

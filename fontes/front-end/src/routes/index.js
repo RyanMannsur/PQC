@@ -16,6 +16,7 @@ import ProdutoPage from "../pages/produto";
 import CampusPage from "../pages/campus";
 import UnidadePage from "../pages/unidadeorganizacional";
 import LocalEstocagemPage from "../pages/localestocagem";
+import UsuariosPage from "../pages/usuario";
 
 const RoutesApp = () => {
   return (
@@ -162,6 +163,17 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <LocalEstocagemPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/usuarios"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <UsuariosPage />
               </AppLayout>
             </PrivateRoute>
           }

@@ -108,6 +108,13 @@ return (
         </ListItemIcon>
         <ListItemText primary="Locais de Estocagem" />
       </ListItem>
+
+            <ListItem component={Link} to="/usuarios">
+        <ListItemIcon>
+          <Assessment />
+        </ListItemIcon>
+        <ListItemText primary="Usuarios" />
+      </ListItem>
       
     </List>
   </Drawer>

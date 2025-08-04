@@ -33,11 +33,13 @@ const CrudTable = ({
               {renderActions ? (
                 renderActions(item)
               ) : (
-                <Button
-                  variant="secondary"
-                  size="small"
-                  onClick={() => onEdit(item)}
-                >{editText}</Button>
+                onEdit && editText ? (
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => onEdit(item)}
+                  >{editText}</Button>
+                ) : null
               )}
             </Td>
           </Tr>

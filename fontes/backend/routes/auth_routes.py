@@ -6,7 +6,6 @@ auth_bp = Blueprint("auth_bp", __name__)
 
 @auth_bp.route("/auth/login", methods=["POST"])
 def login():
-    """Rota para autenticação de usuários."""
     data = request.get_json()
     if not data or 'cpf' not in data or 'senha' not in data:
         return jsonify({"error": "CPF e senha são obrigatórios"}), 400
@@ -37,7 +36,6 @@ def login():
 
 @auth_bp.route("/auth/validate", methods=["POST"])
 def validate_token():
-    """Rota para validar token."""
     data = request.get_json()
     if not data or 'token' not in data:
         return jsonify({"error": "Token é obrigatório"}), 400
