@@ -138,7 +138,15 @@ O frontend estará disponível em: http://localhost:3001
 
 O sistema utiliza autenticação baseada em tokens com controle de acesso administrativo.
 
+
 ### Usuários de Teste Disponíveis:
+
+Além dos exemplos abaixo, há um arquivo com diversas contas de teste prontas para uso no sistema:
+
+- **Arquivo:** `usuarios_teste.txt` (na raiz do projeto)
+- **Formato:** CPF e senha de cada usuário
+
+Exemplo de contas disponíveis:
 
 #### **Usuário Administrador:**
 - **CPF**: 333.333.333-33
