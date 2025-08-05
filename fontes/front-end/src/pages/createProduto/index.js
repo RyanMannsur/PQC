@@ -134,8 +134,8 @@ return (
       <p>Nenhum produto encontrado.</p>
     )}
 
-    <FormGroup justifyContent="center">
-      <Button variant="primary" onClick={handleConfirm}>Confirmar</Button>
+    <FormGroup $justifyContent="center">
+      <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
     </FormGroup>
 
     <Modal

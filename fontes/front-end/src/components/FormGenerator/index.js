@@ -33,15 +33,15 @@ const FormGenerator = ({ fields, formData, onChange, onSubmit, isEditing, isADM 
       </Row>
     ))}
     <div style={{ maxWidth: 350, minWidth: 220, marginTop: 8, display: 'flex', gap: 8 }}>
-      <Button variant="primary" type="submit" style={{ width: isADM ? '50%' : '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
+      <Button $variant="primary" type="submit" style={{ width: isADM ? '50%' : '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
       <Button
-        variant="secondary"
+        $variant="secondary"
         type="button"
         onClick={onCancel}
         style={{ width: isADM ? '50%' : '100%' }}
       >{typeof editCancelText === 'string' ? editCancelText : (isEditing ? 'Cancelar' : 'Cancelar')}</Button>
       {isADM && isEditing ? (
-        <Button variant="danger" type="button" onClick={onDelete} style={{ width: '25%' }}>Excluir</Button>
+        <Button $variant="danger" type="button" onClick={onDelete} style={{ width: '25%' }}>Excluir</Button>
       ) : null}
     </div>
     {showDeleteModal && (
@@ -50,8 +50,8 @@ const FormGenerator = ({ fields, formData, onChange, onSubmit, isEditing, isADM 
           <h3>Confirmar Exclusão</h3>
           <p>Tem certeza que deseja excluir este registro?</p>
           <div style={{ display: 'flex', gap: 16, marginTop: 24 }}>
-            <Button variant="danger" type="button" onClick={typeof onConfirmDelete === 'function' ? onConfirmDelete : onDelete}>Excluir</Button>
-            <Button variant="secondary" type="button" onClick={() => setShowDeleteModal(false)}>Cancelar</Button>
+            <Button $variant="danger" type="button" onClick={typeof onConfirmDelete === 'function' ? onConfirmDelete : onDelete}>Excluir</Button>
+            <Button $variant="secondary" type="button" onClick={() => setShowDeleteModal(false)}>Cancelar</Button>
           </div>
         </div>
       </div>

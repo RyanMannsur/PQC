@@ -35,7 +35,7 @@ const CrudTable = ({
               ) : (
                 onEdit && editText ? (
                   <Button
-                    variant="secondary"
+                    $variant="secondary"
                     size="small"
                     onClick={() => onEdit(item)}
                   >{editText}</Button>

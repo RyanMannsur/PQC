@@ -55,8 +55,8 @@ const Relatorio = () => {
          />
        </C.InputGroup>
 
-       <FormGroup justifyContent="center">
-         <Button variant="primary" onClick={handleBuscarClick}>Buscar</Button>
+       <FormGroup $justifyContent="center">
+         <Button $variant="primary" onClick={handleBuscarClick}>Buscar</Button>
        </FormGroup>
      </C.FiltersContainer>
 

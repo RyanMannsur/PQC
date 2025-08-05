@@ -69,7 +69,6 @@ useEffect(() => {
           seqItem
         );
         
-        // Backend retorna um array, pegar o primeiro elemento
         const produtoData = Array.isArray(produtoResponse) && produtoResponse.length > 0 
           ? produtoResponse[0] 
           : produtoResponse;
@@ -185,7 +184,7 @@ return (
         placeholder="Selecione um laboratório"
       />
       <C.labelError>{mensagem}</C.labelError>
-      <FormGroup justifyContent="center">
+      <FormGroup $justifyContent="center">
         <Button Text="Transferir" onClick={handleTransferir} />
       </FormGroup>
     </C.Content>

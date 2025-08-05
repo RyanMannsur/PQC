@@ -97,7 +97,7 @@ const GerenciarLocaisUsuario = () => {
         data={locais}
         getRowKey={item => item.chave}
         renderActions={local => (
-          <Button variant="danger" size="small" onClick={() => handleRemover(local)}>
+          <Button $variant="danger" size="small" onClick={() => handleRemover(local)}>
             Remover
           </Button>
         )}

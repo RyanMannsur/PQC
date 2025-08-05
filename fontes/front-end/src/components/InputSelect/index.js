@@ -24,7 +24,7 @@ const InputSelect = ({
         value={value || ""} 
         onChange={e => onChange(e.target.value)}
         disabled={disabled}
-        error={error}
+        $error={error}
         {...props}
       >
         <option value="" disabled>

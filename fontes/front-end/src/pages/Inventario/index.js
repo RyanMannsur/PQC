@@ -165,7 +165,7 @@ const Inventario = () => {
           Text="Confirmar Atualização"
           onClick={enviarAtualizacao}
           size="large"
-          fullWidth
+          $fullWidth
         />
       </C.ButtonGroup>
       <Modal

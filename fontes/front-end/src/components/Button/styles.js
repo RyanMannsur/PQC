@@ -93,26 +93,26 @@ export const Button = styled.button`
   text-decoration: none;
   box-sizing: border-box;
   min-width: 100px;
-  
+
   ${({ size }) => sizes[size]}
-  ${({ variant }) => variants[variant]}
-  
-  ${({ fullWidth }) => fullWidth && css`
+  ${({ $variant }) => variants[$variant]}
+
+  ${({ $fullWidth }) => $fullWidth && css`
     width: 100%;
     max-width: 350px;
   `}
-  
+
   ${({ disabled }) => disabled && css`
     opacity: 0.6;
     cursor: not-allowed;
     pointer-events: none;
   `}
-  
+
   &:focus {
     outline: 2px solid rgba(4, 110, 229, 0.3);
     outline-offset: 2px;
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(1px);
   }

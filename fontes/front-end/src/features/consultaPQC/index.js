@@ -36,7 +36,7 @@ function ConsultaPQC({ labId }) {
                 <C.ProductRow>
                   <C.Td>
                     <Button 
-                      variant="outline" 
+                      $variant="outline" 
                       size="small" 
                       onClick={() => toggle("produto", produto.id)}
                     >
@@ -61,7 +61,7 @@ function ConsultaPQC({ labId }) {
                        <C.CampusRow>
                           <C.Td> {/* Célula para o botão */}
                               <Button 
-                                variant="outline" 
+                                $variant="outline" 
                                 size="small"
                                 onClick={() => toggle("campus", campus.id)}
                               >
@@ -98,7 +98,7 @@ function ConsultaPQC({ labId }) {
                                 <C.ItemRow>
                                   <C.Td>
                                     <Button 
-                                      variant="outline" 
+                                      $variant="outline" 
                                       size="small"
                                       onClick={() => toggle("item", item.id)}
                                     >

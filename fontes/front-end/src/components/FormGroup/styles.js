@@ -10,9 +10,9 @@ const gaps = {
 export const FormGroup = styled.div`
   display: flex;
   flex-direction: ${({ direction }) => direction};
-  gap: ${({ gap }) => gaps[gap]};
-  align-items: ${({ alignItems }) => alignItems};
-  justify-content: ${({ justifyContent }) => justifyContent};
+  gap: ${({ $gap }) => gaps[$gap]};
+  align-items: ${({ $alignItems }) => $alignItems};
+  justify-content: ${({ $justifyContent }) => $justifyContent};
   width: 100%;
   
   ${({ direction }) => direction === "row" && css`

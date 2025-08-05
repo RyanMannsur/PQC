@@ -67,7 +67,7 @@ export const Input = styled.input`
     color: #6c757d;
   }
 
-  ${({ error }) => error && css`
+  ${({ $error }) => $error && css`
     border-color: #dc3545;
     
     &:focus {
