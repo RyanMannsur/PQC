@@ -34,14 +34,12 @@ const FormGenerator = ({ fields, formData, onChange, onSubmit, isEditing, isADM 
     ))}
     <div style={{ maxWidth: 350, minWidth: 220, marginTop: 8, display: 'flex', gap: 8 }}>
       <Button variant="primary" type="submit" style={{ width: isADM ? '50%' : '100%' }}>{isEditing ? 'Atualizar' : 'Cadastrar'}</Button>
-      {isEditing && (
-        <Button
-          variant="secondary"
-          type="button"
-          onClick={onCancel}
-          style={{ width: isADM ? '25%' : '50%' }}
-        >Cancelar</Button>
-      )}
+      <Button
+        variant="secondary"
+        type="button"
+        onClick={onCancel}
+        style={{ width: isADM ? '50%' : '100%' }}
+      >{typeof editCancelText === 'string' ? editCancelText : (isEditing ? 'Cancelar' : 'Cancelar')}</Button>
       {isADM && isEditing ? (
         <Button variant="danger" type="button" onClick={onDelete} style={{ width: '25%' }}>Excluir</Button>
       ) : null}

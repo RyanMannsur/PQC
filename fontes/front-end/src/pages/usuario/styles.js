@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  padding: 32px;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 32px 16px 32px 16px;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #f5f6fa;
 `;
 
 export const TitleBottom = styled.h2`

@@ -17,6 +17,7 @@ import CampusPage from "../pages/campus";
 import UnidadePage from "../pages/unidadeorganizacional";
 import LocalEstocagemPage from "../pages/localestocagem";
 import UsuariosPage from "../pages/usuario";
+import GerenciarLocaisUsuario from '../pages/usuario/GerenciarLocais';
 
 const RoutesApp = () => {
   return (
@@ -174,6 +175,17 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <UsuariosPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/usuarios/:token/locais"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <GerenciarLocaisUsuario />
               </AppLayout>
             </PrivateRoute>
           }

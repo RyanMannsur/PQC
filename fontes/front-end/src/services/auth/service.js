@@ -1,4 +1,3 @@
-
 // services/auth/service.js
 const API_BASE_URL = "http://localhost:8088/api";
 // Login via API
@@ -89,5 +88,44 @@ export const modificarLocalEstocagemUsuario = async (token, codCampus, codUnidad
 export const listarLocaisEstocagemUsuario = async (token) => {
   const res = await fetch(`http://localhost:8088/usuarios/${token}/localestocagem`);
   if (!res.ok) throw new Error("Erro ao listar locais de estocagem do usuário");
+  return await res.json();
+};
+
+// Listar locais de estocagem gerenciados por um usuário (por token)
+export const listarLocaisUsuarioToken = async (token) => {
+  const res = await fetch(`http://localhost:8088/api/usuarios/${token}/localestocagem`);
+  if (!res.ok) throw new Error('Erro ao listar locais do usuário');
+  return await res.json();
+};
+
+// Listar locais disponíveis para o usuário (não gerenciados por ele)
+export const listarLocaisDisponiveis = async (token) => {
+  const res = await fetch(`http://localhost:8088/api/usuarios/${token}/localestocagem/disponiveis`);
+  if (!res.ok) throw new Error('Erro ao listar locais disponíveis');
+  return await res.json();
+};
+
+// Adicionar local ao usuário
+export const adicionarLocalUsuario = async (token, chave) => {
+  // chave: string codCampus-codUnidade-codPredio-codLaboratorio
+  const [codCampus, codUnidade, codPredio, codLaboratorio] = chave.split('-');
+  const res = await fetch(`http://localhost:8088/api/usuarios/${token}/localestocagem`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codCampus, codUnidade, codPredio, codLaboratorio, action: 'add' })
+  });
+  if (!res.ok) throw new Error('Erro ao adicionar local');
+  return await res.json();
+};
+
+// Remover local do usuário
+export const removerLocalUsuario = async (token, local) => {
+  const { codCampus, codUnidade, codPredio, codLaboratorio } = local;
+  const res = await fetch(`http://localhost:8088/api/usuarios/${token}/localestocagem`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codCampus, codUnidade, codPredio, codLaboratorio, action: 'remove' })
+  });
+  if (!res.ok) throw new Error('Erro ao remover local');
   return await res.json();
 };

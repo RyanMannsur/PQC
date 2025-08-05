@@ -1,7 +1,8 @@
+
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
 import { listarUsuarios, transformarUsuarioAdm } from '../../services/auth/service';
-import UsuarioLocalForm from '../../features/usuariolocal';
 import { TEXTOS } from './constantes';
 import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import CrudTable from '../../components/CrudTable';
@@ -10,13 +11,14 @@ import CrudTable from '../../components/CrudTable';
 const UsuarioPage = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuarioAtual, setUsuarioAtual] = useState({});
-  const [editing, setEditing] = useState(null);
+  // Removido: edição local de usuário não é mais usada
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [tooltip, setTooltip] = useState({ visible: false, message: "" });
   const formKey = useRef(0);
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsuarios();
@@ -67,9 +69,12 @@ const UsuarioPage = () => {
   };
 
   const handleEdit = (usuario) => {
-    setEditing(usuario);
-    if (anchorRef.current) {
-      anchorRef.current.scrollIntoView({ behavior: 'smooth' });
+    // Redireciona sempre para a página de gerenciamento de locais
+    if (usuario.token) {
+      navigate(`/usuarios/${usuario.token}/locais`);
+    } else {
+      setTooltip({ visible: true, message: 'Usuário sem token cadastrado.' });
+      setTimeout(() => setTooltip({ visible: false, message: '' }), 4000);
     }
   };
 
@@ -81,15 +86,8 @@ const UsuarioPage = () => {
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
-      <TitleBottom>{editing ? TEXTOS.EDITAR_USUARIO : TEXTOS.CADASTRAR_USUARIO}</TitleBottom>
-      {/* Formulário para gerenciar locais do usuário */}
-      <UsuarioLocalForm
-        isADM={usuarioAtual?.isADM}
-        isEditing={!!editing}
-        initialData={editing ? editing : {}}
-        onSubmit={fetchUsuarios}
-        onCancel={() => setEditing(null)}
-      />
+      <TitleBottom>{TEXTOS.CADASTRAR_USUARIO}</TitleBottom>
+      {/* Formulário removido: cadastro de novo usuário */}
       <CrudTable
         title="Lista de Usuários"
         columns={[
