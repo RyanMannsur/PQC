@@ -129,3 +129,13 @@ export const removerLocalUsuario = async (token, local) => {
   if (!res.ok) throw new Error('Erro ao remover local');
   return await res.json();
 };
+
+// Remover status de admin de um usuário
+export const removerUsuarioAdm = async (id) => {
+  const res = await fetch(`http://localhost:8088/api/usuarios/${id}/remover-adm`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error("Erro ao remover status de admin do usuário");
+  return await res.json();
+};

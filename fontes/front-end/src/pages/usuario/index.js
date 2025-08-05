@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
-import { listarUsuarios, transformarUsuarioAdm } from '../../services/auth/service';
+import { listarUsuarios, transformarUsuarioAdm, removerUsuarioAdm } from '../../services/auth/service';
 import { TEXTOS } from './constantes';
 import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import CrudTable from '../../components/CrudTable';
@@ -11,11 +11,9 @@ import CrudTable from '../../components/CrudTable';
 const UsuarioPage = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuarioAtual, setUsuarioAtual] = useState({});
-  // Removido: edição local de usuário não é mais usada
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [tooltip, setTooltip] = useState({ visible: false, message: "" });
-  const formKey = useRef(0);
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
   const navigate = useNavigate();
@@ -58,18 +56,32 @@ const UsuarioPage = () => {
   const handleTransformarAdm = async (usuario) => {
     try {
       await transformarUsuarioAdm(usuario.id);
-      setEditing(null);
-      fetchUsuarios();
+      setTooltip({ visible: false, message: '' });
       setModalMessage(TEXTOS.USUARIO_ATUALIZADO_SUCESSO);
       setIsModalOpen(true);
+      setEditing && setEditing(null);
+      await fetchUsuarios();
     } catch (error) {
       setTooltip({ visible: true, message: TEXTOS.ERRO_ATUALIZAR_USUARIO });
       setTimeout(() => setTooltip({ visible: false, message: '' }), 4000);
     }
   };
 
+  const handleRemoverAdm = async (usuario) => {
+    try {
+      await removerUsuarioAdm(usuario.id);
+      setTooltip({ visible: false, message: '' });
+      setModalMessage('Status de administrador removido com sucesso!');
+      setIsModalOpen(true);
+      setEditing && setEditing(null);
+      await fetchUsuarios();
+    } catch (error) {
+      setTooltip({ visible: true, message: 'Erro ao remover status de admin do usuário' });
+      setTimeout(() => setTooltip({ visible: false, message: '' }), 4000);
+    }
+  };
+
   const handleEdit = (usuario) => {
-    // Redireciona sempre para a página de gerenciamento de locais
     if (usuario.token) {
       navigate(`/usuarios/${usuario.token}/locais`);
     } else {
@@ -80,6 +92,7 @@ const UsuarioPage = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+    setTooltip({ visible: false, message: '' });
     fetchUsuarios();
   };
 
@@ -87,7 +100,6 @@ const UsuarioPage = () => {
     <Container ref={containerRef}>
       <div ref={anchorRef} />
       <TitleBottom>{TEXTOS.CADASTRAR_USUARIO}</TitleBottom>
-      {/* Formulário removido: cadastro de novo usuário */}
       <CrudTable
         title="Lista de Usuários"
         columns={[
@@ -96,17 +108,26 @@ const UsuarioPage = () => {
             label: 'Administrador',
             field: 'isADM',
             render: (item) => {
-              if (item.isADM) return TEXTOS.SIM;
               if (usuarioAtual?.isADM) {
-                return (
-                  <Button
-                    $variant="primary"
-                    size="small"
-                    onClick={() => handleTransformarAdm(item)}
-                  >{TEXTOS.TRANSFORMAR_ADM}</Button>
-                );
+                if (item.isADM) {
+                  return (
+                    <Button
+                      $variant="danger"
+                      size="small"
+                      onClick={() => handleRemoverAdm(item)}
+                    >Remover de Administrador</Button>
+                  );
+                } else {
+                  return (
+                    <Button
+                      $variant="primary"
+                      size="small"
+                      onClick={() => handleTransformarAdm(item)}
+                    >{TEXTOS.TRANSFORMAR_ADM}</Button>
+                  );
+                }
               }
-              return TEXTOS.NAO;
+              return item.isADM ? TEXTOS.SIM : TEXTOS.NAO;
             }
           }
         ]}
@@ -123,7 +144,7 @@ const UsuarioPage = () => {
           </ModalContent>
         </ModalOverlay>
       )}
-      {tooltip.visible && (
+      {tooltip.visible && !isModalOpen && (
         <TooltipError>
           <strong>{TEXTOS.ERRO}</strong> {tooltip.message}
         </TooltipError>

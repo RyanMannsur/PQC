@@ -15,12 +15,21 @@ def listar_usuarios():
     ]
     return usuarios
 
+
 @usuarios_bp.route("/usuarios/<int:id>/adm", methods=["PUT"])
 def transformar_usuario_adm(id):
     db = Db()
     sql = "UPDATE usuario SET isADM = TRUE WHERE id = %s"
-    result = db.execSql(sql, (id,), Mode.DEFAULT)
-    return result
+    db.execSql(sql, (id,), Mode.DEFAULT)
+    return jsonify({"success": True}), 200
+
+@usuarios_bp.route("/usuarios/<int:id>/remover-adm", methods=["PUT"])
+def remover_usuario_adm(id):
+    # Aqui você pode adicionar lógica para garantir que apenas admins possam acessar
+    db = Db()
+    sql = "UPDATE usuario SET isADM = FALSE WHERE id = %s"
+    db.execSql(sql, (id,), Mode.DEFAULT)
+    return jsonify({"success": True}), 200
 
 @usuarios_bp.route("/usuarios/<int:id>/localestocagem", methods=["POST"])
 def modificar_locais_usuario(id):
