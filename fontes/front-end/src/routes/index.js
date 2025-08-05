@@ -1,3 +1,5 @@
+import React from "react";
+import ManualPage from "../pages/manual";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signin from "../pages/Signin";
 import SelecionarLocal from "../pages/SelecionarLocal";
@@ -28,6 +30,14 @@ const RoutesApp = () => {
           element={
             <PublicoLayout>
               <Signin />
+            </PublicoLayout>
+          }
+        />
+        <Route
+          path="/manual"
+          element={
+            <PublicoLayout>
+              <ManualPage />
             </PublicoLayout>
           }
         />
