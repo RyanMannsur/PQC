@@ -18,6 +18,10 @@ const ManualPage = () => {
           <p>Para transferir produtos, vá em <b>Transferências</b>, pesquise, selecione o produto desejado e, na tela seguinte, escolha o destino da transferência.</p>
           <p>Você pode implantar novos produtos no laboratório a qualquer momento, acessando a tela de <b>Implantação</b>.</p>
         </section>
+                <section style={{ marginBottom: 32 }}>
+          <h2 style={{ fontSize: 22, marginBottom: 16 }}>Inventário</h2>
+          <p>Na tela <b>Inventário</b> é possível visualizar a quantidade de cada produto no laboratório. Você pode atualizar a quantidade dos produtos nessa tela sempre que necessário.</p>
+        </section>
         <section style={{ marginBottom: 32 }}>
           <h2 style={{ fontSize: 22, marginBottom: 16 }}>Solicitações e Edição</h2>
           <p>É possível solicitar a adição de novos produtos, campus, unidades e locais, além de editar esses registros conforme necessário.</p>
