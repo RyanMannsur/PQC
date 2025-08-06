@@ -1,18 +1,19 @@
 # routes/siproquim_routes.py 
 from flask import Blueprint, request, jsonify
 import calendar, datetime
-from datetime import date
-from flask import jsonify
-produto_bp = Blueprint("produto_bp", __name__)
+from datetime import datetime
+siproquim_bp = Blueprint("siproquim_bp", __name__)
 import sys
+import os
+# Add parent directory to path to find db module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from db import Db, Mode
 import util
 
 # Passo 0 - Executando o arquivo
-# Abra um novo terminal, execute os seguintes comandos:
-# docker exec -it backend sh
-# python siproquim_routes.py
-# ver bd:   docker exec -it bd-postgres psql -U postgres -d PQC
+# Inicie o docker
+# cole o url no navegador:
+# http://localhost:8088/api/gerarArquivoSiproquim
 
 print("Debugging informações...", file=sys.stdout)
 """
@@ -33,8 +34,8 @@ def secaoIdentificacao(mmm, aaaa):
    transporte = '0'         #nao 1 Numerico
    armazenamento = '1'      #sim 1 Numerico
 
-   lin =  tipo + cnpj + mes + ano + comercializacaoNac + comercializacaoInt
-   lin += producao + transformacao + consumo + fabricacao + transporte + armazenamento = 
+   lin =  f'{tipo}{cnpj}{mes}{ano}{comercializacaoNac}{comercializacaoInt}'
+   lin += f'{producao}{transformacao}{consumo}{fabricacao}{transporte}{armazenamento}\n'
    return lin
 
 """
@@ -46,12 +47,12 @@ químicos controlados.
 """
 def secaoDemonstrativoGeral(codProduto, nomProduto, perPureza, vlrDensidade):
     tipo  = 'DG'   
-    NCM = codProduto            # 11 Alfanumerico
-    nomeComercial = rpad(trunc(nomProduto, 70), 70 '')  # 70 Alfanumerico
+    NCM = codProduto  # 11 Alfanumerico
+    nomeComercial = (nomProduto[:70].ljust(70)) if len(nomProduto) > 70 else nomProduto.ljust(70) # 70 Alfanumerico
     concentracao = f'{int(round(float(perPureza), 0)):03d}'    
     densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')   
-   
-    return tipo + NCM + nomeComercial + concentracao + densidade
+
+    return f'{tipo}{NCM}{ nomeComercial}{concentracao}{densidade}\n'
 
 """
 3.1.3. Seção Movimentação Nacional de Produtos Químicos (MVN): 
@@ -59,26 +60,26 @@ Descreverá as operações de entrada e saída em função de
 compra (COM), venda (VEN), doação (DOA), remessa (REM), retorno (RET) e transferência (TRA) 
 de PQC. 
 """
-def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoNfe, armazenagemNfe, transporteNfe)
+def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoNfe, armazenagemNfe, transporteNfe):
     tipo = 'MVN'
-    if(operacao == 'EC' or operacao == 'ED' or operacao == 'TE' or operacao == 'AE'):
+    if operac in ['EC', 'ED', 'TE', 'AE']:
         entradaSaida = 'E'  # Movimentação de Entrada
     else:
         entradaSaida = 'S'  # Movimentação de Saída
-    if(operac == 'TE'): operacao = 'ET'; #formatação da norma
-    elif(operac == 'AE'): operacao = 'EF'; #formatação da norma
-    elif(operac == 'TS'): operacao = 'ST'
-    else operacao = operac
+    if operac == 'TE': operacao = 'ET'; #formatação da norma
+    elif operac == 'AE': operacao = 'EF'; #formatação da norma
+    elif operac == 'TS' : operacao = 'ST'
+    else: operacao = operac
 
-    cnpjFornecedor = rpad(trunc(cnpj, 14), 14 '')
-    razaoSocialFornecedor = rpad(trunc(razaoSocial, 69), 69 '')
-    numero = rpad(trunc(nomProduto, 10), 10 '')
+    cnpjFornecedor = (cnpj[:14].ljust(14)) if len(cnpj) > 14 else cnpj.ljust(14)
+    razaoSocialFornecedor = (razaoSocial[:69].ljust(69)) if len(razaoSocial) > 69 else razaoSocial.ljust(69) 
+    numero = (numeroNfe[:10].ljust(10)) if len(numeroNfe) > 10 else numeroNfe.ljust(10) 
     data = dataEmissaoNfe.split('-')
-    dataEmissao = f'{produto[2]}/{produto[1]}/{produto[0]}'  # Formato DD/MM/AAAA
-    return tipo + entradaSaida + operacao + cnpjFornecedor + razaoSocialFornecedor + numero + dataEmissao + armazenagemNfe + transporteNfe
+    dataEmissao = f'{data[2]}/{data[1]}/{data[0]}'  # Formato DD/MM/AAAA
+    return f'{tipo}{entradaSaida}{operacao}{cnpjFornecedor}{razaoSocialFornecedor}{numero}{dataEmissao}{armazenagemNfe}{transporteNfe}\n'
 
 # Rota para listar todos os produtos
-@produto_bp.route("/gerarArquivoSiproquim", methods=["GET"])
+@siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
     sql = """
        SELECT A.codProduto,
@@ -131,11 +132,11 @@ def gerar_arquivo():
     nomeArquivo = f'{arquivoDeMapas}{ano}{mes}{cnpj}.txt'
   
     with open(nomeArquivo, 'w', encoding='utf-8') as file:
-        file.write(secaoIdentificacao(mmm, aaaa))
+        file.write(secaoIdentificacao(mes, str(ano)))
         
         for produto in produtos:
             file.write(secaoDemonstrativoGeral(produto[0], produto[1], produto[2], produto[3]))
         for produto in produtos:
-            file.write(secaoMovimentacaoNacional(produto[4], "cnpj-fornecedo", "razao-social-fornecedor"))
-        
-gerar_arquivo()
+            file.write(secaoMovimentacaoNacional(produto[4], "cnpj-fornecedor", "razao-social-fornecedor","numeroNfe", "2001-01-02", "F", "F"))
+
+    return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})

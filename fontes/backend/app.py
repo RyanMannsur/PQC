@@ -3,6 +3,7 @@ from flask_cors import CORS
 from routes.produto_routes import produto_bp
 from routes.campus_routes import campus_bp
 from routes.usuario_routes import usuarios_bp
+from routes.siproquim_routes import siproquim_bp
 from Param import Param
 import logging
 
@@ -39,6 +40,7 @@ except Exception as e:
 app.register_blueprint(produto_bp, url_prefix="/api")
 app.register_blueprint(campus_bp, url_prefix="/api")
 app.register_blueprint(usuarios_bp, url_prefix="/api")
+app.register_blueprint(siproquim_bp, url_prefix="/api")
 
 if __name__ == "__main__":
  # Configurar o host como "0.0.0.0" para permitir acesso externo ao container
