@@ -15,6 +15,18 @@ import util
 # cole o url no navegador:
 # http://localhost:8088/api/gerarArquivoSiproquim
 
+#funções auxílio
+def split(str, num):
+    return [str[start:start+num] for start in range(0, len(str), num)]
+def inserirPonto(str):
+    stringSplit = split(str, 3)
+    if not stringSplit:  # input vazio
+        return str
+    strFinal = stringSplit[0]
+    for i in range(1, len(stringSplit)):
+        strFinal = f'{strFinal}.{stringSplit[i]}'
+    return strFinal
+
 print("Debugging informações...", file=sys.stdout)
 """
 3.1.1. Seção de Identificação da Empresa/Mapa (EM): 
@@ -46,13 +58,13 @@ denominada Identificação do Resíduo Controlado (RC) caso o declarante trabalh
 químicos controlados. 
 """
 def secaoDemonstrativoGeral(codProduto, nomProduto, perPureza, vlrDensidade):
-    tipo  = 'DG'   
+    tipo  = 'PR'   
     NCM = codProduto  # 11 Alfanumerico
     nomeComercial = (nomProduto[:70].ljust(70)) if len(nomProduto) > 70 else nomProduto.ljust(70) # 70 Alfanumerico
     concentracao = f'{int(round(float(perPureza), 0)):03d}'    
     densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')   
 
-    return f'{tipo}{NCM}{ nomeComercial}{concentracao}{densidade}\n'
+    return f'{tipo}{NCM}{nomeComercial}{concentracao}{densidade}\n'
 
 """
 3.1.3. Seção Movimentação Nacional de Produtos Químicos (MVN): 
@@ -62,6 +74,8 @@ de PQC.
 """
 def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoNfe, armazenagemNfe, transporteNfe):
     tipo = 'MVN'
+    if operac in ['AC', 'IN']:
+        return ''
     if operac in ['EC', 'ED', 'TE', 'AE']:
         entradaSaida = 'E'  # Movimentação de Entrada
     else:
@@ -77,6 +91,22 @@ def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoN
     data = dataEmissaoNfe.split('-')
     dataEmissao = f'{data[2]}/{data[1]}/{data[0]}'  # Formato DD/MM/AAAA
     return f'{tipo}{entradaSaida}{operacao}{cnpjFornecedor}{razaoSocialFornecedor}{numero}{dataEmissao}{armazenagemNfe}{transporteNfe}\n'
+
+"""
+3.1.3.1. Subseção  Movimento  (MM):  Registra  efetiva  movimentação  de  produtos  químicos  controlados 
+e/ou resíduo. Ressalta-se que os produtos elencados nessa subseção deverão estar previamente 
+inseridos na seção Demonstrativo Geral (DG). Seguir a seguinte estrutura:
+"""
+def secMovimento(codProduto, perPureza, vlrDensidade, quant, unidMedida):
+    tipo = 'MM'
+    NCM = f'PC{codProduto}'
+    concentracao = f'{int(round(float(perPureza), 0)):03d}'    
+    densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')
+    quantInt = int(round(float(quant), 0))
+    quantFloat = (float(quant) - quantInt) * 1000
+    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):3d}\n' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
+
+    return f'{tipo}{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -133,10 +163,12 @@ def gerar_arquivo():
   
     with open(nomeArquivo, 'w', encoding='utf-8') as file:
         file.write(secaoIdentificacao(mes, str(ano)))
-        
+        file.write('DG\n')
         for produto in produtos:
             file.write(secaoDemonstrativoGeral(produto[0], produto[1], produto[2], produto[3]))
         for produto in produtos:
             file.write(secaoMovimentacaoNacional(produto[4], "cnpj-fornecedor", "razao-social-fornecedor","numeroNfe", "2001-01-02", "F", "F"))
-
+        for produto in produtos:
+            file.write(secMovimento(produto[0], produto[2], produto[3], produto[5], "?")) # não tem unidade de medida no BD, tem q ser 'K' ou 'L'
+    
     return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
