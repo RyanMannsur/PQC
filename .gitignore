@@ -237,3 +237,6 @@ config.local.py
 secrets.py
 .secrets
 credentials.json
+
+# Relatórios do siproquim gerados para teste
+*17220203000196.txt
