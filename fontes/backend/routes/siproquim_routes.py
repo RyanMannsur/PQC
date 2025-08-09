@@ -26,6 +26,16 @@ def inserirPonto(str):
     for i in range(1, len(stringSplit)):
         strFinal = f'{strFinal}.{stringSplit[i]}'
     return strFinal
+def convertYMDtoDMY(data): # converte o modelo de data no bd para o modelo do relatório
+    if not data:
+        return ''
+    partes = data.split('-')
+    if len(partes) != 3:
+        return ''
+    dia = partes[2]
+    mes = partes[1]
+    ano = partes[0]
+    return f'{dia}/{mes}/{ano}'
 
 print("Debugging informações...", file=sys.stdout)
 """
@@ -88,8 +98,7 @@ def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoN
     cnpjFornecedor = (cnpj[:14].ljust(14)) if len(cnpj) > 14 else cnpj.ljust(14)
     razaoSocialFornecedor = (razaoSocial[:69].ljust(69)) if len(razaoSocial) > 69 else razaoSocial.ljust(69) 
     numero = (numeroNfe[:10].ljust(10)) if len(numeroNfe) > 10 else numeroNfe.ljust(10) 
-    data = dataEmissaoNfe.split('-')
-    dataEmissao = f'{data[2]}/{data[1]}/{data[0]}'  # Formato DD/MM/AAAA
+    dataEmissao = convertYMDtoDMY(dataEmissaoNfe)  # Formato DD/MM/AAAA
     return f'{tipo}{entradaSaida}{operacao}{cnpjFornecedor}{razaoSocialFornecedor}{numero}{dataEmissao}{armazenagemNfe}{transporteNfe}\n'
 
 """
@@ -104,7 +113,7 @@ def secMovimento(codProduto, perPureza, vlrDensidade, quant, unidMedida):
     densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')
     quantInt = int(round(float(quant), 0))
     quantFloat = (float(quant) - quantInt) * 1000
-    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):3d}\n' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
+    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):3d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
 
     return f'{tipo}{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
 
