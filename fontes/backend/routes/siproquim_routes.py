@@ -106,7 +106,7 @@ def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoN
 e/ou resíduo. Ressalta-se que os produtos elencados nessa subseção deverão estar previamente 
 inseridos na seção Demonstrativo Geral (DG). Seguir a seguinte estrutura:
 """
-def secMovimento(codProduto, perPureza, vlrDensidade, quant, unidMedida):
+def subsecMovimento(codProduto, perPureza, vlrDensidade, quant, unidMedida):
     tipo = 'MM'
     NCM = f'PC{codProduto}'
     concentracao = f'{int(round(float(perPureza), 0)):03d}'    
@@ -116,6 +116,64 @@ def secMovimento(codProduto, perPureza, vlrDensidade, quant, unidMedida):
     quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):3d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
 
     return f'{tipo}{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
+
+"""
+3.1.3.2. Subseção Transporte (MT): Caso o transporte dos produtos químicos movimentados na NF tenha 
+sido realizado sob responsabilidade de uma empresa (T) Terceirizada, descrita no item da seção 
+3.1.3, deverão ser informados detalhes da transportadora.
+"""
+def subsecTransporte(cnpjTransp, razaoSoc):
+    tipo = 'MT'
+    if cnpjTransp == '':
+        return ''
+    cnpjTransportadora = cnpjTransp
+    razaoSocial = (razaoSoc[:70].ljust(70)) if len(razaoSoc) > 70 else razaoSoc.ljust(70)
+    razaoSocial = razaoSocial.upper()
+    return f'{tipo}{cnpjTransportadora}{razaoSocial}\n'
+
+"""
+3.1.3.3. Subseção Armazenagem (MA): Descreverá as informações relacionadas ao endereço de 
+armazenagem. Essa subseção deve ser informada quando for indicado no preenchimento da seção 
+3.1.3  que  se  trata  de  uma  operação  de  saída  -  com  indicação  do  endereço  do  responsável  pela 
+armazenagem, ou caso seja uma operação de entrada com endereço do local de entrega diferente 
+do endereço de cadastro.
+"""
+def subsecArmazenagem(cnpjArmaz, razaoSocialArmaz, enderecoArmaz, cepArmaz, numeroArmaz, complementoArmaz, bairroArmaz, ufArmaz, municipioArmaz):
+    tipo = 'MA'
+    cnpj = cnpjArmaz
+    razaoSocial = (razaoSocialArmaz[:70].ljust(70)) if len(razaoSocialArmaz) > 70 else razaoSocialArmaz.ljust(70)
+    endereco = (enderecoArmaz[:70].ljust(70)) if len(enderecoArmaz) > 70 else enderecoArmaz.ljust(70)
+    cep = cepArmaz # com máscara 99.999-999
+    numero = (numeroArmaz[:5].ljust(5)) if len(numeroArmaz) > 5 else numeroArmaz.ljust(5)
+    complemento = (complementoArmaz[:20].ljust(20)) if len(complementoArmaz) > 20 else complementoArmaz.ljust(20)
+    bairro = (bairroArmaz[:30].ljust(30)) if len(bairroArmaz) > 30 else bairroArmaz.ljust(30)
+    bairro = bairro.upper()
+    uf = ufArmaz # MA, MG, ES, ets
+    municipio = municipioArmaz # Código IBGE município (observar tabela oficial)
+
+    return f'{tipo}{cnpj}{razaoSocial}{endereco}{cep}{numero}{complemento}{bairro}{uf}{municipio}\n'
+
+"""
+3.1.4. Seção Movimentação Internacional de Produtos Químicos (MVI): Descreverá as operações exportação (E), 
+Importação (I), e Importação por Conta e Ordem (C) de PQC.
+"""
+def secMovimentacaoInternacional(operacao, idPaisAF, razaoSocialAF, numLi, dataRestricaoEmbarque, dataCoEmbarque, numDue, dataDue, numDi, dataDi, responsavelArmazenagem, responsavelTransporte, localEntrega):
+    tipo = 'MVI'
+    operac = operacao # (E)xportação,(I)mportação,Importação (C)onta e Ordem
+    idPais = idPaisAF # Ver tabela oficial
+    razaoSocial = (razaoSocialAF[:70].ljust(70)) if len(razaoSocialAF) > 70 else razaoSocialAF.ljust(70)
+    nLi = numLi # 99/9999999-9
+    dataRestrEmbarque = convertYMDtoDMY(dataRestricaoEmbarque)
+    dataCEmbarque = convertYMDtoDMY(dataCoEmbarque)
+    nDue = numDue #15 num
+    datDue = convertYMDtoDMY(dataDue)
+    nDi = numDi #12 num
+    datDi = convertYMDtoDMY(dataDi)
+    respArmazenagem = responsavelArmazenagem # Exportação: Próprio (E)xportador, Empresa (T)erceirizada; # Importação: deixar em branco; # Importação  por  Conta  e  Ordem:  Próprio  (I)mportador,  Próprio  (A)dquirente,  (T)erceirizada Nacional
+    respTransporte = responsavelTransporte # Exportação:  Próprio  (E)xportador,  Empresa  (T)erceirizada  Nacional,  (A)dquirente/Terceirizada Internacional; # Importação: Próprio (I)mportador, (T)erceirizada Nacional, (F)ornecedor/Terceirizada Internacional; # Importação  por  Conta  e  Ordem:  Próprio  (I)mportador,  Próprio  Adquirente  (Q),  (T)erceirizada Nacional, (F)ornecedor/Terceirizada Internacional
+    locEntrega = localEntrega # Próprio  (I)mportador,  Empresa  (T)erceirizada.  Se  não  for importação, deixar campo em branco
+
+    return f'{tipo}{operac}{idPais}{razaoSocial}{nLi}{dataRestrEmbarque}{dataCEmbarque}{nDue}{datDue}{nDi}{datDi}{respArmazenagem}{respTransporte}{locEntrega}\n'
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -178,6 +236,8 @@ def gerar_arquivo():
         for produto in produtos:
             file.write(secaoMovimentacaoNacional(produto[4], "cnpj-fornecedor", "razao-social-fornecedor","numeroNfe", "2001-01-02", "F", "F"))
         for produto in produtos:
-            file.write(secMovimento(produto[0], produto[2], produto[3], produto[5], "?")) # não tem unidade de medida no BD, tem q ser 'K' ou 'L'
-    
+            file.write(subsecMovimento(produto[0], produto[2], produto[3], produto[5], "?")) # não tem unidade de medida no BD, tem q ser 'K' ou 'L'
+        file.write(subsecTransporte("12345678901234", "razaoSocial"))
+        file.write(subsecArmazenagem("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
+        file.write(secMovimentacaoInternacional('E', "idP", "razaoSocialDoAdquirenteOuFornecedor", "99/9999999-9", "1984-03-01", "1985-01-02", "numDaDUE0000000", "1986-01-03", "99/9999999-9", "1986-01-02", 'E', 'E', 'I'))
     return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
