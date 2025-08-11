@@ -160,28 +160,6 @@ Exemplo de contas disponíveis:
 - **Privilégios**: Acesso limitado (inventário, transferências, consultas)
 - **Laboratórios**: Laboratório de Química Geral (Campus I)
 
----
-## 🔄 Sistema de Migrações
-
-O projeto conta com um sistema completo de migrações para gerenciar mudanças no banco de dados.
-
-### Características:
-- **Execução automática**: As migrações são executadas automaticamente na inicialização da aplicação
-- **Padrão de nomenclatura**: `Numero_codigo_nomepessoa.sql`
-- **Códigos válidos**: `insert`, `delete`, `create`, `alter`
-- **Controle de estado**: Tabela `applied_migrations` mantém registro das migrações aplicadas
-
-### O que as Migrações Criam:
-- Tabelas do sistema de usuários e autenticação com tokens
-- Usuários de teste pré-configurados
-- Sistema de controle de acesso administrativo
-- Estrutura completa do banco de dados
-
-### Documentação Completa:
-- **[fontes/backend/migrations/README.md](fontes/backend/migrations/README.md)**
-
----
-
 ## 🛠️ Comandos de Referência
 
 ### Docker:
