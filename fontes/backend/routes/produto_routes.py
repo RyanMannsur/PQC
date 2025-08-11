@@ -110,7 +110,7 @@ def get_produtos():
             "perPureza": produto[3],
             "vlrDensidade": produto[4],
             "ncm": produto[5],
-            idtAtivo: produto[6]
+            "idtAtivo": produto[6]
         })
 
     return produto_formatado
@@ -303,7 +303,7 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
             "perPureza": produto[3],
             "vlrDensidade": produto[4],
             "ncm": produto[5],
-            idtAtivo: produto[6]
+            "idtAtivo": produto[6]
         })
 
     return produtos_formatado
@@ -509,7 +509,7 @@ def buscar_produtos_local_estocagem():
               "seqItem": produto[4],
               "datValidade": produto[5].strftime("%Y-%m-%d") if hasattr(produto[5], 'strftime') else str(produto[5]),
               "qtdEstoque": float(produto[6]),
-              idtAtivo: produto[7]
+              "idtAtivo": produto[7]
         })
 
     return resultado
