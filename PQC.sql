@@ -41,6 +41,14 @@ create table NotaFiscal (
    primary key (idNFe)
 );
 
+-- Tabela de Unidade de Medida
+CREATE TABLE UnidadeMedida (
+    idUnidadeMedida SERIAL PRIMARY KEY,
+    sigla VARCHAR(10) NOT NULL,
+    nome VARCHAR(50) NOT NULL
+);
+
+
 create table Embalagem (
     codEmbalagem smallint not null,
     nomEmbalagem varchar(30) not null,
@@ -119,6 +127,14 @@ CREATE TABLE usuariolocalestocagem (
         REFERENCES LocalEstocagem (codCampus, codUnidade, codPredio, codLaboratorio) ON DELETE CASCADE
 );
 
+-- Tabela de Transporte
+CREATE TABLE Transporte (
+    idTransporte SERIAL PRIMARY KEY,
+    descricao VARCHAR(255),
+    responsavel VARCHAR(255),
+    cpfResponsavel VARCHAR(20)
+);
+
 
 -- idtTipoMovto
 --  IM implantação
@@ -145,6 +161,24 @@ create table MovtoEstoque (
     primary key(idMovtoEstoque)
 );
 
+CREATE TABLE MovtoEstoqueTransporte (
+    idMovtoEstoque INT REFERENCES MovtoEstoque(idMovtoEstoque) ON DELETE CASCADE,
+    idTransporte INT REFERENCES Transporte(idTransporte) ON DELETE CASCADE,
+    PRIMARY KEY (idMovtoEstoque, idTransporte)
+);
+
+-- Tabela de Fornecedor (chave primária: cnpj)
+CREATE TABLE Fornecedor (
+    cnpj VARCHAR(20) PRIMARY KEY,
+    razaoSocial VARCHAR(255)
+);
+
+CREATE TABLE MovtoEstoqueFornecedor (
+    idMovtoEstoque INT REFERENCES MovtoEstoque(idMovtoEstoque) ON DELETE CASCADE,
+    cnpj VARCHAR(20) REFERENCES Fornecedor(cnpj) ON DELETE CASCADE,
+    PRIMARY KEY (idMovtoEstoque, cnpj)
+);
+
 insert into NotaFiscal (idNFe, txtXML)
    values
      (0, 'xml');
@@ -152,7 +186,7 @@ insert into NotaFiscal (idNFe, txtXML)
 insert into Embalagem (codEmbalagem, nomEmbalagem, qtdCapacidade)
    values
    (1, 'Frasco de 1 litro', 1000);
-   
+
 insert into Produto (nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo)
     values
          ('1,2-DICLOROETANO', 'Lista II', 99.99, 1.30, true),
