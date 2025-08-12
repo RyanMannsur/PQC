@@ -175,6 +175,20 @@ def secMovimentacaoInternacional(operacao, idPaisAF, razaoSocialAF, numLi, dataR
 
     return f'{tipo}{operac}{idPais}{razaoSocial}{nLi}{dataRestrEmbarque}{dataCEmbarque}{nDue}{datDue}{nDi}{datDi}{respArmazenagem}{respTransporte}{locEntrega}\n'
 
+"""
+3.1.4.1. Subseção Responsável pelo Transporte (TRA): Descreverá as informações da pessoa responsável 
+pelo transporte. Deve ser preenchido ao informar na Movimentação Internacional que o 
+responsável pelo transporte é uma Terceirizada Nacional.
+"""
+def subsecResponsavelPeloTransporte(cnpjTransp, razaoSoc):
+    tipo = 'TRA'
+    if cnpjTransp == '':
+        return ''
+    cnpjTransportadora = cnpjTransp
+    razaoSocial = (razaoSoc[:70].ljust(70)) if len(razaoSoc) > 70 else razaoSoc.ljust(70)
+    razaoSocial = razaoSocial.upper()
+    return f'{tipo}{cnpjTransportadora}{razaoSocial}\n'
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -240,4 +254,6 @@ def gerar_arquivo():
         file.write(subsecTransporte("12345678901234", "razaoSocial"))
         file.write(subsecArmazenagem("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
         file.write(secMovimentacaoInternacional('E', "idP", "razaoSocialDoAdquirenteOuFornecedor", "99/9999999-9", "1984-03-01", "1985-01-02", "numDaDUE0000000", "1986-01-03", "99/9999999-9", "1986-01-02", 'E', 'E', 'I'))
+        file.write(subsecResponsavelPeloTransporte("12345678901234", "razaoSocial"))
+        
     return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
