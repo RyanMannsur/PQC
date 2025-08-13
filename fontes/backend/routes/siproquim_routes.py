@@ -37,6 +37,22 @@ def convertYMDtoDMY(data): # converte o modelo de data no bd para o modelo do re
     ano = partes[0]
     return f'{dia}/{mes}/{ano}'
 
+# funções gerais
+def descreverEnderecoDeEmpresa(tipoEmp, cnpjEmp, razaoSocialEmp, enderecoEmp, cepEmp, numeroEmp, complementoEmp, bairroEmp, ufEmp, municipioEmp):
+    tipo = tipoEmp
+    cnpj = cnpjEmp
+    razaoSocial = (razaoSocialEmp[:70].ljust(70)) if len(razaoSocialEmp) > 70 else razaoSocialEmp.ljust(70)
+    endereco = (enderecoEmp[:70].ljust(70)) if len(enderecoEmp) > 70 else enderecoEmp.ljust(70)
+    cep = cepEmp # com máscara 99.999-999
+    numero = (numeroEmp[:5].ljust(5)) if len(numeroEmp) > 5 else numeroEmp.ljust(5)
+    complemento = (complementoEmp[:20].ljust(20)) if len(complementoEmp) > 20 else complementoEmp.ljust(20)
+    bairro = (bairroEmp[:30].ljust(30)) if len(bairroEmp) > 30 else bairroEmp.ljust(30)
+    bairro = bairro.upper()
+    uf = ufEmp # MA, MG, ES, ets
+    municipio = municipioEmp # Código IBGE município (observar tabela oficial)
+
+    return f'{tipo}{cnpj}{razaoSocial}{endereco}{cep}{numero}{complemento}{bairro}{uf}{municipio}\n'
+
 print("Debugging informações...", file=sys.stdout)
 """
 3.1.1. Seção de Identificação da Empresa/Mapa (EM): 
@@ -94,7 +110,7 @@ def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoN
     elif operac == 'AE': operacao = 'EF'; #formatação da norma
     elif operac == 'TS' : operacao = 'ST'
     else: operacao = operac
-
+    # TODO: revisar essa lógica depois
     cnpjFornecedor = (cnpj[:14].ljust(14)) if len(cnpj) > 14 else cnpj.ljust(14)
     razaoSocialFornecedor = (razaoSocial[:69].ljust(69)) if len(razaoSocial) > 69 else razaoSocial.ljust(69) 
     numero = (numeroNfe[:10].ljust(10)) if len(numeroNfe) > 10 else numeroNfe.ljust(10) 
@@ -138,20 +154,9 @@ armazenagem. Essa subseção deve ser informada quando for indicado no preenchim
 armazenagem, ou caso seja uma operação de entrada com endereço do local de entrega diferente 
 do endereço de cadastro.
 """
-def subsecArmazenagem(cnpjArmaz, razaoSocialArmaz, enderecoArmaz, cepArmaz, numeroArmaz, complementoArmaz, bairroArmaz, ufArmaz, municipioArmaz):
+def subsecArmazenagem(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
     tipo = 'MA'
-    cnpj = cnpjArmaz
-    razaoSocial = (razaoSocialArmaz[:70].ljust(70)) if len(razaoSocialArmaz) > 70 else razaoSocialArmaz.ljust(70)
-    endereco = (enderecoArmaz[:70].ljust(70)) if len(enderecoArmaz) > 70 else enderecoArmaz.ljust(70)
-    cep = cepArmaz # com máscara 99.999-999
-    numero = (numeroArmaz[:5].ljust(5)) if len(numeroArmaz) > 5 else numeroArmaz.ljust(5)
-    complemento = (complementoArmaz[:20].ljust(20)) if len(complementoArmaz) > 20 else complementoArmaz.ljust(20)
-    bairro = (bairroArmaz[:30].ljust(30)) if len(bairroArmaz) > 30 else bairroArmaz.ljust(30)
-    bairro = bairro.upper()
-    uf = ufArmaz # MA, MG, ES, ets
-    municipio = municipioArmaz # Código IBGE município (observar tabela oficial)
-
-    return f'{tipo}{cnpj}{razaoSocial}{endereco}{cep}{numero}{complemento}{bairro}{uf}{municipio}\n'
+    return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
 
 """
 3.1.4. Seção Movimentação Internacional de Produtos Químicos (MVI): Descreverá as operações exportação (E), 
@@ -199,20 +204,11 @@ pela  armazenagem.  Deve  ser  preenchido  ao  realizar  uma  movimentação  de
 Importação  por  Conta  e  Ordem  cujo  responsável  pelo  transporte  seja  o  próprio  importador  ou 
 uma terceirizada nacional. 
 """
-def subsecResponsavelArmazenagem(cnpjArmaz, razaoSocialArmaz, enderecoArmaz, cepArmaz, numeroArmaz, complementoArmaz, bairroArmaz, ufArmaz, municipioArmaz):
+def subsecResponsavelArmazenagem(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
     tipo = 'AMZ'
-    cnpj = cnpjArmaz
-    razaoSocial = (razaoSocialArmaz[:70].ljust(70)) if len(razaoSocialArmaz) > 70 else razaoSocialArmaz.ljust(70)
-    endereco = (enderecoArmaz[:70].ljust(70)) if len(enderecoArmaz) > 70 else enderecoArmaz.ljust(70)
-    cep = cepArmaz # com máscara 99.999-999
-    numero = (numeroArmaz[:5].ljust(5)) if len(numeroArmaz) > 5 else numeroArmaz.ljust(5)
-    complemento = (complementoArmaz[:20].ljust(20)) if len(complementoArmaz) > 20 else complementoArmaz.ljust(20)
-    bairro = (bairroArmaz[:30].ljust(30)) if len(bairroArmaz) > 30 else bairroArmaz.ljust(30)
-    bairro = bairro.upper()
-    uf = ufArmaz # MA, MG, ES, ets
-    municipio = municipioArmaz # Código IBGE município (observar tabela oficial)
+    return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
 
-    return f'{tipo}{cnpj}{razaoSocial}{endereco}{cep}{numero}{complemento}{bairro}{uf}{municipio}\n'
+
 
 
 # Rota para listar todos os produtos
