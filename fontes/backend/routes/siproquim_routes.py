@@ -193,6 +193,28 @@ def subsecResponsavelPeloTransporte(razaoSoc, cnpjTransp = ''):
     razaoSocial = razaoSocial.upper()
     return f'{tipo}{cnpjTransportadora}{razaoSocial}\n'
 
+"""
+3.1.4.3. Subseção Responsável pela Armazenagem (AMZ): Descreverá o endereço da pessoa responsável 
+pela  armazenagem.  Deve  ser  preenchido  ao  realizar  uma  movimentação  de  Exportação  ou  de 
+Importação  por  Conta  e  Ordem  cujo  responsável  pelo  transporte  seja  o  próprio  importador  ou 
+uma terceirizada nacional. 
+"""
+def subsecResponsavelArmazenagem(cnpjArmaz, razaoSocialArmaz, enderecoArmaz, cepArmaz, numeroArmaz, complementoArmaz, bairroArmaz, ufArmaz, municipioArmaz):
+    tipo = 'AMZ'
+    cnpj = cnpjArmaz
+    razaoSocial = (razaoSocialArmaz[:70].ljust(70)) if len(razaoSocialArmaz) > 70 else razaoSocialArmaz.ljust(70)
+    endereco = (enderecoArmaz[:70].ljust(70)) if len(enderecoArmaz) > 70 else enderecoArmaz.ljust(70)
+    cep = cepArmaz # com máscara 99.999-999
+    numero = (numeroArmaz[:5].ljust(5)) if len(numeroArmaz) > 5 else numeroArmaz.ljust(5)
+    complemento = (complementoArmaz[:20].ljust(20)) if len(complementoArmaz) > 20 else complementoArmaz.ljust(20)
+    bairro = (bairroArmaz[:30].ljust(30)) if len(bairroArmaz) > 30 else bairroArmaz.ljust(30)
+    bairro = bairro.upper()
+    uf = ufArmaz # MA, MG, ES, ets
+    municipio = municipioArmaz # Código IBGE município (observar tabela oficial)
+
+    return f'{tipo}{cnpj}{razaoSocial}{endereco}{cep}{numero}{complemento}{bairro}{uf}{municipio}\n'
+
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -260,4 +282,5 @@ def gerar_arquivo():
         file.write(secMovimentacaoInternacional('E', "idP", "razaoSocialDoAdquirenteOuFornecedor", "99/9999999-9", "1984-03-01", "1985-01-02", "numDaDUE0000000", "1986-01-03", "99/9999999-9", "1986-01-02", 'E', 'E', 'I'))
         file.write(subsecResponsavelPeloTransporte("razaoSocial", "12345678901234"))
         file.write(subsecResponsavelPeloTransporte("razaoSocial"))
+        file.write(subsecResponsavelArmazenagem("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
     return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
