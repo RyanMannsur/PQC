@@ -208,8 +208,13 @@ def subsecResponsavelArmazenagem(cnpj, razaoSocial, endereco, cep, numero, compl
     tipo = 'AMZ'
     return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
 
-
-
+"""
+3.1.4.4. Subseção Local de Entrega (TER): Descreverá o endereço do local de entrega. Deve ser preenchido 
+ao realizar uma movimentação de Importação.
+"""
+def subsecLocalEntrega(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
+    tipo = 'TER'
+    return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -278,5 +283,6 @@ def gerar_arquivo():
         file.write(secMovimentacaoInternacional('E', "idP", "razaoSocialDoAdquirenteOuFornecedor", "99/9999999-9", "1984-03-01", "1985-01-02", "numDaDUE0000000", "1986-01-03", "99/9999999-9", "1986-01-02", 'E', 'E', 'I'))
         file.write(subsecResponsavelPeloTransporte("razaoSocial", "12345678901234"))
         file.write(subsecResponsavelPeloTransporte("razaoSocial"))
-        file.write(subsecResponsavelArmazenagem("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
-    return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
+        file.write(subsecLocalEntrega("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
+
+        return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
