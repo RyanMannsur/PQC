@@ -216,6 +216,15 @@ def subsecLocalEntrega(cnpj, razaoSocial, endereco, cep, numero, complemento, ba
     tipo = 'TER'
     return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
 
+"""
+3.1.4.5. Subseção Adquirente (ADQ): Descreverá o endereço do adquirente da movimentação. Deve ser 
+preenchido ao realizar uma movimentação de Importação por Conta e Ordem. 
+"""
+def subsecAdquirente(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
+    tipo = 'ADQ'
+    return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
+
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -284,5 +293,5 @@ def gerar_arquivo():
         file.write(subsecResponsavelPeloTransporte("razaoSocial", "12345678901234"))
         file.write(subsecResponsavelPeloTransporte("razaoSocial"))
         file.write(subsecLocalEntrega("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
-
+        file.write(subsecAdquirente("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
