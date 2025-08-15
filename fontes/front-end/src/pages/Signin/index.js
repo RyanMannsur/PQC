@@ -67,7 +67,7 @@ const Signin = () => {
         <Button 
           Text={loading ? "Entrando..." : "Entrar"} 
           onClick={handleLogin} 
-          fullWidth 
+          fullwidth 
           disabled={loading}
         />
       </C.Content>
