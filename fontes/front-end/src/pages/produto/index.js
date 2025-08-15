@@ -140,7 +140,7 @@ const ProdutoPage = () => {
               if (usuario?.isADM) {
                 return (
                   <Button
-                    variant="primary"
+                    $variant="primary"
                     size="small"
                     onClick={() => handleAtivar(item)}
                   >Ativar</Button>
@@ -160,7 +160,7 @@ const ProdutoPage = () => {
           <ModalContent>
             <h3>{TEXTOS.SUCESSO}</h3>
             <p>{modalMessage}</p>
-            <Button variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
+            <Button $variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
           </ModalContent>
         </ModalOverlay>
       )}

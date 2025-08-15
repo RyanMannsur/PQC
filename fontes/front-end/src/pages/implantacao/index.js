@@ -93,8 +93,8 @@ return (
   <C.Container>
     <C.Title>Implantação de Produtos no {labName}</C.Title>
     <ImplantacaoList data={produtos} onChange={handleChange} />
-    <FormGroup justifyContent="center">
-      <Button variant="primary" onClick={handleConfirm}>Confirmar</Button>
+    <FormGroup $justifyContent="center">
+      <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
     </FormGroup>
 
     <Modal

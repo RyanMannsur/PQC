@@ -26,6 +26,7 @@ cd PQC
 
 ### 2. Iniciar os Containers
 ```bash
+docker-compose down -v #Derruba o anterior
 docker-compose up --build -d
 ```
 
@@ -115,7 +116,6 @@ python app.py
 ```
 
 O backend estará disponível em: http://localhost:8088
-*As migrações são executadas automaticamente na inicialização*
 
 ### 4. Configurar o Frontend (React/Vite)
 
@@ -138,7 +138,15 @@ O frontend estará disponível em: http://localhost:3001
 
 O sistema utiliza autenticação baseada em tokens com controle de acesso administrativo.
 
+
 ### Usuários de Teste Disponíveis:
+
+Além dos exemplos abaixo, há um arquivo com diversas contas de teste prontas para uso no sistema:
+
+- **Arquivo:** `usuarios_teste.txt` (na raiz do projeto)
+- **Formato:** CPF e senha de cada usuário
+
+Exemplo de contas disponíveis:
 
 #### **Usuário Administrador:**
 - **CPF**: 333.333.333-33
@@ -151,28 +159,6 @@ O sistema utiliza autenticação baseada em tokens com controle de acesso admini
 - **Senha**: senha123
 - **Privilégios**: Acesso limitado (inventário, transferências, consultas)
 - **Laboratórios**: Laboratório de Química Geral (Campus I)
-
----
-## 🔄 Sistema de Migrações
-
-O projeto conta com um sistema completo de migrações para gerenciar mudanças no banco de dados.
-
-### Características:
-- **Execução automática**: As migrações são executadas automaticamente na inicialização da aplicação
-- **Padrão de nomenclatura**: `Numero_codigo_nomepessoa.sql`
-- **Códigos válidos**: `insert`, `delete`, `create`, `alter`
-- **Controle de estado**: Tabela `applied_migrations` mantém registro das migrações aplicadas
-
-### O que as Migrações Criam:
-- Tabelas do sistema de usuários e autenticação com tokens
-- Usuários de teste pré-configurados
-- Sistema de controle de acesso administrativo
-- Estrutura completa do banco de dados
-
-### Documentação Completa:
-- **[fontes/backend/migrations/README.md](fontes/backend/migrations/README.md)**
-
----
 
 ## 🛠️ Comandos de Referência
 

@@ -73,7 +73,7 @@ const SelecionarLocal = () => {
     <C.Container>
       <C.Label>SELECIONE O LOCAL DE ESTOCAGEM</C.Label>
       <C.Content>
-        <FormGroup gap="medium" alignItems="center">
+        <FormGroup $gap="medium" $alignItems="center">
           {labOptions.length > 1 && (
             <Select
               options={labOptions.map((lab) => ({
@@ -87,12 +87,12 @@ const SelecionarLocal = () => {
                 setError("");
               }}
               placeholder="Selecione o laboratório"
-              error={!!error}
+              $error={!!error}
             />
           )}
           {error && <C.labelError>{error}</C.labelError>}
           {labOptions.length > 1 && (
-            <Button onClick={handleSelect} fullWidth>
+            <Button onClick={handleSelect} $fullWidth>
               Selecionar
             </Button>
           )}
