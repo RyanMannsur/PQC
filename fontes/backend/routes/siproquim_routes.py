@@ -223,7 +223,28 @@ preenchido ao realizar uma movimentação de Importação por Conta e Ordem.
 def subsecAdquirente(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
     tipo = 'ADQ'
     return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
+"""
+3.1.4.6. Subseção Nota Fiscal (NF): Descreverá as informações referentes a nota fiscal, e seus produtos. 
+Deve  ser  preenchido  em  qualquer  tipo  de  movimentação  internacional. Atentar  que,  para 
+Importação por Conta e Ordem, deve ser informado a nota fiscal de entrada e de saída uma após 
+a outra, antes de informar os produtos.
+"""
+def subsecNotaFiscalCabecalho(numeroNf, dataNf, codigoOperacao):
+    tipo = 'NF'
+    numero = numeroNf
+    data = convertYMDtoDMY(dataNf)
+    codigo = codigoOperacao # (E)ntrada ou (S)aída
+    return f'{tipo}{numero}{data}{codigo}\n'
 
+def subsecNotaFiscalProduto(codProduto, perPureza, vlrDensidade, quant, unidMedida):
+    NCM = f'PC{codProduto}'
+    concentracao = f'{int(round(float(perPureza), 0)):03d}'    
+    densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')
+    quantInt = int(round(float(quant), 0))
+    quantFloat = (float(quant) - quantInt) * 1000
+    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):3d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
+
+    return f'{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -294,4 +315,10 @@ def gerar_arquivo():
         file.write(subsecResponsavelPeloTransporte("razaoSocial"))
         file.write(subsecLocalEntrega("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
         file.write(subsecAdquirente("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
+        file.write(
+            subsecNotaFiscalCabecalho('1010201010', '2017-01-11', 'E') +
+            subsecNotaFiscalCabecalho('1210201010', '2017-01-11', 'S') +
+            subsecNotaFiscalProduto('2323.23.66', 32,32, 999999999, 'K')       
+        )
+        
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
