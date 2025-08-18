@@ -56,7 +56,7 @@ const ImplantacaoList = ({ data, onChange }) => {
         <tr>
           <C.Th>Produto</C.Th>
           <C.Th>Lista</C.Th>
-          <C.Th>Pureza</C.Th>
+          <C.Th>Pureza (%)</C.Th>
           <C.Th>Densidade</C.Th>
           <C.Th>Ações</C.Th>
         </tr>
@@ -85,7 +85,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                 {(implantacoes[produto.codProduto] || []).map((item, idx) => (
                   <C.ItemRow key={`${produto.codProduto}-${idx}`}>
                     <C.SublistTd>
-                      Embalagem
+                      Código da embalagem
                       <Input
                         type="text"
                         value={item.codEmbalagem}
@@ -102,6 +102,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                         onChange={(e) =>
                           handleFieldChange(produto.codProduto, idx, "qtdEstoque", e.target.value)
                         }
+                        min="1"
                       />
                     </C.SublistTd>
                     <C.SublistTd>
