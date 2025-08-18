@@ -129,7 +129,7 @@ def subsecMovimento(codProduto, perPureza, vlrDensidade, quant, unidMedida):
     densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')
     quantInt = int(round(float(quant), 0))
     quantFloat = (float(quant) - quantInt) * 1000
-    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):3d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
+    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):03d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
 
     return f'{tipo}{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
 
@@ -242,7 +242,7 @@ def subsecNotaFiscalProduto(codProduto, perPureza, vlrDensidade, quant, unidMedi
     densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')
     quantInt = int(round(float(quant), 0))
     quantFloat = (float(quant) - quantInt) * 1000
-    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):3d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
+    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):03d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
 
     return f'{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
 
