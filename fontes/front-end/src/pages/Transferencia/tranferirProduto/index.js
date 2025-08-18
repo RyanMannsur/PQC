@@ -18,6 +18,8 @@ const [labId, setLabId] = useState(null);
 const [novoLab, setNovoLab] = useState(null);
 const [labs, setLabs] = useState([]);
 const [mensagem, setMensagem] = useState("");
+const [tipoTransferencia, setTipoTransferencia] = useState("total"); // "total" ou "parcial"
+const [quantidade, setQuantidade] = useState("");
 
 useEffect(() => {
   const localStorageData = JSON.parse(localStorage.getItem("labId"));
@@ -95,7 +97,21 @@ const handleTransferir = async () => {
   const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
   const qtdAtual = parseFloat(produto.qtdEstoque);
 
-  if (qtdAtual <= 0) {
+  let qtdTransferir = qtdAtual;
+  if (tipoTransferencia === "parcial") {
+    const qtd = parseFloat(quantidade);
+    if (isNaN(qtd) || qtd <= 0) {
+      setMensagem("Informe uma quantidade válida para transferir.");
+      return;
+    }
+    if (qtd > qtdAtual) {
+      setMensagem("Quantidade a transferir não pode ser maior que o estoque atual.");
+      return;
+    }
+    qtdTransferir = qtd;
+  }
+
+  if (qtdTransferir <= 0) {
     setMensagem("Quantidade do produto no estoque atual é zero ou negativa.");
     return;
   }
@@ -111,26 +127,40 @@ const handleTransferir = async () => {
     await atualizarInventario(
       codProduto,
       seqItem,
-      -qtdAtual,
+      -qtdTransferir,
       codCampus,
       codUnidade,
       codPredio,
       codLaboratorio,
       "TS"
     );
-    await atualizarInventario(
-      codProduto,
-      seqItem,
-      qtdAtual,
-      codCampusDestino,
-      codUnidadeDestino,
-      codPredioDestino,
-      codLaboratorioDestino,
-      "TE"
-    );
 
-    setMensagem(""); 
+    if (tipoTransferencia === "parcial") {
+      await atualizarInventario(
+        codProduto,
+        null,
+        qtdTransferir,
+        codCampusDestino,
+        codUnidadeDestino,
+        codPredioDestino,
+        codLaboratorioDestino,
+        "TE",
+        seqItem // seqItemOrigem
+      );
+    } else {
+      await atualizarInventario(
+        codProduto,
+        seqItem,
+        qtdTransferir,
+        codCampusDestino,
+        codUnidadeDestino,
+        codPredioDestino,
+        codLaboratorioDestino,
+        "TE"
+      );
+    }
 
+    setMensagem("");
     navigate("/transferencias", {
       state: { successMessage: "Transferência realizada com sucesso!" },
     });
@@ -162,32 +192,76 @@ const data = [
 
 return (
   <C.Container>
-    <h1>Transferir Produto</h1>
+    <C.Title>Transferir Produto</C.Title>
+    <C.TableWrapper>
+      {data.length > 0 ? (
+        <ItemList columns={columns} data={data} />
+      ) : (
+        <C.NoData>Nenhum produto encontrado no inventário.</C.NoData>
+      )}
+    </C.TableWrapper>
 
-    {produto.nomProduto && <h2>{produto.nomProduto}</h2>}
-
-    {data.length > 0 ? (
-      <ItemList columns={columns} data={data} />
-    ) : (
-      <p>Nenhum produto encontrado no inventário.</p>
-    )}
-    <C.Content>
-      <Select
-        label="Selecionar Laboratório de Destino"
-        options={labs}
-        value={novoLab ? novoLab.value : ""}
-        onChange={value => {
-          const selectedLab = labs.find(lab => lab.value === value);
-          setNovoLab(selectedLab);
-          setMensagem("");
-        }}
-        placeholder="Selecione um laboratório"
-      />
+    <C.FormFull>
+      <C.FormGroup>
+        <Select
+          label="Selecionar Laboratório de Destino"
+          options={labs}
+          value={novoLab ? novoLab.value : ""}
+          onChange={value => {
+            const selectedLab = labs.find(lab => lab.value === value);
+            setNovoLab(selectedLab);
+            setMensagem("");
+          }}
+          placeholder="Selecione um laboratório"
+        />
+      </C.FormGroup>
+      <C.FormGroup style={{ marginTop: 8 }}>
+        <C.RadioGroup>
+          <label>
+            <input
+              type="radio"
+              name="tipoTransferencia"
+              value="total"
+              checked={tipoTransferencia === "total"}
+              onChange={() => setTipoTransferencia("total")}
+            />
+            Transferir tudo
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="tipoTransferencia"
+              value="parcial"
+              checked={tipoTransferencia === "parcial"}
+              onChange={() => setTipoTransferencia("parcial")}
+            />
+            Transferir apenas uma quantidade
+          </label>
+        </C.RadioGroup>
+      </C.FormGroup>
+      {tipoTransferencia === "parcial" && (
+        <C.FormGroup style={{ marginBottom: 8 }}>
+          <C.Label>
+            Quantidade a transferir:
+            <C.InputQtd
+              type="number"
+              min="0.01"
+              step="0.01"
+              max={produto.qtdEstoque}
+              value={quantidade}
+              onChange={e => setQuantidade(e.target.value)}
+            />
+            <span style={{ marginLeft: 8, color: '#888', fontSize: 13 }}>
+              (Disponível: {produto.qtdEstoque})
+            </span>
+          </C.Label>
+        </C.FormGroup>
+      )}
       <C.labelError>{mensagem}</C.labelError>
       <FormGroup $justifyContent="center">
         <Button Text="Transferir" onClick={handleTransferir} />
       </FormGroup>
-    </C.Content>
+    </C.FormFull>
   </C.Container>
 );
 };

@@ -1178,13 +1178,12 @@ def atualizar_inventario_by_sequencia():
     codPredio = data.get("codPredio")
     codLaboratorio = data.get("codLaboratorio")
     idtTipoMovto = data.get("idtTipoMovto")  # Agora é dinâmico e recebido pelo JSON
-    txtJustificativa = data.get("txtJustificativa", "Atualização de inventário") 
+    txtJustificativa = data.get("txtJustificativa", "Atualização de inventário")
 
-    # Converter tipos de dados se necessário
     try:
         codProduto = int(codProduto)
-        seqItem = int(seqItem)
         qtdEstoque = float(qtdEstoque)
+        seqItem = int(seqItem) if seqItem is not None else None
     except (ValueError, TypeError):
         return util.formataAviso("Erro: codProduto, seqItem e qtdEstoque devem ser números válidos")
 
@@ -1194,28 +1193,64 @@ def atualizar_inventario_by_sequencia():
     valida.codUnidade(codUnidade)
     valida.codPredio(codPredio)
     valida.codLaboratorio(codLaboratorio)
-    valida.idtTipoMovto(idtTipoMovto)  
+    valida.idtTipoMovto(idtTipoMovto)
     if valida.temMensagem():
         return valida.getMensagens()
 
-    
-    # Define a data do movimento como a data atual
     datMovto = datetime.datetime.now()
+    db = Db()
 
-    sql = """
-        INSERT INTO MovtoEstoque
-           (codProduto, seqItem, codCampus, codUnidade, codPredio, 
-            codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    params = (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa,)
+    # Lógica para transferência parcial: criar novo ProdutoItem se TE e seqItem for None
+    if idtTipoMovto == "TE" and seqItem is None:
+        seqItemOrigem = data.get("seqItemOrigem")
+        datValidade = None
+        seqEmbalagem = None
+        if seqItemOrigem:
+            sql_busca = "SELECT datValidade, seqEmbalagem FROM ProdutoItem WHERE codProduto = %s AND seqItem = %s"
+            res = db.execSql(sql_busca, (codProduto, seqItemOrigem), Mode.SELECT)
+            if res and isinstance(res, list):
+                datValidade = res[0][0]
+                seqEmbalagem = res[0][1]
 
-    try:
-        db = Db()   
-        return db.execSql(sql, params, Mode.COMMIT)
-    except Exception as e:
-        return db.getErro(e)
- 
+        # Buscar próximo seqItem
+        sql_ultimo_seq = "SELECT COALESCE(MAX(seqItem), 0) + 1 FROM ProdutoItem WHERE codProduto = %s"
+        resultado_seq = db.execSql(sql_ultimo_seq, (codProduto,), Mode.SELECT)
+        if isinstance(resultado_seq, list) and resultado_seq:
+            novo_seqItem = resultado_seq[0][0]
+        else:
+            novo_seqItem = 1
+
+        # Inserir novo ProdutoItem herdando validade/embalagem se possível
+        sql_insert_item = "INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, seqEmbalagem) VALUES (%s, %s, NULL, %s, %s)"
+        resultado_item = db.execSql(sql_insert_item, (codProduto, novo_seqItem, datValidade, seqEmbalagem))
+        if not isinstance(resultado_item, tuple) or resultado_item[1] != 200:
+            return resultado_item
+
+        # Inserir movimento de estoque para o novo item
+        sql = """
+            INSERT INTO MovtoEstoque
+               (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        params = (codProduto, novo_seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+        try:
+            return db.execSql(sql, params, Mode.COMMIT)
+        except Exception as e:
+            return db.getErro(e)
+    else:
+        # Transferência total ou outros movimentos: usar seqItem informado normalmente
+        sql = """
+            INSERT INTO MovtoEstoque
+               (codProduto, seqItem, codCampus, codUnidade, codPredio, 
+                codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        params = (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+        try:
+            return db.execSql(sql, params, Mode.COMMIT)
+        except Exception as e:
+            return db.getErro(e)
 
 
 #Rota para adiconar 1 produto no laboratorio
