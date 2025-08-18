@@ -1,3 +1,5 @@
+import React from "react";
+import ManualPage from "../pages/manual";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signin from "../pages/Signin";
 import SelecionarLocal from "../pages/SelecionarLocal";
@@ -17,6 +19,7 @@ import CampusPage from "../pages/campus";
 import UnidadePage from "../pages/unidadeorganizacional";
 import LocalEstocagemPage from "../pages/localestocagem";
 import UsuariosPage from "../pages/usuario";
+import GerenciarLocaisUsuario from '../pages/usuario/GerenciarLocais';
 
 const RoutesApp = () => {
   return (
@@ -27,6 +30,14 @@ const RoutesApp = () => {
           element={
             <PublicoLayout>
               <Signin />
+            </PublicoLayout>
+          }
+        />
+        <Route
+          path="/manual"
+          element={
+            <PublicoLayout>
+              <ManualPage />
             </PublicoLayout>
           }
         />
@@ -174,6 +185,17 @@ const RoutesApp = () => {
             <PrivateRoute>
               <AppLayout>
                 <UsuariosPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/usuarios/:token/locais"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <GerenciarLocaisUsuario />
               </AppLayout>
             </PrivateRoute>
           }

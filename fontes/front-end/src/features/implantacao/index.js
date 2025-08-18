@@ -71,7 +71,7 @@ const ImplantacaoList = ({ data, onChange }) => {
               <C.Td>{produto.vlrDensidade}</C.Td>
               <C.Td>
                 <Button 
-                  variant="outline" 
+                  $variant="outline" 
                   size="small"
                   onClick={() => toggleExpand(produto.codProduto)}
                 >
@@ -127,7 +127,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                     <C.SublistTd>
                       <div className="button-container">
                         <Button 
-                          variant="success" 
+                          $variant="success" 
                           size="small"
                           onClick={() => handleAddSubitem(produto.codProduto)}
                           style={{ 
@@ -142,7 +142,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                           ➕
                         </Button>
                         <Button 
-                          variant="danger" 
+                          $variant="danger" 
                           size="small"
                           onClick={() => handleRemoveSubitem(produto.codProduto, idx)}
                           style={{ padding: '4px 8px', fontSize: '12px', minWidth: '30px', marginLeft: '8px' }}

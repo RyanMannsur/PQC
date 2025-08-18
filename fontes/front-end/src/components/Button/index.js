@@ -6,11 +6,11 @@ const Button = ({
   Text, // Mantém compatibilidade com a prop Text antiga
   onClick, 
   type = "button", 
-  variant = "primary", 
+    $variant = "primary", 
   size = "medium", 
   disabled = false,
   loading = false,
-  fullWidth = false,
+    $fullWidth = false,
   ...props 
 }) => {
   // Usa Text se fornecido, senão usa children
@@ -20,10 +20,10 @@ const Button = ({
     <C.Button 
       type={type} 
       onClick={onClick}
-      variant={variant}
+        $variant={$variant}
       size={size}
       disabled={disabled || loading}
-      fullWidth={fullWidth}
+        $fullWidth={$fullWidth}
       {...props}
     >
       {loading ? "Carregando..." : buttonText}

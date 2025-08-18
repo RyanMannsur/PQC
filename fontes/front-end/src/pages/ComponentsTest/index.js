@@ -49,22 +49,22 @@ const ComponentsTest = () => {
 
       <Section>
         <Title>Botões</Title>
-        <FormGroup direction="row" gap="medium">
-          <Button variant="primary">Primário</Button>
-          <Button variant="secondary">Secundário</Button>
-          <Button variant="success">Sucesso</Button>
-          <Button variant="danger">Perigo</Button>
-          <Button variant="warning">Aviso</Button>
-          <Button variant="outline">Outline</Button>
+        <FormGroup direction="row" $gap="medium">
+          <Button $variant="primary">Primário</Button>
+          <Button $variant="secondary">Secundário</Button>
+          <Button $variant="success">Sucesso</Button>
+          <Button $variant="danger">Perigo</Button>
+          <Button $variant="warning">Aviso</Button>
+          <Button $variant="outline">Outline</Button>
         </FormGroup>
         
-        <FormGroup direction="row" gap="medium" style={{ marginTop: "16px" }}>
+        <FormGroup direction="row" $gap="medium" style={{ marginTop: "16px" }}>
           <Button size="small">Pequeno</Button>
           <Button size="medium">Médio</Button>
           <Button size="large">Grande</Button>
         </FormGroup>
         
-        <FormGroup direction="row" gap="medium" style={{ marginTop: "16px" }}>
+        <FormGroup direction="row" $gap="medium" style={{ marginTop: "16px" }}>
           <Button disabled>Desabilitado</Button>
           <Button loading={formData.loading} onClick={handleSubmit}>
             {formData.loading ? "Carregando..." : "Com Loading"}
@@ -74,7 +74,7 @@ const ComponentsTest = () => {
 
       <Section>
         <Title>Inputs</Title>
-        <FormGroup direction="column" gap="medium">
+        <FormGroup direction="column" $gap="medium">
           <Input
             label="Nome"
             value={formData.name}
@@ -89,11 +89,11 @@ const ComponentsTest = () => {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             placeholder="Digite seu e-mail"
-            error={formData.email && !formData.email.includes("@")}
+            $error={formData.email && !formData.email.includes("@")}
             errorMessage="E-mail inválido"
           />
           
-          <FormGroup direction="row" gap="medium">
+          <FormGroup direction="row" $gap="medium">
             <Input
               label="Input Pequeno"
               size="small"
@@ -125,7 +125,7 @@ const ComponentsTest = () => {
 
       <Section>
         <Title>Select</Title>
-        <FormGroup direction="column" gap="medium">
+        <FormGroup direction="column" $gap="medium">
           <Select
             label="Categoria"
             options={categoryOptions}
@@ -140,7 +140,7 @@ const ComponentsTest = () => {
             options={categoryOptions}
             value=""
             onChange={() => {}}
-            error={true}
+            $error={true}
             placeholder="Este select tem erro"
           />
           
@@ -156,7 +156,7 @@ const ComponentsTest = () => {
 
       <Section>
         <Title>Checkbox</Title>
-        <FormGroup direction="column" gap="medium">
+        <FormGroup direction="column" $gap="medium">
           <Checkbox
             checked={formData.isActive}
             onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
@@ -174,7 +174,7 @@ const ComponentsTest = () => {
             checked={false}
             onChange={() => {}}
             label="Checkbox com erro"
-            error={true}
+            $error={true}
           />
           
           <Checkbox
@@ -188,10 +188,10 @@ const ComponentsTest = () => {
 
       <Section>
         <Title>FormGroup Layouts</Title>
-        <FormGroup direction="column" gap="large">
+        <FormGroup direction="column" $gap="large">
           <div>
             <h3>Layout em linha (Row)</h3>
-            <FormGroup direction="row" gap="medium">
+            <FormGroup direction="row" $gap="medium">
               <Input label="Campo 1" value="Valor 1" onChange={() => {}} />
               <Input label="Campo 2" value="Valor 2" onChange={() => {}} />
               <Button>Ação</Button>
@@ -200,7 +200,7 @@ const ComponentsTest = () => {
           
           <div>
             <h3>Layout em coluna (Column)</h3>
-            <FormGroup direction="column" gap="small">
+            <FormGroup direction="column" $gap="small">
               <Input label="Campo A" value="Valor A" onChange={() => {}} />
               <Input label="Campo B" value="Valor B" onChange={() => {}} />
               <Button>Enviar</Button>
@@ -211,7 +211,7 @@ const ComponentsTest = () => {
 
       <Section>
         <Title>Exemplo de Formulário Completo</Title>
-        <FormGroup direction="column" gap="medium">
+        <FormGroup direction="column" $gap="medium">
           <Input
             label="Nome do Produto"
             value={formData.name}
@@ -220,7 +220,7 @@ const ComponentsTest = () => {
             required
           />
           
-          <FormGroup direction="row" gap="medium">
+          <FormGroup direction="row" $gap="medium">
             <Input
               label="Pureza (%)"
               type="number"
@@ -256,9 +256,9 @@ const ComponentsTest = () => {
             label="Produto ativo no sistema"
           />
           
-          <FormGroup direction="row" gap="medium">
+          <FormGroup direction="row" $gap="medium">
             <Button 
-              variant="outline" 
+              $variant="outline" 
               onClick={() => setFormData({ name: "", email: "", category: "", isActive: false })}
             >
               Limpar

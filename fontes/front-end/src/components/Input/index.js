@@ -7,7 +7,7 @@ const Input = ({
   value, 
   onChange, 
   label,
-  error = false,
+  $error = false,
   errorMessage,
   disabled = false,
   required = false,
@@ -28,11 +28,11 @@ const Input = ({
         type={type}
         placeholder={placeholder}
         disabled={disabled}
-        error={error}
+        $error={$error}
         size={size}
         {...props}
       />
-      {error && errorMessage && (
+      {$error && errorMessage && (
         <C.ErrorMessage>{errorMessage}</C.ErrorMessage>
       )}
     </C.Container>

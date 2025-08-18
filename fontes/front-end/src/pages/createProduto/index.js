@@ -62,7 +62,7 @@ const handleConfirm = async () => {
   const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
 
   const dadosParaEnvio = {
-    tipoCadastro: tipoCadastro.value,
+    tipoCadastro: tipoCadastro?.value || "",
     codCampus,
     codUnidade,
     codPredio,
@@ -78,19 +78,14 @@ const handleConfirm = async () => {
   };
 
   try {
-    console.log("Dados enviados:", dadosParaEnvio);
     const response = await cadastrarProdutos(dadosParaEnvio);
-    console.log("Resposta recebida:", response);
     
     if (response && (response.message || response.tipo === "SUCESSO")) {
-      console.log("Cadastro realizado com sucesso:", response);
       setIsModalOpen(true); 
     } else {
-      console.error("Erro ao realizar cadastro - resposta inválida:", response);
       alert("Erro ao realizar cadastro.");
     }
   } catch (error) {
-    console.error("Erro ao realizar cadastro:", error);
     alert("Erro ao realizar cadastro. Verifique os detalhes no console.");
   }
 };
@@ -115,12 +110,14 @@ return (
 
     <C.SelectContainer>
       <label htmlFor="tipoCadastro">Tipo de Cadastro:</label>
-      <Select
-        options={options}
-        value={tipoCadastro?.value || ""}
-        onChange={(selectedOption) => setTipoCadastro(selectedOption)}
-        placeholder="Selecione o tipo de cadastro"
-      />
+        <Select
+          options={options}
+          value={tipoCadastro}
+          onChange={setTipoCadastro}
+          placeholder="Selecione o tipo de cadastro"
+          name="tipoCadastro"
+          id="tipoCadastro"
+        />
     </C.SelectContainer>
 
     {produtos.length > 0 ? (
@@ -134,8 +131,8 @@ return (
       <p>Nenhum produto encontrado.</p>
     )}
 
-    <FormGroup justifyContent="center">
-      <Button variant="primary" onClick={handleConfirm}>Confirmar</Button>
+    <FormGroup $justifyContent="center">
+      <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
     </FormGroup>
 
     <Modal

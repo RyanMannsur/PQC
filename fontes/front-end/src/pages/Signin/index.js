@@ -53,22 +53,29 @@ const Signin = () => {
           placeholder="Digite seu CPF"
           value={cpf}
           label="Usuário:"
-          onChange={(e) => [setCpf(e.target.value), setError("")]}
+          onChange={(e) => [setCpf(e.target.value), setError("")]} 
         />
         <Input
           type="password"
           placeholder="Digite sua senha"
           value={senha}
           label="Senha:"
-          onChange={(e) => [setSenha(e.target.value), setError("")]}
+          onChange={(e) => [setSenha(e.target.value), setError("")]} 
         />
         <C.labelError>{error}</C.labelError>
         <div>*Utilizar as mesmas credenciais do SIGAA</div>
         <Button 
           Text={loading ? "Entrando..." : "Entrar"} 
           onClick={handleLogin} 
-          fullWidth 
+          $fullWidth 
           disabled={loading}
+        />
+        <Button
+          Text="Manual do Sistema"
+          $variant="secondary"
+          style={{ marginTop: 16 }}
+          onClick={() => navigate('/manual')}
+          $fullWidth
         />
       </C.Content>
     </C.Container>

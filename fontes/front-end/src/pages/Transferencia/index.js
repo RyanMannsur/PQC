@@ -53,8 +53,6 @@ const handlePesquisar = async () => {
 };
 
 const handleActionClick = (id, key) => {
-  console.log("id", id);
-  console.log("key", key);
   if (key === "acoes") {
     const [codProduto, seqItem] = id.split("-");
     navigate(`/transferir/${codProduto}/${seqItem}`);
@@ -89,7 +87,7 @@ return (
   <C.Container>
     <h1>Transferências</h1>
 
-    <FormGroup direction="row" gap="medium" alignItems="flex-end" justifyContent="center">
+    <FormGroup direction="row" $gap="medium" $alignItems="flex-end" $justifyContent="center">
       <Input
         type="text"
         placeholder="Digite o produto"

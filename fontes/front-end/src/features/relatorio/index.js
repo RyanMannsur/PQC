@@ -36,7 +36,7 @@ return (
             <C.Td>{produto.qtdGeralAtual}</C.Td>
             <C.Td>
               <Button 
-                variant="secondary" 
+                $variant="secondary" 
                 size="small"
                 onClick={() => toggleMovimentacoes(produto.produto.codProduto)}
               >

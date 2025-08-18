@@ -118,7 +118,7 @@ const CampusPage = () => {
           <ModalContent>
             <h3>{TEXTOS.SUCESSO}</h3>
             <p>{modalMessage}</p>
-            <Button variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
+            <Button $variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
           </ModalContent>
         </ModalOverlay>
       )}

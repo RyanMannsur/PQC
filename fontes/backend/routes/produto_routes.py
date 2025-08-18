@@ -85,7 +85,7 @@ def get_produtos():
                perPureza,
                vlrDensidade,
                ncm,
-               "idtAtivo"
+               idtAtivo
           FROM Produto
         """
 
@@ -133,7 +133,7 @@ def obter_produto(codProduto):
         JOIN OrgaoControle C
           ON C.codOrgaoControle = B.codOrgaoControle
         WHERE A.codProduto = %s
-          AND A."idtAtivo" = true
+          AND A.idtAtivo = true
     """
     params = (codProduto,)
 
@@ -272,11 +272,11 @@ def obter_produtos_por_laboratorio(codCampus, codUnidade, codPredio, codLaborato
                A.perPureza,
                A.vlrDensidade,
                A.ncm,
-               A."idtAtivo"
+               A.idtAtivo
           FROM Produto A
           JOIN MovtoEstoque B
             ON B.codProduto = A.codProduto        
-         WHERE A."idtAtivo" = true
+         WHERE A.idtAtivo = true
            AND B.codCampus = %s 
            AND B.codUnidade = %s
            AND B.codPredio = %s
@@ -460,7 +460,7 @@ def buscar_produtos_local_estocagem():
               B.seqItem,
               B.datValidade,
               sum(C.qtdEstoque) as estoque_total,
-              A."idtAtivo"
+              A.idtAtivo
          FROM Produto A
          JOIN ProdutoItem B
            ON B.codProduto = A.codProduto
@@ -477,7 +477,7 @@ def buscar_produtos_local_estocagem():
                AND idtTipoMovto = 'IN'
              GROUP BY codProduto, seqItem
          ) UltInv ON UltInv.codProduto = C.codProduto AND UltInv.seqItem = C.seqItem
-        WHERE A."idtAtivo" = true
+    WHERE A.idtAtivo = true
           AND C.codCampus = %s
           AND C.codUnidade = %s
           AND C.codPredio = %s
@@ -770,7 +770,7 @@ def relatorio_produtos():
            AND C.SeqItem = B.SeqItem
           JOIN LocalEstocagem D
             ON D.codLaboratorio = C.codLaboratorio
-         WHERE A."idtAtivo"
+         WHERE A.idtAtivo
          ORDER BY 1, 6
     """
     params = None
@@ -856,7 +856,7 @@ def produtos_implantados_por_laboratorio(codCampus, codUnidade, codPredio, codLa
                A.perPureza,
                A.vlrDensidade
           FROM Produto A
-         WHERE A."idtAtivo" = true
+         WHERE A.idtAtivo = true
            AND A.codProduto not in (SELECT distinct codProduto 
                                     FROM MovtoEstoque B
                                    WHERE B.codProduto = A.codProduto
@@ -946,7 +946,7 @@ def add_produto():
         return valida.getMensagens()
 
     sql = """
-        INSERT INTO Produto (nomProduto, nomLista, perPureza, vlrDensidade, "idtAtivo", ncm) 
+    INSERT INTO Produto (nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo, ncm) 
             VALUES (%s, %s, %s, %s, %s, %s)
     """
     params = (nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo, ncm)
@@ -989,7 +989,7 @@ def update_produto(codProduto):
                         nomLista = %s,
                         perPureza = %s,
                         vlrDensidade = %s,
-                        "idtAtivo" = %s
+                        idtAtivo = %s
                   WHERE codProduto = %s
             """
             params_update = (nomProduto, nomLista, perPureza, vlrDensidade, idtAtivo, codProduto)
