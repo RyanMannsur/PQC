@@ -333,5 +333,5 @@ def gerar_arquivo():
             subsecNotaFiscalCabecalho('1210201010', '2017-01-11', 'S') +
             subsecNotaFiscalProduto('2323.23.66', 32,32, 999999999, 'K')       
         )
-        
+        file.write(secUtilizacaoProducao("NCMNCMNCMNCMN", 96, 56.41, 1325.4013, 'L'))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
