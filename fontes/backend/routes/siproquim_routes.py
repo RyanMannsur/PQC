@@ -299,7 +299,29 @@ def subsecProdutoFinalProduzidoTransformacao(codProduto, perPureza, vlrDensidade
     data = convertYMDtoDMY(dataTransformacao)
     return f'{qtdProduto}{data}{reacaoQuimica}\n'
 
+"""
+3.1.7. Seção Utilização para consumo (UC): Registra os efetivos quantitativos consumidos pelo declarante no mês 
+de referência. Os produtos químicos elencados nessa Seção deverão ser anteriormente registrados na seção 
+Demonstrativo Geral
+"""
+def secUtilizacaoConsumo(codProduto, perPureza, vlrDensidade, quant, unidMedida, codigoConsumo, observacaoConsumo, dataConsumo):
+    tipo = 'UC'
+    qtdProduto = descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)[:-1] #Slicing pra remover o newline
+    codigo = str(codigoConsumo) # 1 - Limpeza e Manutenção # 2 - Análises Laboratoriais # 3 - Outros # 4 - Processo Produtivo # 5 - Tratamento de Afluentes e Efluentes
+    observacao = ajustarTamanhoStr(observacaoConsumo, 62)
+    data = convertYMDtoDMY(dataConsumo)
+    return f'{qtdProduto}{codigo}{observacao}{data}\n'
 
+"""
+3.1.8. Seção Fabricação (FB): Registra os efetivos quantitativos de produtos químicos controlados fabricados pelo 
+declarante  no  mês  de  referência  com  base  em  produtos  químicos  não  controlados.  Os  produtos  químicos 
+elencados  nessa  Seção  deverão  ser  anteriormente  registrados  na  seção  Demonstrativo  Geral 
+"""
+def secFabricacao(codProduto, perPureza, vlrDensidade, quant, unidMedida, dataFabricacao):
+    tipo = 'FB'
+    qtdProduto = descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)[:-1] #Slicing pra remover o newline
+    data = convertYMDtoDMY(dataFabricacao)
+    return f'{qtdProduto}{data}\n'
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -379,4 +401,7 @@ def gerar_arquivo():
         file.write(subsecProdutoFinalProduzido("NCMProdutoPrd", 81.44, 99.41, 8121325.4019, 'K', "Esse produto foi produzido de maneira produtiva a fim de produzir o produto", "2025-11-01"))
         file.write(secUtilizacaoParaTransformacao("transformacao", 99.99, 81.412, 8121326.4019, 'L', "2025-12-21"))
         file.write(subsecProdutoFinalProduzidoTransformacao("NCMProdutoPrd", 81.44, 99.41, 8121325.4019, 'K', "2025-11-01", "Esse produto foi feito por meio de uma transformacao envolvendo produtos quimicos que envolvem carbono e hidrogenio e etc"))
+        file.write(secUtilizacaoConsumo("NCMNCMNCMNCMN", 96, 56.41, 1325.4013, 'L', 2, "observacao: observa-se", "2024-09-30"))
+        file.write(secFabricacao("fabricacao123", 99.99, 81.412, 8121326.4019, 'L', "2025-12-21"))
+
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
