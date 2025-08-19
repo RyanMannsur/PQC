@@ -37,16 +37,19 @@ def convertYMDtoDMY(data): # converte o modelo de data no bd para o modelo do re
     ano = partes[0]
     return f'{dia}/{mes}/{ano}'
 
+def ajustarTamanhoStr(str, size):
+    return (str[:size].ljust(size)) if len(str) > size else str.ljust(size)
+
 # funções gerais
 def descreverEnderecoDeEmpresa(tipoEmp, cnpjEmp, razaoSocialEmp, enderecoEmp, cepEmp, numeroEmp, complementoEmp, bairroEmp, ufEmp, municipioEmp):
     tipo = tipoEmp
     cnpj = cnpjEmp
-    razaoSocial = (razaoSocialEmp[:70].ljust(70)) if len(razaoSocialEmp) > 70 else razaoSocialEmp.ljust(70)
-    endereco = (enderecoEmp[:70].ljust(70)) if len(enderecoEmp) > 70 else enderecoEmp.ljust(70)
+    razaoSocial = ajustarTamanhoStr(razaoSocialEmp, 70)
+    endereco = ajustarTamanhoStr(enderecoEmp, 70)
     cep = cepEmp # com máscara 99.999-999
-    numero = (numeroEmp[:5].ljust(5)) if len(numeroEmp) > 5 else numeroEmp.ljust(5)
-    complemento = (complementoEmp[:20].ljust(20)) if len(complementoEmp) > 20 else complementoEmp.ljust(20)
-    bairro = (bairroEmp[:30].ljust(30)) if len(bairroEmp) > 30 else bairroEmp.ljust(30)
+    numero = ajustarTamanhoStr(numeroEmp, 5)
+    complemento = ajustarTamanhoStr(complementoEmp, 20)
+    bairro = ajustarTamanhoStr(bairroEmp, 30)
     bairro = bairro.upper()
     uf = ufEmp # MA, MG, ES, ets
     municipio = municipioEmp # Código IBGE município (observar tabela oficial)
@@ -97,7 +100,7 @@ químicos controlados.
 def secaoDemonstrativoGeral(codProduto, nomProduto, perPureza, vlrDensidade):
     tipo  = 'PR'   
     NCM = codProduto  # 11 Alfanumerico
-    nomeComercial = (nomProduto[:70].ljust(70)) if len(nomProduto) > 70 else nomProduto.ljust(70) # 70 Alfanumerico
+    nomeComercial = ajustarTamanhoStr(nomProduto, 70) # 70 Alfanumerico
     concentracao = f'{int(round(float(perPureza), 0)):03d}'    
     densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')   
 
@@ -122,9 +125,9 @@ def secaoMovimentacaoNacional(operac, cnpj, razaoSocial, numeroNfe, dataEmissaoN
     elif operac == 'TS' : operacao = 'ST'
     else: operacao = operac
     # TODO: revisar essa lógica depois
-    cnpjFornecedor = (cnpj[:14].ljust(14)) if len(cnpj) > 14 else cnpj.ljust(14)
-    razaoSocialFornecedor = (razaoSocial[:69].ljust(69)) if len(razaoSocial) > 69 else razaoSocial.ljust(69) 
-    numero = (numeroNfe[:10].ljust(10)) if len(numeroNfe) > 10 else numeroNfe.ljust(10) 
+    cnpjFornecedor = ajustarTamanhoStr(cnpj, 14)
+    razaoSocialFornecedor = ajustarTamanhoStr(razaoSocial, 69) 
+    numero = ajustarTamanhoStr(numeroNfe, 10) 
     dataEmissao = convertYMDtoDMY(dataEmissaoNfe)  # Formato DD/MM/AAAA
     return f'{tipo}{entradaSaida}{operacao}{cnpjFornecedor}{razaoSocialFornecedor}{numero}{dataEmissao}{armazenagemNfe}{transporteNfe}\n'
 
@@ -146,7 +149,7 @@ def subsecTransporte(cnpjTransp, razaoSoc):
     if cnpjTransp == '':
         return ''
     cnpjTransportadora = cnpjTransp
-    razaoSocial = (razaoSoc[:70].ljust(70)) if len(razaoSoc) > 70 else razaoSoc.ljust(70)
+    razaoSocial = ajustarTamanhoStr(razaoSoc, 70)
     razaoSocial = razaoSocial.upper()
     return f'{tipo}{cnpjTransportadora}{razaoSocial}\n'
 
@@ -169,7 +172,7 @@ def secMovimentacaoInternacional(operacao, idPaisAF, razaoSocialAF, numLi, dataR
     tipo = 'MVI'
     operac = operacao # (E)xportação,(I)mportação,Importação (C)onta e Ordem
     idPais = idPaisAF # Ver tabela oficial
-    razaoSocial = (razaoSocialAF[:70].ljust(70)) if len(razaoSocialAF) > 70 else razaoSocialAF.ljust(70)
+    razaoSocial = ajustarTamanhoStr(razaoSocialAF, 70)
     nLi = numLi # 99/9999999-9
     dataRestrEmbarque = convertYMDtoDMY(dataRestricaoEmbarque)
     dataCEmbarque = convertYMDtoDMY(dataCoEmbarque)
@@ -197,7 +200,7 @@ def subsecResponsavelPeloTransporte(razaoSoc, cnpjTransp = ''):
     if cnpjTransp == '':
         tipo = 'TRI'
     cnpjTransportadora = cnpjTransp
-    razaoSocial = (razaoSoc[:70].ljust(70)) if len(razaoSoc) > 70 else razaoSoc.ljust(70)
+    razaoSocial = ajustarTamanhoStr(razaoSoc, 70)
     razaoSocial = razaoSocial.upper()
     return f'{tipo}{cnpjTransportadora}{razaoSocial}\n'
 
@@ -257,6 +260,22 @@ elencados  nessa  Seção  deverão  ser  anteriormente  registrados  na  seçã
 def secUtilizacaoProducao(codProduto, perPureza, vlrDensidade, quant, unidMedida):
     tipo = 'UP'
     return descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)
+
+"""
+3.1.5.1. Subseção  Produto  Final  Produzido  –  Produto  Químico  Controlado  (UF):  Registra  os  efetivos 
+quantitativos  de  produtos  químicos  produzidos  pelo  declarante  no  mês  de  referência  (UP).  Os 
+produtos  químicos  elencados  nessa  Seção  deverão  ser  anteriormente  registrados  na  seção 
+Demonstrativo Geral. Essa seção deve ser informada caso a produção tenha como produto final 
+um Produto Químico Controlado. 
+""" # Não sei se existirá no produto final, mas de qualquer forma vai ficar já pronto
+def subsecProdutoFinalProduzido(codProduto, perPureza, vlrDensidade, quant, unidMedida, descricaoProducao, dataProduzida):
+    tipo = 'UF'
+    qtdProduto = descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)[:-1] #Slicing pra remover o newline
+    descricao = ajustarTamanhoStr(descricaoProducao, 200)
+    data = convertYMDtoDMY(dataProduzida)
+    return f'{qtdProduto}{descricao}{data}'
+
+
 
 
 # Rota para listar todos os produtos
@@ -334,4 +353,5 @@ def gerar_arquivo():
             subsecNotaFiscalProduto('2323.23.66', 32,32, 999999999, 'K')       
         )
         file.write(secUtilizacaoProducao("NCMNCMNCMNCMN", 96, 56.41, 1325.4013, 'L'))
+        file.write(subsecProdutoFinalProduzido("NCMProdutoPrd", 81.44, 99.41, 8121325.4019, 'K', "Esse produto foi produzido de maneira produtiva a fim de produzir o produto", "2025-11-01"))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
