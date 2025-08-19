@@ -53,6 +53,17 @@ def descreverEnderecoDeEmpresa(tipoEmp, cnpjEmp, razaoSocialEmp, enderecoEmp, ce
 
     return f'{tipo}{cnpj}{razaoSocial}{endereco}{cep}{numero}{complemento}{bairro}{uf}{municipio}\n'
 
+def descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida):
+    NCM = f'PC{codProduto}'
+    concentracao = f'{int(round(float(perPureza), 0)):03d}'    
+    densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')
+    quantInt = int(round(float(quant), 0))
+    quantFloat = (float(quant) - quantInt) * 1000
+    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):03d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
+
+    return f'{tipo}{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
+
+
 print("Debugging informações...", file=sys.stdout)
 """
 3.1.1. Seção de Identificação da Empresa/Mapa (EM): 
@@ -124,15 +135,7 @@ inseridos na seção Demonstrativo Geral (DG). Seguir a seguinte estrutura:
 """
 def subsecMovimento(codProduto, perPureza, vlrDensidade, quant, unidMedida):
     tipo = 'MM'
-    NCM = f'PC{codProduto}'
-    concentracao = f'{int(round(float(perPureza), 0)):03d}'    
-    densidade = f'{round(float(vlrDensidade), 2):05.2f}'.replace('.', ',')
-    quantInt = int(round(float(quant), 0))
-    quantFloat = (float(quant) - quantInt) * 1000
-    quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):03d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
-
-    return f'{tipo}{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
-
+    return descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)
 """
 3.1.3.2. Subseção Transporte (MT): Caso o transporte dos produtos químicos movimentados na NF tenha 
 sido realizado sob responsabilidade de uma empresa (T) Terceirizada, descrita no item da seção 
@@ -245,6 +248,16 @@ def subsecNotaFiscalProduto(codProduto, perPureza, vlrDensidade, quant, unidMedi
     quantidade = f'{inserirPonto(str(quantInt).zfill(9))},{int(quantFloat):03d}' # 9 num inteiro, 3 casa decimal, 2 pontos e 1 vírgula
 
     return f'{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
+
+"""
+3.1.5. Seção Utilização para Produção (UP): Registra os efetivos quantitativos consumidos pelo declarante no mês 
+de  referência  (UP)  para  a  produção  de  produtos  químicos controlados  diversos  (UF).  Os  produtos  químicos 
+elencados  nessa  Seção  deverão  ser  anteriormente  registrados  na  seção  Demonstrativo  Geral
+"""
+def secUtilizacaoProducao(codProduto, perPureza, vlrDensidade, quant, unidMedida):
+    tipo = 'UP'
+    return descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)
+
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
