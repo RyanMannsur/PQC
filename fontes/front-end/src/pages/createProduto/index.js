@@ -14,6 +14,7 @@ const [tipoCadastro, setTipoCadastro] = useState("");
 const [loading, setLoading] = useState(true);
 const { labId, labName } = useLocal(); 
 const [isModalOpen, setIsModalOpen] = useState(false); 
+const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 const navigate = useNavigate(); 
 
 useEffect(() => {
@@ -50,7 +51,7 @@ useEffect(() => {
 
 const handleConfirm = async () => {
   if (!tipoCadastro) {
-    alert("Por favor, selecione o tipo de cadastro antes de confirmar.");
+    setIsErrorModalOpen(true);
     return;
   }
 
@@ -89,6 +90,9 @@ const handleConfirm = async () => {
     alert("Erro ao realizar cadastro. Verifique os detalhes no console.");
   }
 };
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+  };
 
 const handleCloseModal = () => {
   setIsModalOpen(false); 
@@ -141,6 +145,13 @@ return (
       onClose={handleCloseModal}
     >
       <p>Os produtos foram cadastrados com sucesso!</p>
+    </Modal>
+    <Modal
+      title="Atenção"
+      isOpen={isErrorModalOpen}
+      onClose={handleCloseErrorModal}
+    >
+      <p>Por favor, selecione o tipo de cadastro antes de confirmar.</p>
     </Modal>
   </C.Container>
 );

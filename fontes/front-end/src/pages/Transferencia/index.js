@@ -24,7 +24,6 @@ useEffect(() => {
     const timer = setTimeout(() => {
       setIsTooltipVisible(false);
     }, 3000);
-    return () => clearTimeout(timer);
   }
 
   const fetchProdutos = async () => {
