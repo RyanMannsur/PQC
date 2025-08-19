@@ -273,8 +273,31 @@ def subsecProdutoFinalProduzido(codProduto, perPureza, vlrDensidade, quant, unid
     qtdProduto = descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)[:-1] #Slicing pra remover o newline
     descricao = ajustarTamanhoStr(descricaoProducao, 200)
     data = convertYMDtoDMY(dataProduzida)
-    return f'{qtdProduto}{descricao}{data}'
+    return f'{qtdProduto}{descricao}{data}\n'
 
+"""
+3.1.6. Seção Utilização para Transformação (UT): Registra os efetivos quantitativos consumidos pelo declarante no 
+mês de referência (UT) para a transformação em produtos químicos controlados diversos (UZ). Os produtos 
+químicos elencados nessa Seção deverão ser anteriormente registrados na seção Demonstrativo Geral 
+"""
+def secUtilizacaoParaTransformacao(codProduto, perPureza, vlrDensidade, quant, unidMedida, dataTransformacao):
+    tipo = 'UT'
+    qtdProduto = descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)[:-1] #Slicing pra remover o newline
+    data = convertYMDtoDMY(dataTransformacao)
+    return f'{qtdProduto}{data}\n'
+
+"""
+3.1.6.1. Subseção Produto Final Produzido na Transformação (UZ): Registra os efetivos quantitativos de 
+produtos  químicos  transformados  pelo  declarante  no  mês  de  referência  (UP).  Os  produtos 
+químicos elencados nessa Seção deverão ser anteriormente registrados na seção Demonstrativo 
+Geral
+"""
+def subsecProdutoFinalProduzidoTransformacao(codProduto, perPureza, vlrDensidade, quant, unidMedida, dataTransformacao, descricaoReacaoQuimica):
+    tipo = 'UZ'
+    qtdProduto = descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)[:-1] #Slicing pra remover o newline
+    reacaoQuimica = ajustarTamanhoStr(descricaoReacaoQuimica, 200)
+    data = convertYMDtoDMY(dataTransformacao)
+    return f'{qtdProduto}{data}{reacaoQuimica}\n'
 
 
 
@@ -354,4 +377,6 @@ def gerar_arquivo():
         )
         file.write(secUtilizacaoProducao("NCMNCMNCMNCMN", 96, 56.41, 1325.4013, 'L'))
         file.write(subsecProdutoFinalProduzido("NCMProdutoPrd", 81.44, 99.41, 8121325.4019, 'K', "Esse produto foi produzido de maneira produtiva a fim de produzir o produto", "2025-11-01"))
+        file.write(secUtilizacaoParaTransformacao("transformacao", 99.99, 81.412, 8121326.4019, 'L', "2025-12-21"))
+        file.write(subsecProdutoFinalProduzidoTransformacao("NCMProdutoPrd", 81.44, 99.41, 8121325.4019, 'K', "2025-11-01", "Esse produto foi feito por meio de uma transformacao envolvendo produtos quimicos que envolvem carbono e hidrogenio e etc"))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
