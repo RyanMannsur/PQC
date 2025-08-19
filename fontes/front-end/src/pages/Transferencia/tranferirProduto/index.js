@@ -5,6 +5,7 @@ import * as C from "./styles";
 import {
 obterProduto,
 atualizarInventario,
+transferirProdutoParcial,
 } from "../../../services/produto/service";
 import { obterTodosLaboratorios } from "../../../services/laboratorio/service";
 import ItemList from "../../../components/ItemList";
@@ -124,30 +125,39 @@ const handleTransferir = async () => {
   } = novoLab;
 
   try {
-    await atualizarInventario(
-      codProduto,
-      seqItem,
-      -qtdTransferir,
-      codCampus,
-      codUnidade,
-      codPredio,
-      codLaboratorio,
-      "TS"
-    );
-
     if (tipoTransferencia === "parcial") {
-      await atualizarInventario(
+      const result = await transferirProdutoParcial({
         codProduto,
-        null,
-        qtdTransferir,
+        seqItemOrigem: seqItem,
+        qtdTransferida: qtdTransferir,
+        codCampusOrigem: codCampus,
+        codUnidadeOrigem: codUnidade,
+        codPredioOrigem: codPredio,
+        codLaboratorioOrigem: codLaboratorio,
         codCampusDestino,
         codUnidadeDestino,
         codPredioDestino,
         codLaboratorioDestino,
-        "TE",
-        seqItem // seqItemOrigem
-      );
+      });
+      if (result && result.tipo === "SUCESSO") {
+        setMensagem("");
+        navigate("/transferencias", {
+          state: { successMessage: "Transferência parcial realizada com sucesso!" },
+        });
+      } else {
+        setMensagem(result?.mensagem || "Erro ao realizar transferência parcial.");
+      }
     } else {
+      await atualizarInventario(
+        codProduto,
+        seqItem,
+        -qtdTransferir,
+        codCampus,
+        codUnidade,
+        codPredio,
+        codLaboratorio,
+        "TS"
+      );
       await atualizarInventario(
         codProduto,
         seqItem,
@@ -158,12 +168,11 @@ const handleTransferir = async () => {
         codLaboratorioDestino,
         "TE"
       );
+      setMensagem("");
+      navigate("/transferencias", {
+        state: { successMessage: "Transferência realizada com sucesso!" },
+      });
     }
-
-    setMensagem("");
-    navigate("/transferencias", {
-      state: { successMessage: "Transferência realizada com sucesso!" },
-    });
   } catch (error) {
     setMensagem("Erro ao realizar transferência.");
   }

@@ -318,4 +318,42 @@ const produtoService = {
   }
 };
 
+
+export const transferirProdutoParcial = async ({
+  codProduto,
+  seqItemOrigem,
+  qtdTransferida,
+  codCampusOrigem,
+  codUnidadeOrigem,
+  codPredioOrigem,
+  codLaboratorioOrigem,
+  codCampusDestino,
+  codUnidadeDestino,
+  codPredioDestino,
+  codLaboratorioDestino,
+  txtJustificativa = "Transferência parcial de produto"
+}) => {
+  try {
+    const payload = {
+      codProduto,
+      seqItemOrigem,
+      qtdTransferida,
+      codCampusOrigem,
+      codUnidadeOrigem,
+      codPredioOrigem,
+      codLaboratorioOrigem,
+      codCampusDestino,
+      codUnidadeDestino,
+      codPredioDestino,
+      codLaboratorioDestino,
+      txtJustificativa
+    };
+    const response = await api.post("/transferenciaParcial", payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao transferir produto parcialmente:", error);
+    return { error: "Erro ao transferir produto parcialmente" };
+  }
+};
+
 export default produtoService;

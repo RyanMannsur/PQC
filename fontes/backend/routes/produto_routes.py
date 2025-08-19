@@ -217,7 +217,7 @@ def consultarProdutos_por_token(token):
               G.codLaboratorio,
               G.nomLocal,
               B.seqItem,
-              B.seqEmbalagem,
+              B.codembalagem,
               B.datValidade,
               desTipoMovto(C.idtTipoMovto) as desTipoMovto,
               C.datMovto,
@@ -1206,7 +1206,7 @@ def atualizar_inventario_by_sequencia():
         datValidade = None
         seqEmbalagem = None
         if seqItemOrigem:
-            sql_busca = "SELECT datValidade, seqEmbalagem FROM ProdutoItem WHERE codProduto = %s AND seqItem = %s"
+            sql_busca = "SELECT datValidade, codembalagem FROM ProdutoItem WHERE codProduto = %s AND seqItem = %s"
             res = db.execSql(sql_busca, (codProduto, seqItemOrigem), Mode.SELECT)
             if res and isinstance(res, list):
                 datValidade = res[0][0]
@@ -1221,8 +1221,8 @@ def atualizar_inventario_by_sequencia():
             novo_seqItem = 1
 
         # Inserir novo ProdutoItem herdando validade/embalagem se possível
-        sql_insert_item = "INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, seqEmbalagem) VALUES (%s, %s, NULL, %s, %s)"
-        resultado_item = db.execSql(sql_insert_item, (codProduto, novo_seqItem, datValidade, seqEmbalagem))
+        sql_insert_item = "INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codembalagem) VALUES (%s, %s, NULL, %s, %s)"
+        resultado_item = db.execSql(sql_insert_item, (codProduto, novo_seqItem, datValidade, codEmbalagem))
         if not isinstance(resultado_item, tuple) or resultado_item[1] != 200:
             return resultado_item
 
@@ -1266,7 +1266,7 @@ def adicionar_produto(codProduto):
     datMovto = data.get('datMovto')
     qtdEstoque = data.get('qtdEstoque')
     idtTipoMovto = data.get('idtTipoMovto')
-    seqEmbalagem = data.get('seqEmbalagem')
+    codEmbalagem = data.get('codembalagem')
     datValidade = data.get('datValidade')
     txtJustificativa = data.get('txtJustificativa')
 
@@ -1277,7 +1277,7 @@ def adicionar_produto(codProduto):
     valida.codPredio(codPredio)
     valida.datMovto(datMovto)
     valida.idtTipoMovto(idtTipoMovto)
-    valida.seqEmbalagem(seqEmbalagem)
+    valida.codEmbalagem(codEmbalagem)
     if valida.temMensagem():
         return valida.getMensagens()
 
@@ -1298,10 +1298,10 @@ def adicionar_produto(codProduto):
             
         # Inserir item do produto
         sql_insert_item = """
-            INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, seqEmbalagem)
+            INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codembalagem)
             VALUES (%s, %s, NULL, %s, %s)
         """
-        resultado_item = db.execSql(sql_insert_item, (codProduto, seqItem, datValidade, seqEmbalagem))
+        resultado_item = db.execSql(sql_insert_item, (codProduto, seqItem, datValidade, codEmbalagem))
         if not isinstance(resultado_item, tuple) or resultado_item[1] != 200:
             return resultado_item
 
@@ -1657,3 +1657,78 @@ def validate_token():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# Nova rota para transferência parcial de produto
+@produto_bp.route("/transferenciaParcial", methods=["POST"])
+def transferencia_parcial():
+    data = request.get_json()
+
+    codProduto = data.get("codProduto")
+    seqItemOrigem = data.get("seqItemOrigem")
+    qtdTransferida = data.get("qtdTransferida")
+    codCampusOrigem = data.get("codCampusOrigem")
+    codUnidadeOrigem = data.get("codUnidadeOrigem")
+    codPredioOrigem = data.get("codPredioOrigem")
+    codLaboratorioOrigem = data.get("codLaboratorioOrigem")
+    codCampusDestino = data.get("codCampusDestino")
+    codUnidadeDestino = data.get("codUnidadeDestino")
+    codPredioDestino = data.get("codPredioDestino")
+    codLaboratorioDestino = data.get("codLaboratorioDestino")
+    txtJustificativa = data.get("txtJustificativa", "Transferência parcial de produto")
+
+    # Validação básica
+    if not all([
+        codProduto, seqItemOrigem, qtdTransferida,
+        codCampusOrigem, codUnidadeOrigem, codPredioOrigem, codLaboratorioOrigem,
+        codCampusDestino, codUnidadeDestino, codPredioDestino, codLaboratorioDestino
+    ]):
+        return {"mensagem": "Dados obrigatórios faltando para transferência parcial", "tipo": "ERRO"}, 400
+
+    db = Db()
+    datMovto = datetime.datetime.now()
+
+    # 1. Gera movimentação TS (Transferência Saída) no laboratório de origem
+    sql_ts = """
+        INSERT INTO MovtoEstoque
+           (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, 'TS', -%s, %s)
+    """
+    params_ts = (codProduto, seqItemOrigem, codCampusOrigem, codUnidadeOrigem, codPredioOrigem, codLaboratorioOrigem, datMovto, qtdTransferida, txtJustificativa)
+    try:
+        db.execSql(sql_ts, params_ts, Mode.DEFAULT)
+    except Exception as e:
+        return db.getErro(e)
+
+    # 2. Buscar validade e codEmbalagem do item original
+    sql_busca = "SELECT datValidade, codEmbalagem FROM ProdutoItem WHERE codProduto = %s AND seqItem = %s"
+    res = db.execSql(sql_busca, (codProduto, seqItemOrigem), Mode.SELECT)
+    if not res or not isinstance(res, list):
+        return {"mensagem": "Item original não encontrado para transferência parcial", "tipo": "ERRO"}, 400
+    datValidade, codEmbalagem = res[0]
+
+    # 3. Gerar novo seqItem para o produto
+    sql_ultimo_seq = "SELECT COALESCE(MAX(seqItem), 0) + 1 FROM ProdutoItem WHERE codProduto = %s"
+    resultado_seq = db.execSql(sql_ultimo_seq, (codProduto,), Mode.SELECT)
+    novo_seqItem = resultado_seq[0][0] if resultado_seq and isinstance(resultado_seq, list) else 1
+
+    # 4. Criar novo ProdutoItem no laboratório de destino
+    sql_insert_item = """
+        INSERT INTO ProdutoItem (codProduto, seqItem, idNFe, datValidade, codEmbalagem)
+        VALUES (%s, %s, NULL, %s, %s)
+    """
+    db.execSql(sql_insert_item, (codProduto, novo_seqItem, datValidade, codEmbalagem), Mode.DEFAULT)
+
+    # 5. Gera movimentação TE (Transferência Entrada) no laboratório de destino
+    sql_te = """
+        INSERT INTO MovtoEstoque
+           (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, 'TE', %s, %s)
+    """
+    params_te = (codProduto, novo_seqItem, codCampusDestino, codUnidadeDestino, codPredioDestino, codLaboratorioDestino, datMovto, qtdTransferida, txtJustificativa)
+    try:
+        db.execSql(sql_te, params_te, Mode.COMMIT)
+    except Exception as e:
+        return db.getErro(e)
+
+    return {"mensagem": "Transferência parcial realizada com sucesso!", "tipo": "SUCESSO"}, 200
