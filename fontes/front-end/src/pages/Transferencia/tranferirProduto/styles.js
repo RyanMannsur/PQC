@@ -1,54 +1,57 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const Container = styled.div`
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background: #f7f8fa;
 `;
 
-export const Content = styled.div`
-  gap: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+export const FormFull = styled.div`
   width: 100%;
-  box-shadow: 0 1px 2px #0003;
-  background-color: white;
-  max-width: 350px;
-  padding: 20px;
-  border-radius: 5px;
-`;
-
-export const Button = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-export const ButtonContainer = styled.div`
+  max-width: 900px;
+  min-height: 220px;
+  background: #f7f8fa;
+  margin: 20px auto 0 auto;
+  padding: 18px 20px 18px 20px;
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px #0001;
+  border-radius: 8px;
+  gap: 8px;
 `;
 
-export const ButtonGroup = styled.div`
+export const FormGroup = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 6px;
+`;
+
+export const RadioGroup = styled.div`
+  display: flex;
+  gap: 24px;
   justify-content: center;
-  gap: 10px;
-  margin-top: 30px;
+  margin-bottom: 8px;
+`;
+
+export const Label = styled.label`
+  font-size: 1rem;
+  color: #222;
+`;
+
+export const InputQtd = styled.input`
+  margin-left: 8px;
+  width: 100px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
 `;
 
 export const labelError = styled.label`
@@ -56,17 +59,31 @@ export const labelError = styled.label`
   color: red;
 `;
 
-export const Form = styled.div`
-  gap: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+
+export const Title = styled.h1`
+  font-size: 2.3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  color: #222;
+`;
+
+export const Subtitle = styled.h2`
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #007bff;
+`;
+
+export const TableWrapper = styled.div`
   width: 100%;
-  box-shadow: 0 1px 2px #0003;
-  background-color: white;
-  max-width: 350px;
-  padding: 20px;
-  border-radius: 5px;
-  margin-top: 20px;
+  max-width: 900px;
+  margin: 0 auto 24px auto;
+`;
+
+export const NoData = styled.p`
+  color: #888;
+  text-align: center;
+  font-size: 1.1rem;
 `;
