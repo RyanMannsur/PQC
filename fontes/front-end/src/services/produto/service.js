@@ -67,10 +67,11 @@ export const atualizarInventario = async (
   codUnidade,
   codPredio,
   codLaboratorio,
-  idtTipoMovto
+  idtTipoMovto,
+  seqItemOrigem = undefined
 ) => {
   try {
-    const response = await api.post("/atualizarInventarioBySequencia", {
+    const payload = {
       codProduto,
       seqItem,
       qtdEstoque,
@@ -79,7 +80,11 @@ export const atualizarInventario = async (
       codPredio,
       codLaboratorio,
       idtTipoMovto,
-    });
+    };
+    if (seqItemOrigem !== undefined) {
+      payload.seqItemOrigem = seqItemOrigem;
+    }
+    const response = await api.post("/atualizarInventarioBySequencia", payload);
     return response.data;
   } catch (error) {
     console.error("Erro ao atualizar inventário:", error);
@@ -310,6 +315,44 @@ const produtoService = {
       console.error("Erro ao excluir produto:", error);
       throw error;
     }
+  }
+};
+
+
+export const transferirProdutoParcial = async ({
+  codProduto,
+  seqItemOrigem,
+  qtdTransferida,
+  codCampusOrigem,
+  codUnidadeOrigem,
+  codPredioOrigem,
+  codLaboratorioOrigem,
+  codCampusDestino,
+  codUnidadeDestino,
+  codPredioDestino,
+  codLaboratorioDestino,
+  txtJustificativa = "Transferência parcial de produto"
+}) => {
+  try {
+    const payload = {
+      codProduto,
+      seqItemOrigem,
+      qtdTransferida,
+      codCampusOrigem,
+      codUnidadeOrigem,
+      codPredioOrigem,
+      codLaboratorioOrigem,
+      codCampusDestino,
+      codUnidadeDestino,
+      codPredioDestino,
+      codLaboratorioDestino,
+      txtJustificativa
+    };
+    const response = await api.post("/transferenciaParcial", payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao transferir produto parcialmente:", error);
+    return { error: "Erro ao transferir produto parcialmente" };
   }
 };
 

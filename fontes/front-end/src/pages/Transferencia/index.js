@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import * as C from "./styles";
-import { Input, Button, FormGroup } from "../../components";
 import ItemList from "../../components/ItemList";
-import Tooltip from "../../components/Tooltip"; 
+import Tooltip from "../../components/Tooltip";
 import { buscarProdutos } from "../../services/produto/service";
 import { formatarData } from "../../helpers/dataHelper";
 
 const Transferencias = () => {
 const navigate = useNavigate();
 const location = useLocation(); 
-const [produto, setProduto] = useState("");
-const [pureza, setPureza] = useState("");
-const [densidade, setDensidade] = useState("");
 const [produtos, setProdutos] = useState([]);
 const [localData, setLocalData] = useState(null);
-const [isTooltipVisible, setIsTooltipVisible] = useState(false); 
-const [tooltipMessage, setTooltipMessage] = useState(""); 
+const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+const [tooltipMessage, setTooltipMessage] = useState("");
 
 useEffect(() => {
   const localStorageData = JSON.parse(localStorage.getItem("labId"));
@@ -25,32 +21,27 @@ useEffect(() => {
   if (location.state?.successMessage) {
     setTooltipMessage(location.state.successMessage);
     setIsTooltipVisible(true);
-
     const timer = setTimeout(() => {
       setIsTooltipVisible(false);
     }, 3000);
-
-    return () => clearTimeout(timer); 
   }
+
+  const fetchProdutos = async () => {
+    if (localStorageData) {
+      const { codCampus, codUnidade, codPredio, codLaboratorio } = localStorageData;
+      const produtosResponse = await buscarProdutos(
+        codCampus,
+        codUnidade,
+        codPredio,
+        codLaboratorio
+      );
+      setProdutos(produtosResponse);
+    } else {
+      console.error("Dados de local não encontrados no local storage.");
+    }
+  };
+  fetchProdutos();
 }, [location.state]);
-
-const handlePesquisar = async () => {
-  if (localData) {
-    const { codCampus, codUnidade, codPredio, codLaboratorio } = localData;
-    const produtosResponse = await buscarProdutos(
-      codCampus,
-      codUnidade,
-      codPredio,
-      codLaboratorio,
-      produto,
-      pureza,
-      densidade
-    );
-    setProdutos(produtosResponse);
-  } else {
-    console.error("Dados de local não encontrados no local storage.");
-  }
-};
 
 const handleActionClick = (id, key) => {
   if (key === "acoes") {
@@ -86,33 +77,6 @@ const data = produtos.filter((produto) => produto.qtdEstoque > 0).map((produto) 
 return (
   <C.Container>
     <h1>Transferências</h1>
-
-    <FormGroup direction="row" $gap="medium" $alignItems="flex-end" $justifyContent="center">
-      <Input
-        type="text"
-        placeholder="Digite o produto"
-        value={produto}
-        label="Produto"
-        onChange={(e) => setProduto(e.target.value)}
-      />
-      <Input
-        type="text"
-        placeholder="Digite a pureza"
-        value={pureza}
-        label="Pureza"
-        onChange={(e) => setPureza(e.target.value)}
-      />
-      <Input
-        type="text"
-        placeholder="Digite a densidade"
-        value={densidade}
-        label="Densidade"
-        onChange={(e) => setDensidade(e.target.value)}
-      />
-      <Button onClick={handlePesquisar} size="medium">
-        Pesquisar
-      </Button>
-    </FormGroup>
 
     {produtos.length > 0 ? (
       <ItemList
