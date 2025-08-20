@@ -323,6 +323,28 @@ def secFabricacao(codProduto, perPureza, vlrDensidade, quant, unidMedida, dataFa
     data = convertYMDtoDMY(dataFabricacao)
     return f'{qtdProduto}{data}\n'
 
+"""
+3.1.9. Seção Transporte Nacional (TN): Registra a movimentação de produtos químicos transportados. Essa seção 
+deverá ser utilizada por empresas cuja atividade (CNAE), principal ou secundária, seja transporte. Os produtos 
+químicos elencados na seção, deverão ser anteriormente registrados na seção Demonstrativo Geral. 
+"""
+def secTransporteNacional(cpfCnpjContratante, nomeContratante, numeroNf, dataEmissaoNf, cpfCnpjOrigemCarga, razaoSocialOrigemCarga, cpfCnpjDestinoCarga, razaoSocialDestinoCarga, localRetirada, localEntrega):
+    tipo = 'TN'
+    contratante = ajustarTamanhoStr(cpfCnpjContratante, 14)
+    nomeCont = ajustarTamanhoStr(nomeContratante, 70)
+    numero = numeroNf #10 caracteres
+    dataEmissao = convertYMDtoDMY(dataEmissaoNf)
+    origemCarga = ajustarTamanhoStr(cpfCnpjOrigemCarga, 14)
+    razaoSocialOrigem = ajustarTamanhoStr(razaoSocialOrigemCarga, 70)
+    destinoCarga = ajustarTamanhoStr(cpfCnpjDestinoCarga, 14)
+    razaoSocialDestino = ajustarTamanhoStr(razaoSocialDestinoCarga, 70)
+    
+    #(P)róprio ou (A)rmazenagem Terceirizada
+    retirada = localRetirada
+    entrega = localEntrega
+
+    return f'{tipo}{contratante}{nomeCont}{numero}{dataEmissao}{origemCarga}{razaoSocialOrigem}{destinoCarga}{razaoSocialDestino}{retirada}{entrega}'
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -403,5 +425,5 @@ def gerar_arquivo():
         file.write(subsecProdutoFinalProduzidoTransformacao("NCMProdutoPrd", 81.44, 99.41, 8121325.4019, 'K', "2025-11-01", "Esse produto foi feito por meio de uma transformacao envolvendo produtos quimicos que envolvem carbono e hidrogenio e etc"))
         file.write(secUtilizacaoConsumo("NCMNCMNCMNCMN", 96, 56.41, 1325.4013, 'L', 2, "observacao: observa-se", "2024-09-30"))
         file.write(secFabricacao("fabricacao123", 99.99, 81.412, 8121326.4019, 'L', "2025-12-21"))
-
+        file.write(secTransporteNacional("12345678901", "contratante pessoa fisica", "1234567890", "2022-10-01", "12345678901", "razaoSocial da origem da carga, essa e uma pessoa comum", "12345678901234", "razao social do destino da carga, essa e uma empresa", "P", "T"))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
