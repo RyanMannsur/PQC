@@ -345,6 +345,13 @@ def secTransporteNacional(cpfCnpjContratante, nomeContratante, numeroNf, dataEmi
 
     return f'{tipo}{contratante}{nomeCont}{numero}{dataEmissao}{origemCarga}{razaoSocialOrigem}{destinoCarga}{razaoSocialDestino}{retirada}{entrega}'
 
+"""
+3.1.9.1. Subseção Conhecimento de Carga (CC): O preenchimento dessa Subseção é obrigatório quando 
+se  tratar  de  um  transporte  Intermunicipal  ou  Interestadual.  Registra  os  detalhes  acerca  dos 
+conhecimentos de carga utilizados na operação de transporte.
+"""
+
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
