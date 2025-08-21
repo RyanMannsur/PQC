@@ -343,13 +343,24 @@ def secTransporteNacional(cpfCnpjContratante, nomeContratante, numeroNf, dataEmi
     retirada = localRetirada
     entrega = localEntrega
 
-    return f'{tipo}{contratante}{nomeCont}{numero}{dataEmissao}{origemCarga}{razaoSocialOrigem}{destinoCarga}{razaoSocialDestino}{retirada}{entrega}'
+    return f'{tipo}{contratante}{nomeCont}{numero}{dataEmissao}{origemCarga}{razaoSocialOrigem}{destinoCarga}{razaoSocialDestino}{retirada}{entrega}\n'
 
 """
 3.1.9.1. Subseção Conhecimento de Carga (CC): O preenchimento dessa Subseção é obrigatório quando 
 se  tratar  de  um  transporte  Intermunicipal  ou  Interestadual.  Registra  os  detalhes  acerca  dos 
 conhecimentos de carga utilizados na operação de transporte.
 """
+def subsecConhecimentoCarga(numero, dataConhecimentoCarga, dataRecebimentoCarga, responsavelRecebimento, *modalTransporte):
+    tipo = 'CC'
+    num = numero; #9 dig
+    dataCC = convertYMDtoDMY(dataConhecimentoCarga)
+    dataRC = convertYMDtoDMY(dataRecebimentoCarga)
+    responsavel = ajustarTamanhoStr(responsavelRecebimento, 70)
+    str =  f'{tipo}{num}{dataCC}{dataRC}{responsavel}'
+    for modalidade in modalTransporte: # (RO)doviário, (AQ)uaviário, (FE)rroviário ou (AE)reo
+        str += modalidade
+
+    return f'{str}\n'
 
 
 # Rota para listar todos os produtos
@@ -433,4 +444,7 @@ def gerar_arquivo():
         file.write(secUtilizacaoConsumo("NCMNCMNCMNCMN", 96, 56.41, 1325.4013, 'L', 2, "observacao: observa-se", "2024-09-30"))
         file.write(secFabricacao("fabricacao123", 99.99, 81.412, 8121326.4019, 'L', "2025-12-21"))
         file.write(secTransporteNacional("12345678901", "contratante pessoa fisica", "1234567890", "2022-10-01", "12345678901", "razaoSocial da origem da carga, essa e uma pessoa comum", "12345678901234", "razao social do destino da carga, essa e uma empresa", "P", "T"))
+        file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento todos metodos', 'RO','AQ','FE','AE'))
+        file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento aereo only', 'AE'))
+        file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento todos mas por array', *['RO','AQ','FE','AE']))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
