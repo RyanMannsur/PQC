@@ -383,6 +383,21 @@ def subsecLocalEntregaLE(cpfCnpjTerceirizada, nomeTerceirizada):
 
     return f'{tipo}{terceirizada}{nome}\n'
 
+"""
+3.1.10.  Seção Transporte Internacional (TI): Descreverá as operações exportação (EX) e Importação (IM)
+"""
+def secTransporteInternacional(operacao, contratante, numeroNF, dataEmissaoNfe, cpfCnpjEmpresa, nomeEmpresa, localArmazenamento):
+    tipo = 'TI'
+    oper = operacao # (E)xportação, (I)mportação
+    contrat = contratante # (O)rigem da carga, (D)estino da carga
+    num = numeroNF # 10 num
+    data = convertYMDtoDMY(dataEmissaoNfe)
+    empresa = ajustarTamanhoStr(cpfCnpjEmpresa, 14)
+    nome = ajustarTamanhoStr(nomeEmpresa, 70)
+    local = localArmazenamento # (P)róprio ou (A)rmazenagem Terceirizada
+
+    return f'{tipo}{oper}{contrat}{num}{data}{empresa}{nome}{local}\n'
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -469,4 +484,5 @@ def gerar_arquivo():
         file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento todos mas por array', *['RO','AQ','FE','AE']))
         file.write(subsecLocalRetiradaLR('12345678901', 'essa terceirizada so tem cpf mas nao cnpj'))
         file.write(subsecLocalEntregaLE('12345678901234', 'essa terceirizada tem cnpj mas nao cpf '))
+        file.write(secTransporteInternacional('I', 'D', '1234567890', '2022-11-21', '12345678901', 'empresa que usa cpf aparentemente', 'P'))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
