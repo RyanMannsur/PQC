@@ -218,7 +218,7 @@ def subsecResponsavelArmazenagem(cnpj, razaoSocial, endereco, cep, numero, compl
 3.1.4.4. Subseção Local de Entrega (TER): Descreverá o endereço do local de entrega. Deve ser preenchido 
 ao realizar uma movimentação de Importação.
 """
-def subsecLocalEntrega(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
+def subsecLocalEntregaTER(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
     tipo = 'TER'
     return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
 
@@ -366,10 +366,21 @@ def subsecConhecimentoCarga(numero, dataConhecimentoCarga, dataRecebimentoCarga,
 3.1.9.2. Subseção Local de Retirada (LR): O preenchimento dessa Subseção é obrigatório para os casos de 
 Local  de  Retirada  =  (A)  Armazenagem  Terceirizada  na  Seção  Transporte  Nacional  (TN). 
 """
-def subsecLocalRetirada(cpfCnpjTerceirizada, nomeTerceirizada):
+def subsecLocalRetiradaLR(cpfCnpjTerceirizada, nomeTerceirizada):
     tipo = 'LR'
     terceirizada = ajustarTamanhoStr(cpfCnpjTerceirizada, 14)
     nome = ajustarTamanhoStr(nomeTerceirizada, 70)
+    return f'{tipo}{terceirizada}{nome}\n'
+
+"""
+Subseção Local de Entrega (LE): O preenchimento dessa Subseção é obrigatório para os casos 
+de Local de Entrega = (A) Armazenagem Terceirizada na Seção Transporte Nacional (TN).
+"""
+def subsecLocalEntregaLE(cpfCnpjTerceirizada, nomeTerceirizada):
+    tipo = 'LE'
+    terceirizada = ajustarTamanhoStr(cpfCnpjTerceirizada, 14)
+    nome = ajustarTamanhoStr(nomeTerceirizada, 70)
+
     return f'{tipo}{terceirizada}{nome}\n'
 
 # Rota para listar todos os produtos
@@ -439,7 +450,7 @@ def gerar_arquivo():
         file.write(secMovimentacaoInternacional('E', "idP", "razaoSocialDoAdquirenteOuFornecedor", "99/9999999-9", "1984-03-01", "1985-01-02", "numDaDUE0000000", "1986-01-03", "99/9999999-9", "1986-01-02", 'E', 'E', 'I'))
         file.write(subsecResponsavelPeloTransporte("razaoSocial", "12345678901234"))
         file.write(subsecResponsavelPeloTransporte("razaoSocial"))
-        file.write(subsecLocalEntrega("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
+        file.write(subsecLocalEntregaTER("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
         file.write(subsecAdquirente("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
         file.write(
             subsecNotaFiscalCabecalho('1010201010', '2017-01-11', 'E') +
@@ -456,5 +467,6 @@ def gerar_arquivo():
         file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento todos metodos', 'RO','AQ','FE','AE'))
         file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento aereo only', 'AE'))
         file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento todos mas por array', *['RO','AQ','FE','AE']))
-        file.write(subsecLocalRetirada('12345678901', 'essa terceirizada so tem cpf mas nao cnpj'))
+        file.write(subsecLocalRetiradaLR('12345678901', 'essa terceirizada so tem cpf mas nao cnpj'))
+        file.write(subsecLocalEntregaLE('12345678901234', 'essa terceirizada tem cnpj mas nao cpf '))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
