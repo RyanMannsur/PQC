@@ -417,6 +417,22 @@ def subsecPessoaInternacional(nomeEmpresa, idPais, enderecoCompleto):
     endereco = ajustarTamanhoStr(enderecoCompleto, 70)
     return f'{tipo}{nome}{id}{endereco}\n'
 
+"""
+3.1.11. Seção  Armazenamento  (AR):  Registra  a  movimentação  de  produtos  químicos  armazenados.  Essa 
+seção deverá ser utilizada por empresas cuja atividade (CNAE), principal ou secundária, seja armazenamento. 
+Os  produtos  químicos  elencados  na  seção,  deverão  ser  anteriormente  registrados  na  seção  Demonstrativo 
+Geral.
+"""
+def secArmazenamento(cpfCnpjContratante, nomeRazaoSocial, numeroNF, dataEmissaoNf, dataEntradaSaida, tipoOperacao):
+    tipo = 'AR'
+    contratante = ajustarTamanhoStr(cpfCnpjContratante, 14)
+    nomeRazSoc = ajustarTamanhoStr(nomeRazaoSocial, 72)
+    numNF = numeroNF #10 num
+    dataEmissao = convertYMDtoDMY(dataEmissaoNf)
+    dataES = convertYMDtoDMY(dataEntradaSaida)
+    tipoOp = tipoOperacao # E (entrada) ou S (Saída) 
+
+    return f'{tipo}{contratante}{nomeRazSoc}{numNF}{dataEmissao}{dataES}{tipoOp}\n'
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -506,5 +522,6 @@ def gerar_arquivo():
         file.write(secTransporteInternacional('I', 'D', '1234567890', '2022-11-21', '12345678901', 'empresa que usa cpf aparentemente', 'P'))
         file.write(subsecArmazenagemLA('12345678901234', 'empresa responsavel pela armazenagem usando cpf'))
         file.write(subsecPessoaInternacional('nome da empresa de negocios LTDA', 'idp', 'endereco completo da empresa de negocios LTDA'))
-        
+        file.write(secArmazenamento('12345678901', 'nome da pessoa fisica ou razao social da empresa', 'numeroDaNF', '2023-02-01', '2012-12-12', 'E'))
+
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
