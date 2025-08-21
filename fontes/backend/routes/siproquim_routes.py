@@ -433,6 +433,16 @@ def secArmazenamento(cpfCnpjContratante, nomeRazaoSocial, numeroNF, dataEmissaoN
     tipoOp = tipoOperacao # E (entrada) ou S (Saída) 
 
     return f'{tipo}{contratante}{nomeRazSoc}{numNF}{dataEmissao}{dataES}{tipoOp}\n'
+
+"""
+3.1.11.1. Subseção  Produtos  Armazenados  (PA):  Registra  efetiva  movimentação  de  armazenagem 
+produtos  químicos  controlados  e/ou  resíduo.  Ressalta-se  que  os  produtos  elencados  nessa 
+subseção  deverão  estar  previamente  inseridos  na  seção  Demonstrativo  Geral  (DG). 
+"""
+def subsecProdutosArmazenados(codProduto, perPureza, vlrDensidade, quant, unidMedida):
+    tipo = 'PA'
+    return descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quant, unidMedida)
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -523,5 +533,5 @@ def gerar_arquivo():
         file.write(subsecArmazenagemLA('12345678901234', 'empresa responsavel pela armazenagem usando cpf'))
         file.write(subsecPessoaInternacional('nome da empresa de negocios LTDA', 'idp', 'endereco completo da empresa de negocios LTDA'))
         file.write(secArmazenamento('12345678901', 'nome da pessoa fisica ou razao social da empresa', 'numeroDaNF', '2023-02-01', '2012-12-12', 'E'))
-
+        file.write(subsecProdutosArmazenados("NCMProdutoArm", 81.44, 99.41, 8121325.4019, 'L'))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
