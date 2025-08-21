@@ -362,6 +362,15 @@ def subsecConhecimentoCarga(numero, dataConhecimentoCarga, dataRecebimentoCarga,
 
     return f'{str}\n'
 
+"""
+3.1.9.2. Subseção Local de Retirada (LR): O preenchimento dessa Subseção é obrigatório para os casos de 
+Local  de  Retirada  =  (A)  Armazenagem  Terceirizada  na  Seção  Transporte  Nacional  (TN). 
+"""
+def subsecLocalRetirada(cpfCnpjTerceirizada, nomeTerceirizada):
+    tipo = 'LR'
+    terceirizada = ajustarTamanhoStr(cpfCnpjTerceirizada, 14)
+    nome = ajustarTamanhoStr(nomeTerceirizada, 70)
+    return f'{tipo}{terceirizada}{nome}\n'
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -447,4 +456,5 @@ def gerar_arquivo():
         file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento todos metodos', 'RO','AQ','FE','AE'))
         file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento aereo only', 'AE'))
         file.write(subsecConhecimentoCarga('123456789', '2025-12-24', '2025-12-25', 'responsavel pelo recebimento todos mas por array', *['RO','AQ','FE','AE']))
+        file.write(subsecLocalRetirada('12345678901', 'essa terceirizada so tem cpf mas nao cnpj'))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
