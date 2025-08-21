@@ -405,6 +405,18 @@ def subsecArmazenagemLA(cpfCnpjEmpresa, nomeEmpresa):
     tipo = 'LA'
     return f'{tipo}{identificarEmpresa(cpfCnpjEmpresa, nomeEmpresa)}\n'
 
+"""
+3.1.10.2. Subseção  Pessoa  Internacional  (PI):  O  preenchimento  dessa  Subseção  é  obrigatório  para 
+todo Transporte Internacional (TI). Para operação de Importação, será utilizado como pessoa de 
+origem da carga (O). Para Exportação, como pessoa destino da carga (D).
+"""
+def subsecPessoaInternacional(nomeEmpresa, idPais, enderecoCompleto):
+    tipo = 'PI'
+    nome = ajustarTamanhoStr(nomeEmpresa, 70)
+    id = idPais
+    endereco = ajustarTamanhoStr(enderecoCompleto, 70)
+    return f'{tipo}{nome}{id}{endereco}\n'
+
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
 def gerar_arquivo():
@@ -493,4 +505,6 @@ def gerar_arquivo():
         file.write(subsecLocalEntregaLE('12345678901234', 'essa terceirizada tem cnpj mas nao cpf '))
         file.write(secTransporteInternacional('I', 'D', '1234567890', '2022-11-21', '12345678901', 'empresa que usa cpf aparentemente', 'P'))
         file.write(subsecArmazenagemLA('12345678901234', 'empresa responsavel pela armazenagem usando cpf'))
+        file.write(subsecPessoaInternacional('nome da empresa de negocios LTDA', 'idp', 'endereco completo da empresa de negocios LTDA'))
+        
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
