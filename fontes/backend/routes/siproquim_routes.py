@@ -397,7 +397,13 @@ def secTransporteInternacional(operacao, contratante, numeroNF, dataEmissaoNfe, 
 
     return f'{tipo}{oper}{contrat}{num}{data}{empresa}{nome}{local}\n'
 
-
+"""
+3.1.10.1. Subseção de Armazenamento (LA): O preenchimento dessa Subseção é obrigatório para os 
+casos de armazenagem terceirizada = (A) Transporte Internacional (TI). 
+"""
+def subsecArmazenagemLA(cpfCnpjEmpresa, nomeEmpresa):
+    tipo = 'LA'
+    return f'{tipo}{identificarEmpresa(cpfCnpjEmpresa, nomeEmpresa)}\n'
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -486,4 +492,5 @@ def gerar_arquivo():
         file.write(subsecLocalRetiradaLR('12345678901', 'essa terceirizada so tem cpf mas nao cnpj'))
         file.write(subsecLocalEntregaLE('12345678901234', 'essa terceirizada tem cnpj mas nao cpf '))
         file.write(secTransporteInternacional('I', 'D', '1234567890', '2022-11-21', '12345678901', 'empresa que usa cpf aparentemente', 'P'))
+        file.write(subsecArmazenagemLA('12345678901234', 'empresa responsavel pela armazenagem usando cpf'))
         return jsonify({"message": f"Arquivo {nomeArquivo} gerado", "arquivo": nomeArquivo})
