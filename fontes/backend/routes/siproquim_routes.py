@@ -66,6 +66,10 @@ def descreverQuantidadeDeProduto(tipo, codProduto, perPureza, vlrDensidade, quan
 
     return f'{tipo}{NCM}{concentracao}{densidade}{quantidade}{unidMedida}\n'
 
+def identificarEmpresa(cpfCnpjEmpresa, nomeEmpresa):
+    empresa = ajustarTamanhoStr(cpfCnpjEmpresa, 14)
+    nome = ajustarTamanhoStr(nomeEmpresa, 70)
+    return f'{empresa}{nome}'
 
 print("Debugging informações...", file=sys.stdout)
 """
@@ -160,7 +164,7 @@ armazenagem. Essa subseção deve ser informada quando for indicado no preenchim
 armazenagem, ou caso seja uma operação de entrada com endereço do local de entrega diferente 
 do endereço de cadastro.
 """
-def subsecArmazenagem(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
+def subsecArmazenagemMA(cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio):
     tipo = 'MA'
     return descreverEnderecoDeEmpresa(tipo, cnpj, razaoSocial, endereco, cep, numero, complemento, bairro, uf, municipio)
 
@@ -368,9 +372,7 @@ Local  de  Retirada  =  (A)  Armazenagem  Terceirizada  na  Seção  Transporte 
 """
 def subsecLocalRetiradaLR(cpfCnpjTerceirizada, nomeTerceirizada):
     tipo = 'LR'
-    terceirizada = ajustarTamanhoStr(cpfCnpjTerceirizada, 14)
-    nome = ajustarTamanhoStr(nomeTerceirizada, 70)
-    return f'{tipo}{terceirizada}{nome}\n'
+    return f'{tipo}{identificarEmpresa(cpfCnpjTerceirizada, nomeTerceirizada)}\n'
 
 """
 Subseção Local de Entrega (LE): O preenchimento dessa Subseção é obrigatório para os casos 
@@ -378,10 +380,7 @@ de Local de Entrega = (A) Armazenagem Terceirizada na Seção Transporte Naciona
 """
 def subsecLocalEntregaLE(cpfCnpjTerceirizada, nomeTerceirizada):
     tipo = 'LE'
-    terceirizada = ajustarTamanhoStr(cpfCnpjTerceirizada, 14)
-    nome = ajustarTamanhoStr(nomeTerceirizada, 70)
-
-    return f'{tipo}{terceirizada}{nome}\n'
+    return f'{tipo}{identificarEmpresa(cpfCnpjTerceirizada, nomeTerceirizada)}\n'
 
 """
 3.1.10.  Seção Transporte Internacional (TI): Descreverá as operações exportação (EX) e Importação (IM)
@@ -397,6 +396,8 @@ def secTransporteInternacional(operacao, contratante, numeroNF, dataEmissaoNfe, 
     local = localArmazenamento # (P)róprio ou (A)rmazenagem Terceirizada
 
     return f'{tipo}{oper}{contrat}{num}{data}{empresa}{nome}{local}\n'
+
+
 
 # Rota para listar todos os produtos
 @siproquim_bp.route("/gerarArquivoSiproquim", methods=["GET"])
@@ -461,7 +462,7 @@ def gerar_arquivo():
         for produto in produtos:
             file.write(subsecMovimento(produto[0], produto[2], produto[3], produto[5], "?")) # não tem unidade de medida no BD, tem q ser 'K' ou 'L'
         file.write(subsecTransporte("12345678901234", "razaoSocial"))
-        file.write(subsecArmazenagem("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
+        file.write(subsecArmazenagemMA("12345678901234", "razaoSocial", "enderecoArmaz", "33333-333", "numer", "complementoArmaz", "bairroArmaz", "uf", "municipioArmaz"))
         file.write(secMovimentacaoInternacional('E', "idP", "razaoSocialDoAdquirenteOuFornecedor", "99/9999999-9", "1984-03-01", "1985-01-02", "numDaDUE0000000", "1986-01-03", "99/9999999-9", "1986-01-02", 'E', 'E', 'I'))
         file.write(subsecResponsavelPeloTransporte("razaoSocial", "12345678901234"))
         file.write(subsecResponsavelPeloTransporte("razaoSocial"))
