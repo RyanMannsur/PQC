@@ -1,26 +1,26 @@
 import React from "react";
 import { useImperativeHandle } from 'react';
 import { forwardRef } from 'react';
-import { useRef } from 'react';
 
 const QrCodeGenerationSelector = forwardRef((props, ref) => {
-
+  
   const {codProduto, seqItem, produto, densidade, pureza, validade} = props; 
   let checked = false; 
   
-
-
   const setChecked = () =>{
     checked = !checked
   }  
 
-  const generateQrCode = () => {
-    return 'Img'
-  };
+  const generateQrCode = (stringData) =>{
+    const QRCode = require('qrcode');
+    
+    QRCode.toDataURL(stringData, { errorCorrectionLevel: 'H' }, function (err, qrCode) {
+      if (err) return console.log("error occurred");
+      qrcodeData.QrCodeImg = qrCode;
+    })
+  }
 
-
-  let qrcodeData = {
-    "QrCodeImg": generateQrCode(),
+  let qrCodeInfo = {
     "codProduto": codProduto,
     "seqItem": seqItem,
     "produto": produto,
@@ -28,22 +28,19 @@ const QrCodeGenerationSelector = forwardRef((props, ref) => {
     "pureza": pureza,
     "validade": validade,
   }
-
-
-
-
+  let qrcodeData = {"QrCodeImg": '',}
 
   useImperativeHandle(ref, () => ({
     fetchQrCode(){
-      window.alert('QrcodeFetched' + codProduto+ ':' +seqItem);
-      console.log(qrcodeData)
+      generateQrCode(JSON.stringify(qrCodeInfo));
+      qrcodeData = Object.assign({}, qrCodeInfo, qrcodeData);
+      console.log(qrcodeData);
       return qrcodeData;
     },
     isChecked(){
       return checked;
     }
   }));
-
 
   return (
     <input type="checkbox" className="QrCodeSelector" onChange={setChecked}></input>

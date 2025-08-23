@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import * as C from "./styles";
-import QrCodeGenerationSelector from "../QrCodeGenerator/GeneratorSelector";
-import QrCodePrintButton from "../QrCodeGenerator/PrintButton";
+import QrCodeGenerationSelector from "../QrCode/GeneratorSelector";
+import QrCodePrintButton from "../QrCode/PrintButton";
 
 const InventarioList = ({ data, onQuantityChange }) => {
   // Initialize qrCodeRefs as an object
