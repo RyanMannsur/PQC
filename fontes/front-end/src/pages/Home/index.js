@@ -1,66 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import * as C from "./styles";
-import { useLocal } from "../../contexts/local";
-import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
-import Modal from "../../components/Modal";
+import produtoService from "../../services/produtoService"
 import { useNavigate } from "react-router-dom";
+import StatusMessage from "../../components/StatusMensagem";
+
 
 
 const Home = () => {
-const { labId, labName } = useLocal();
-const [isModalOpen, setIsModalOpen] = useState(false);
 const navigate = useNavigate();
+const [statusMessage, setStatusMessage] = useState(null);
+const [loading, setLoading] = useState(false);
 
 useEffect(() => {
   const fetchLabDetails = async () => {
-    if (!labId) return;
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+   
+    if (!usuario)
+       return;
     
-    const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-
     try {
-      const produtos = await obterEstoqueLocalEstocagem(
-        codCampus, codUnidade, codPredio, codLaboratorio
+      setLoading(true)
+      const produtos = await produtoService.verificarSeTeveImplantacao(
+        usuario.laboratorios[usuario.indCorrente].codCampus,
+        usuario.laboratorios[usuario.indCorrente].codUnidade,
+        usuario.laboratorios[usuario.indCorrente].codPredio,
+        usuario.laboratorios[usuario.indCorrente].codLaboratorio
       );
 
-      const produtosComQuantidade = produtos.filter(produto =>
-        Array.isArray(produto.item) && produto.item.some(i => i.qtdEstoque > 0)
-      );
-
-      if (produtosComQuantidade.length === 0) {
-        setIsModalOpen(true);
+      if (produtos.qtdItensImplantados === 0) {
+        setStatusMessage({ tipo: 'AVISO', mensagem: ['Necessário realizar implantação dos produtos neste laboratório'] });
       }
     } catch (error) {
-      console.error("Erro ao buscar informações do laboratório:", error);
-    }
+        const msg = 'Erro no servidor. ' + error;
+        setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+      } finally {
+        setLoading(false);
+      }
   };
 
   fetchLabDetails();
-}, [labId]);
+}, []);
 
-const handleModalClose = () => {
-  setIsModalOpen(false);
+const onCloseMessage = () => {
+  setStatusMessage(null);
   navigate("/implantacao"); 
 };
 
-if (!labName && !isModalOpen) {
-  return <C.Label>Carregando informações...</C.Label>;
-}
 
 return (
   <>
-    <Modal
-      title="Implantação Necessária"
-      isOpen={isModalOpen}
-      onClose={handleModalClose}
-    >
-      Laboratório vazio. Você será redirecionado(a) para a implantação do local selecionado.
-    </Modal>
-    {labName && (
-      <C.Container>
-        <C.Content>
-          <C.Label>Bem-vindo ao {labName}</C.Label>
-        </C.Content>
-      </C.Container>
+    {/* RENDERIZA O STATUS MESSAGE AQUI */}
+    {statusMessage && (
+      <StatusMessage
+        message={statusMessage}
+        onClose={onCloseMessage}
+      />
     )}
   </>
 );

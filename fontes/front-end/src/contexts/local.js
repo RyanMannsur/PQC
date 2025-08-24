@@ -1,44 +1,24 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState } from "react";
+import authService from '../services/authService'
+
 
 export const LocalContext = createContext({});
 
 export const LocalProvider = ({ children }) => {
-const [labId, setLabId] = useState(null);
-const [labName, setLabName] = useState(null);
+  // O estado `usuario` agora é a única fonte de verdade.
+  // Ele é inicializado com os dados do usuário do localStorage.
+  const [usuario, setUsuario] = useState(() => {
+    return authService.getCurrentUser();
+  });
 
-useEffect(() => {
-  const storedLocalId = localStorage.getItem("labId");
-  const storedLabName = localStorage.getItem("labName");
-  if (storedLocalId) {
-    setLabId(JSON.parse(storedLocalId));
-  }
-  if (storedLabName) {
-    setLabName(storedLabName);
-  }
-}, []);
-
-const handleSetLabId = (id) => {
-  setLabId(id);
-  localStorage.setItem("labId", JSON.stringify(id));
+  return (
+    <LocalContext.Provider value={{ usuario, setUsuario }}>
+      {children}
+    </LocalContext.Provider>
+  );
 };
 
-const handleSetLabName = (name) => {
-  setLabName(name);
-  localStorage.setItem("labName", name);
-};
-
-return (
-  <LocalContext.Provider value={{ 
-    labId, 
-    setLabId: handleSetLabId,
-    labName,
-    setLabName: handleSetLabName
-  }}>
-    {children}
-  </LocalContext.Provider>
-);
-};
-
+// hook personalizado
 export const useLocal = () => {
-return useContext(LocalContext);
+  return useContext(LocalContext);
 };

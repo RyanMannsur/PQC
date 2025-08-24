@@ -25,16 +25,15 @@ export const Td = styled.td`
   padding: 8px;
   vertical-align: top;
   color: #4a5568;
-  border-bottom: 1px solid #e2e8f0;
 `;
 
 export const ProductRow = styled.tr`
-  background-color: #4a90e2;
+  background-color: #4a91e2a8;
   color: white;
   font-weight: 500;
 `;
 
-export const CampusRow = styled.tr`
+export const LocalRow = styled.tr`
   background-color: #add8e6;
   color: #2d3748;
 `;
@@ -45,9 +44,23 @@ export const ItemRow = styled.tr`
 `;
 
 export const MovRow = styled.tr`
-  background-color: #f8f9fa;
+  background-color: #f4f4e3ff;
   font-size: 14px;
   color: #4a5568;
 `;
 
 
+export const BotaoMaisMenos = styled.button`
+  padding: 0;
+  min-width: auto;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  width: auto;
+  cursor: pointer;`
+;

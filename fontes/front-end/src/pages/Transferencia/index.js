@@ -1,136 +1,228 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import * as C from "./styles";
-import { Input, Button, FormGroup } from "../../components";
-import ItemList from "../../components/ItemList";
-import Tooltip from "../../components/Tooltip"; 
-import { buscarProdutos } from "../../services/produto/service";
+import produtoService from "../../services/produtoService"
+import localEstocagem from "../../services/localEstocagemService";
+import TransferenciaList from "../../features/transferencia";
+import Button from "../../components/Button";
 import { formatarData } from "../../helpers/dataHelper";
+import StatusMessage from "../../components/StatusMensagem";
 
-const Transferencias = () => {
-const navigate = useNavigate();
-const location = useLocation(); 
-const [produto, setProduto] = useState("");
-const [pureza, setPureza] = useState("");
-const [densidade, setDensidade] = useState("");
-const [produtos, setProdutos] = useState([]);
-const [localData, setLocalData] = useState(null);
-const [isTooltipVisible, setIsTooltipVisible] = useState(false); 
-const [tooltipMessage, setTooltipMessage] = useState(""); 
+const Transferencia = () => {
+  const [produtos, setProdutos] = useState([]);
+  const [locaisDestino, setLocaisDestino] = useState([]); 
+  const [localSelecionado, setLocalSelecionado] = useState(''); 
+  const [usuario, setUsuario] = useState(null);
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  const fetchLocais = async () => {
+    try {
+      setLoading(true);
+      const usuario = JSON.parse(localStorage.getItem("usuario"));
+      setUsuario(usuario);
+      if (!usuario) {
+        setStatusMessage({ tipo: 'ERRO', mensagem: ['Erro ao acessar dados do usuário'] });
+        return;
+      }
 
-useEffect(() => {
-  const localStorageData = JSON.parse(localStorage.getItem("labId"));
-  setLocalData(localStorageData);
+      const lab = usuario.laboratorios[usuario.indCorrente]
+      if (lab.codCampus === null) {
+        setStatusMessage({ tipo: 'AVISO', mensagem: ['Usuario não está como responsável de nenhum laboratório'] });
+        setLoading(false);
+        return;
+      }
+      
+      const response = await localEstocagem.obterOutrosLocaisEstocagem(lab.codCampus, lab.codUnidade, lab.codPredio, lab.codLaboratorio);
+      
+      if (Array.isArray(response)) {
+        setLocaisDestino(response);
+      } else {
+        setStatusMessage(response);
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor.' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (location.state?.successMessage) {
-    setTooltipMessage(location.state.successMessage);
-    setIsTooltipVisible(true);
+  const fetchProdutos = async () => {
+    setLoading(true);
+    try {
+      const usuario = JSON.parse(localStorage.getItem("usuario"));
+      if (!usuario) return;
 
-    const timer = setTimeout(() => {
-      setIsTooltipVisible(false);
-    }, 3000);
+      const lab = usuario.laboratorios[usuario.indCorrente];
+      const response = await produtoService.obterEstoqueLocalEstocagem(
+        lab.codCampus,
+        lab.codUnidade,
+        lab.codPredio,
+        lab.codLaboratorio
+      );
 
-    return () => clearTimeout(timer); 
-  }
-}, [location.state]);
+      const produtosAgrupados = agruparProdutos(response);
+      setProdutos(produtosAgrupados);
+    } catch (error) {
+      const msg = 'Erro no servidor.' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const handlePesquisar = async () => {
-  if (localData) {
-    const { codCampus, codUnidade, codPredio, codLaboratorio } = localData;
-    const produtosResponse = await buscarProdutos(
-      codCampus,
-      codUnidade,
-      codPredio,
-      codLaboratorio,
-      produto,
-      pureza,
-      densidade
+  useEffect(() => {
+    fetchLocais();
+    fetchProdutos();
+  }, []);
+
+  const agruparProdutos = (produtosResponse) => {
+    const mapa = {};
+    if (!Array.isArray(produtosResponse)) return [];
+
+    produtosResponse.forEach((produto) => {
+      const { codProduto, nomProduto, perPureza, vlrDensidade, item } = produto;
+      if (!Array.isArray(item)) return;
+
+      if (!mapa[codProduto]) {
+        mapa[codProduto] = {
+          codProduto,
+          nomProduto,
+          perPureza,
+          vlrDensidade,
+          itens: [],
+        };
+      }
+
+      item.forEach(({ seqItem, datValidade, codEmbalagem, qtdEstoque }) => {
+        mapa[codProduto].itens.push({
+          seqItem,
+          datValidade: formatarData(datValidade),
+          codEmbalagem: codEmbalagem,
+          qtdAtual: qtdEstoque,
+          qtdTransferir: 0,
+        });
+      });
+    });
+
+    return Object.values(mapa);
+  };
+
+  const handleQuantityChange = (codProduto, seqItem, qtdTransferir) => {
+    setProdutos((prevProdutos) =>
+      prevProdutos.map((produto) =>
+        produto.codProduto === codProduto
+          ? {
+              ...produto,
+              itens: produto.itens.map((item) =>
+                item.seqItem === seqItem
+                  ? { ...item, qtdTransferir: qtdTransferir}
+                  : item
+              ),
+            }
+          : produto
+      )
     );
-    setProdutos(produtosResponse);
-  } else {
-    console.error("Dados de local não encontrados no local storage.");
-  }
+  };
+  
+  const enviarAtualizacao = async () => {
+    if (!usuario) return;
+    if (!localSelecionado) {
+      setStatusMessage({ tipo: 'ERRO', mensagem: ['Selecione um local de destino para a transferência.'] });
+      return;
+    }
+
+    const lab = usuario.laboratorios[usuario.indCorrente];
+    const [codCampusDestino, codUnidadeDestino, codPredioDestino, codLaboratorioDestino] = localSelecionado.split('/');
+
+    const payload = {
+      codCampusOrigem: lab.codCampus,
+      codUnidadeOrigem: lab.codUnidade,
+      codPredioOrigem: lab.codPredio,
+      codLaboratorioOrigem: lab.codLaboratorio,
+      codCampusDestino: codCampusDestino,
+      codUnidadeDestino: codUnidadeDestino,
+      codPredioDestino: codPredioDestino,
+      codLaboratorioDestino: codLaboratorioDestino,
+      produtos: produtos.flatMap((produto) =>
+        produto.itens
+          .filter((item) => item.qtdTransferir > 0)
+          .map((item) => ({
+            codProduto: produto.codProduto,
+            seqItem: item.seqItem,
+            codEmbalagem: item.codEmbalagem,
+            qtdEstoque: parseFloat(item.qtdAtual),
+            qtdTransferir: parseFloat(item.qtdTransferir), 
+        }))
+      ),
+    };
+    
+    try {
+      setLoading(true);
+      const response = await produtoService.atualizarTransferencia(payload);
+      setStatusMessage(response);
+    } catch (err) {
+      const msg = 'Erro no servidor.' + err.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseMessage = () => {
+    setStatusMessage(null);
+  };
+
+  return (
+    <C.Container>
+      <h1>Transferência</h1>
+      
+      {/* Listbox para seleção do local de destino */}
+      <div style={{ marginBottom: '20px' }}>
+        <label htmlFor="locaisDestino">Transferir para:</label>
+        <select
+          id="locaisDestino"
+          value={localSelecionado}
+          onChange={(e) => setLocalSelecionado(e.target.value)}
+          style={{ marginLeft: '10px', padding: '8px', borderRadius: '4px' }}
+        >
+          <option value="">Selecione um local...</option>
+          {locaisDestino.map(local => (
+            <option 
+              key={`${local.codCampus}/${local.codUnidade}/${local.codPredio}/${local.codLaboratorio}`}
+              value={`${local.codCampus}/${local.codUnidade}/${local.codPredio}/${local.codLaboratorio}`}
+            >
+               {`${local.codCampus}/${local.codUnidade} - ${local.nomLocal}`}
+            </option>
+
+          ))}
+        </select>
+      </div>
+
+      {statusMessage && (
+        <StatusMessage
+          message={statusMessage}
+          onClose={handleCloseMessage}
+        />
+      )}
+
+      {produtos.length > 0 ? (
+        <TransferenciaList data={produtos} onQuantityChange={handleQuantityChange} />
+      ) : (
+        <p>Nenhum produto encontrado no local.</p>
+      )}
+
+      <C.ButtonGroup>
+        <Button
+          Text="Confirmar Atualização"
+          onClick={enviarAtualizacao}
+          size="large"
+          $fullWidth
+          disabled={!localSelecionado || loading}
+        />
+      </C.ButtonGroup>
+    </C.Container>
+  );
 };
 
-const handleActionClick = (id, key) => {
-  if (key === "acoes") {
-    const [codProduto, seqItem] = id.split("-");
-    navigate(`/transferir/${codProduto}/${seqItem}`);
-  }
-};
-
-const columns = [
-  { key: "nome", label: "Nome", type: "string" },
-  { key: "quantidade", label: "Quantidade", type: "string" },
-  { key: "validade", label: "Data de Validade", type: "string" },
-  { key: "pureza", label: "Pureza", type: "string" },
-  { key: "densidade", label: "Densidade", type: "string" },
-  {
-    key: "acoes",
-    label: "Transferir",
-    type: "button",
-  },
-];
-
-const data = produtos.filter((produto) => produto.qtdEstoque > 0).map((produto) => ({
-  id: `${produto.codProduto}-${produto.seqItem}`,
-  codigo: produto.codProduto,
-  nome: produto.nomProduto,
-  quantidade: produto.qtdEstoque,
-  validade: formatarData(produto.datValidade),
-  pureza: produto.perPureza,
-  densidade: produto.vlrDensidade,
-  seqItem: produto.seqItem,
-}));
-
-return (
-  <C.Container>
-    <h1>Transferências</h1>
-
-    <FormGroup direction="row" $gap="medium" $alignItems="flex-end" $justifyContent="center">
-      <Input
-        type="text"
-        placeholder="Digite o produto"
-        value={produto}
-        label="Produto"
-        onChange={(e) => setProduto(e.target.value)}
-      />
-      <Input
-        type="text"
-        placeholder="Digite a pureza"
-        value={pureza}
-        label="Pureza"
-        onChange={(e) => setPureza(e.target.value)}
-      />
-      <Input
-        type="text"
-        placeholder="Digite a densidade"
-        value={densidade}
-        label="Densidade"
-        onChange={(e) => setDensidade(e.target.value)}
-      />
-      <Button onClick={handlePesquisar} size="medium">
-        Pesquisar
-      </Button>
-    </FormGroup>
-
-    {produtos.length > 0 ? (
-      <ItemList
-        columns={columns}
-        data={data}
-        onActionClick={handleActionClick}
-      />
-    ) : (
-      <p>Nenhum produto encontrado.</p>
-    )}
-
-    <Tooltip
-      message={tooltipMessage}
-      isVisible={isTooltipVisible}
-      onClose={() => setIsTooltipVisible(false)}
-    />
-  </C.Container>
-);
-};
-
-export default Transferencias;
+export default Transferencia;

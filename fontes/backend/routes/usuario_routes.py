@@ -1,96 +1,25 @@
 from flask import Blueprint, request, jsonify
 from db import Db, Mode
+from valida import Valida
+import util
 
 usuarios_bp = Blueprint("usuarios_bp", __name__)
 
-@usuarios_bp.route("/usuarios", methods=["GET"])
-def listar_usuarios():
-    db = Db()
-    sql = "SELECT id, cpf, isADM, token FROM usuario"
-    result = db.execSql(sql, None, Mode.SELECT)
-    if not isinstance(result, list):
-        return result
-    usuarios = [
-        {"id": r[0], "cpf": r[1], "isADM": r[2], "token": r[3]} for r in result
-    ]
-    return usuarios
-
-
-@usuarios_bp.route("/usuarios/<int:id>/adm", methods=["PUT"])
-def transformar_usuario_adm(id):
-    db = Db()
-    sql = "UPDATE usuario SET isADM = TRUE WHERE id = %s"
-    db.execSql(sql, (id,), Mode.DEFAULT)
-    return jsonify({"success": True}), 200
-
-@usuarios_bp.route("/usuarios/<int:id>/remover-adm", methods=["PUT"])
-def remover_usuario_adm(id):
-    # Aqui você pode adicionar lógica para garantir que apenas admins possam acessar
-    db = Db()
-    sql = "UPDATE usuario SET isADM = FALSE WHERE id = %s"
-    db.execSql(sql, (id,), Mode.DEFAULT)
-    return jsonify({"success": True}), 200
-
-@usuarios_bp.route("/usuarios/<int:id>/localestocagem", methods=["POST"])
-def modificar_locais_usuario(id):
-    data = request.get_json()
-    if not data or 'codCampus' not in data or 'codUnidade' not in data or 'codPredio' not in data or 'codLaboratorio' not in data or 'action' not in data:
-        return jsonify({"error": "Dados obrigatórios: codCampus, codUnidade, codPredio, codLaboratorio, action"}), 400
-    codCampus = data['codCampus']
-    codUnidade = data['codUnidade']
-    codPredio = data['codPredio']
-    codLaboratorio = data['codLaboratorio']
-    action = data['action']
-    try:
-        db = Db()
-        if action == 'add':
-            sql = "INSERT INTO usuariolocalestocagem (idUsuario, codCampus, codUnidade, codPredio, codLaboratorio) VALUES (%s, %s, %s, %s, %s)"
-            db.execSql(sql, (id, codCampus, codUnidade, codPredio, codLaboratorio), Mode.DEFAULT)
-        elif action == 'remove':
-            sql = "DELETE FROM usuariolocalestocagem WHERE idUsuario = %s AND codCampus = %s AND codUnidade = %s AND codPredio = %s AND codLaboratorio = %s"
-            db.execSql(sql, (id, codCampus, codUnidade, codPredio, codLaboratorio), Mode.DEFAULT)
-        else:
-            return jsonify({"error": "Ação inválida"}), 400
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@usuarios_bp.route("/usuarios/<int:id>/localestocagem", methods=["GET"])
-def listar_locais_usuario(id):
+@usuarios_bp.route("/usuarios/<codCPF>/localestocagem/disponiveis", methods=["GET"])
+def listar_locais_disponiveis_usuario(codCPF):
     try:
         db = Db()
         sql = """
-            SELECT l.codCampus, l.codUnidade, l.codPredio, l.codLaboratorio, l.nomLocal
-            FROM localestocagem l
-            JOIN usuariolocalestocagem ul ON ul.codCampus = l.codCampus AND ul.codUnidade = l.codUnidade AND ul.codPredio = l.codPredio AND ul.codLaboratorio = l.codLaboratorio
-            WHERE ul.idUsuario = %s
+            SELECT codCampus, 
+                   codUnidade,
+                   codPredio,
+                   codLaboratorio, 
+                   nomLocal
+              FROM localestocagem 
+             WHERE codCPFResponsavel != %s
         """
-        result = db.execSql(sql, (id,), Mode.SELECT)
-        locais = [
-            {
-                "codCampus": r[0],
-                "codUnidade": r[1],
-                "codPredio": r[2],
-                "codLaboratorio": r[3],
-                "nomLocal": r[4]
-            } for r in result
-        ]
-        return jsonify(locais), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@usuarios_bp.route("/usuarios/<token>/localestocagem", methods=["GET"])
-def listar_locais_usuario_token(token):
-    try:
-        db = Db()
-        sql = """
-            SELECT l.codCampus, l.codUnidade, l.codPredio, l.codLaboratorio, l.nomLocal
-            FROM localestocagem l
-            JOIN usuariolocalestocagem ul ON ul.codCampus = l.codCampus AND ul.codUnidade = l.codUnidade AND ul.codPredio = l.codPredio AND ul.codLaboratorio = l.codLaboratorio
-            WHERE ul.token = %s
-        """
-        result = db.execSql(sql, (token,), Mode.SELECT)
+        params = (codCPF,)
+        result = db.execSql(sql, params, Mode.SELECT)
         locais = [
             {
                 "codCampus": r[0],
@@ -105,54 +34,142 @@ def listar_locais_usuario_token(token):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@usuarios_bp.route("/usuarios/<token>/localestocagem/disponiveis", methods=["GET"])
-def listar_locais_disponiveis_usuario(token):
-    try:
-        db = Db()
-        sql = """
-            SELECT l.codCampus, l.codUnidade, l.codPredio, l.codLaboratorio, l.nomLocal
-            FROM localestocagem l
-            WHERE NOT EXISTS (
-                SELECT 1 FROM usuariolocalestocagem ul
-                WHERE ul.token = %s
-                AND ul.codCampus = l.codCampus AND ul.codUnidade = l.codUnidade AND ul.codPredio = l.codPredio AND ul.codLaboratorio = l.codLaboratorio
-            )
-        """
-        result = db.execSql(sql, (token,), Mode.SELECT)
-        locais = [
-            {
-                "codCampus": r[0],
-                "codUnidade": r[1],
-                "codPredio": r[2],
-                "codLaboratorio": r[3],
-                "nomLocal": r[4],
-                "chave": f"{r[0]}-{r[1]}-{r[2]}-{r[3]}"
-            } for r in result
-        ]
-        return jsonify(locais), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
-@usuarios_bp.route("/usuarios/<token>/localestocagem", methods=["POST"])
-def modificar_locais_usuario_token(token):
-    data = request.get_json()
-    if not data or 'codCampus' not in data or 'codUnidade' not in data or 'codPredio' not in data or 'codLaboratorio' not in data or 'action' not in data:
-        return jsonify({"error": "Dados obrigatórios: codCampus, codUnidade, codPredio, codLaboratorio, action"}), 400
-    codCampus = data['codCampus']
-    codUnidade = data['codUnidade']
-    codPredio = data['codPredio']
-    codLaboratorio = data['codLaboratorio']
-    action = data['action']
+@usuarios_bp.route('/usuario', methods=['GET'])
+def listar_usuario():
+    sql = """
+        SELECT codCPF,
+               nomUsuario,
+               idtTipoUsuario
+          FROM Usuario
+         ORDER BY 2
+    """
+
+    db = Db()
     try:
-        db = Db()
-        if action == 'add':
-            sql = "INSERT INTO usuariolocalestocagem (token, codCampus, codUnidade, codPredio, codLaboratorio) VALUES (%s, %s, %s, %s, %s)"
-            db.execSql(sql, (token, codCampus, codUnidade, codPredio, codLaboratorio), Mode.DEFAULT)
-        elif action == 'remove':
-            sql = "DELETE FROM usuariolocalestocagem WHERE token = %s AND codCampus = %s AND codUnidade = %s AND codPredio = %s AND codLaboratorio = %s"
-            db.execSql(sql, (token, codCampus, codUnidade, codPredio, codLaboratorio), Mode.DEFAULT)
-        else:
-            return jsonify({"error": "Ação inválida"}), 400
-        return jsonify({"success": True}), 200
+        usuarios = db.execSql(sql, None, Mode.SELECT)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return db.getErro(e)
+
+    if not usuarios:
+        return util.formataAviso("Usuarios não encontrado")
+
+    usuario_formatado = []
+    for usuario in usuarios: 
+        usuario_formatado.append({
+            "codCPF": usuario[0],
+            "nomUsuario": usuario[1],
+            "idtTipoUsuario": usuario[2],
+        })
+
+    return usuario_formatado
+
+@usuarios_bp.route('/obterResponsaveis', methods=['GET'])
+def obter_usuariosResponsaveis():
+    sql = """
+        SELECT codCPF,
+               nomUsuario,
+               idtTipoUsuario
+          FROM Usuario
+         ORDER BY nomUsuario
+    """
+
+    db = Db()
+    try:
+        usuarios = db.execSql(sql, None, Mode.SELECT)
+    except Exception as e:
+        return db.getErro(e)
+
+    if not usuarios:
+        return util.formataAviso("Usuarios não encontrado")
+
+    usuario_formatado = []
+    for usuario in usuarios: 
+        usuario_formatado.append({
+            "codCPFResponsavel": usuario[0],
+            "nomUsuario": usuario[1],
+            "idtTipoUsuario": usuario[2],
+        })
+
+    return usuario_formatado
+
+
+@usuarios_bp.route('/usuario', methods=['POST'])
+def cadastrar_usuario():
+    data = request.get_json()
+ 
+    codCPF = data.get('codCPF')
+    nomUsuario = data.get('nomUsuario')
+    idtTipoUsuario = data.get('idtTipoUsuario')
+       
+    valida = Valida()
+    valida.codCPF(codCPF)
+    valida.nomUsuario(nomUsuario)
+    valida.idtTipoUsuario(idtTipoUsuario)
+    
+    if valida.temMensagem():
+        return valida.getMensagens()
+
+    sql = """
+        INSERT INTO usuario 
+           (codCPF, nomUsuario, idtTipoUsuario)
+             VALUES (%s, %s, %s)
+    """
+    params = (codCPF, nomUsuario, idtTipoUsuario,)
+    
+    db = Db()
+    try:
+        return db.execSql(sql, params)
+    except Exception as e:
+        return db.getErro(e)
+    
+@usuarios_bp.route('/usuario/<codCPF>', methods=['PUT'])
+def atualizar_usuarios(codCPF):
+    data = request.get_json()
+    
+    nomUsuario = data.get('nomUsuario')
+    idtTipoUsuario = data.get('idtTipoUsuario')
+       
+    valida = Valida()
+    valida.codCPF(codCPF)
+    valida.nomUsuario(nomUsuario)
+    valida.idtTipoUsuario(idtTipoUsuario)
+    
+    if valida.temMensagem():
+        return valida.getMensagens()
+
+
+    sql = """
+        UPDATE Usuario
+           SET nomUsuario = %s,
+               idtTipoUsuario = %s
+         WHERE codCPF = %s
+    """
+    params = (nomUsuario, idtTipoUsuario, codCPF,)
+    
+    db = Db()
+    try:
+        return db.execSql(sql, params)
+    except Exception as e:
+        return db.getErro(e)
+
+
+@usuarios_bp.route('/usuario/<codCPF>', methods=['DELETE'])
+def excluir_usuario(codCPF):
+    valida = Valida()
+    valida.codCPF(codCPF)
+    if valida.temMensagem():
+        return valida.getMensagens()
+
+    sql = """
+        DELETE FROM Usuario
+         WHERE codCPF = %s
+    """
+    params = (codCPF,)
+
+    db = Db()
+    try:
+        return db.execSql(sql, params)
+    except Exception as e:
+        return db.getErro(e)
+

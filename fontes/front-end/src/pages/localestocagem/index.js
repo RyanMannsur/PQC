@@ -1,141 +1,236 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import LocalEstocagemForm from '../../features/localestocagem';
-import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
-import { getLocais, createLocal, updateLocal, deleteLocal } from '../../services/localService';
-import { TEXTOS, CAMPOS } from './constants';
-import { Container, TitleBottom, ModalOverlay, ModalContent } from './styles';
+import localEstocagemService from '../../services/localEstocagemService';
+import campusService from '../../services/campusService';
+import unidadeOrganizacionalService from '../../services/unidadeOrganizacionalService';
+import usuarioService from '../../services/usuarioService'
+import { CircularProgress } from "@mui/material";
+
+import { CAMPOS } from '../constants';
+import { Container, TitleBottom } from './styles';
 
 const LocalEstocagemPage = () => {
-  const [locais, setLocais] = useState([]);
-  const [usuario, setUsuario] = useState({});
-  const [editing, setEditing] = useState(null);
-  const containerRef = useRef(null);
-  const anchorRef = useRef(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [locais, setLocais] = useState([]);
+  const [campi, setCampi] = useState([]);
+  const [unidades, setUnidades] = useState([]);
+  const [responsaveis, setResponsaveis] = useState([]);
+  const [editing, setEditing] = useState(null);
+  const containerRef = useRef(null);
+  const anchorRef = useRef(null);
+  const [formKey, setFormKey] = useState(0);
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchLocais();
-    const token = localStorage.getItem('userToken');
-    if (token) {
-      fetchUsuario(token);
-    }
-  }, []);
-
-  const fetchUsuario = async (token) => {
-    try {
-      const response = await fetch('http://localhost:8088/api/auth/validate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      });
-      if (!response.ok) throw new Error('Erro ao buscar usuário');
-      const data = await response.json();
-      setUsuario(data);
-    } catch (error) {
-      setUsuario({});
-    }
-  };
-
-  const fetchLocais = async () => {
-    const data = await getLocais();
-    const arr = Array.isArray(data) ? data : [];
-    setLocais(arr.length ? arr.sort((a, b) => String(a.nomlocal).localeCompare(String(b.nomlocal))) : []);
-  };
-
-  const handleCreate = async (local) => {
-    try {
-      await createLocal(local);
-      setModalMessage(TEXTOS.LOCAL_CADASTRADO_SUCESSO);
-      setIsModalOpen(true);
-      window.location.reload();
-    } catch (error) {
-      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_CADASTRAR_LOCAL;
-      setModalMessage(msg);
-      setIsModalOpen(true);
+  const [formData, setFormData] = useState({
+    codCampus: '',
+    codUnidade: '',
+    codPredio: '',
+    codLaboratorio: '',
+    nomLocal: '',
+    codCPFResponsavel: ''
+  });
+  
+  const handleChange = e => {
+    const { name, value, type, checked } = e.target;
+    
+    if (name === 'codCampus') {
+      setFormData(prevData => ({ 
+        ...prevData, 
+        codCampus: value, 
+        codUnidade: '' // Limpa o campo de unidade
+      }));
+      if (value) {
+        fetchUnidades(value); // Busca unidades para o novo campus
+      } else {
+        setUnidades([]);
+      }
+    } else {
+      setFormData(prevData => ({
+        ...prevData,
+        [name]: type === 'checkbox' ? checked : value,
+      }));
     }
   };
 
-  const handleUpdate = async (local) => {
-    try {
-      await updateLocal(local);
-      setModalMessage(TEXTOS.LOCAL_ATUALIZADO_SUCESSO);
-      setIsModalOpen(true);
-      setEditing(null);
-      window.location.reload();
-    } catch (error) {
-      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_ATUALIZAR_LOCAL;
-      setModalMessage(msg);
-      setIsModalOpen(true);
+  
+  // --- Lógica de busca de dados ---
+
+  const fetchLocais = async () => {
+    try {
+      setLoading(true);
+      const response = await localEstocagemService.listar();
+      if (Array.isArray(response)) {
+        setLocais(response);
+      } else {
+        setStatusMessage(response);
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor: ' + error.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCampi = async () => {
+    try {
+      setLoading(true);
+      const response = await campusService.listar();
+      if (Array.isArray(response)) {
+        setCampi(response);
+      } else {
+        setStatusMessage(response);
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor: ' + error.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUnidades = async (codCampus) => {
+    try {
+      setLoading(true);
+      const response = await unidadeOrganizacionalService.obterUnidadePorCampus(codCampus);
+      if (Array.isArray(response)) {
+        setUnidades(response);
+      } else {
+        setStatusMessage(response);
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor: ' + error.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchResponsaveis = async () => {
+    try {
+      setLoading(true);
+      const response = await usuarioService.obterResponsaveis();
+      if (Array.isArray(response)) {
+        setResponsaveis(response);
+      } else {
+        setStatusMessage(response);
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor: ' + error.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLocais();
+    fetchCampi();
+    fetchResponsaveis();
+  }, []);
+
+ 
+  // --- Lógica de CRUD e UI ---
+
+  const handleCreate = async (local) => {
+    try {
+      const response = await localEstocagemService.cadastrar(local);
+      setStatusMessage(response);
+      handleCancel();
+      fetchLocais();
+    } catch (error) {
+      const msg = 'Erro no servidor: ' + error.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    }
+  };
+
+  const handleUpdate = async (local) => {
+    try {
+      const response = await localEstocagemService.alterar(local);
+      setStatusMessage(response);
+      handleCancel();
+      fetchLocais();
+    } catch (error) {
+      const msg = 'Erro no servidor: ' + error.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    }
+  };
+
+  const handleDelete = async (local) => {
+    try {
+      const response = await localEstocagemService.excluir(local);
+      setStatusMessage(response);
+      fetchLocais();
+    } catch (error) {
+      const msg = 'Erro no servidor: ' + error.message;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    }
+  };
+
+  const handleEdit = (local) => {
+    setEditing(local);
+    setFormData(local)
+    if (local.codCampus) {
+      fetchUnidades(local.codCampus);
     }
-  };
+    setFormKey(prev => prev + 1);
+    if (anchorRef.current) {
+      anchorRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
-  const handleDelete = async (local) => {
-    await deleteLocal(local);
-    window.location.reload();
-  };
+  const handleCancel = () => {
+    setEditing(null);
+    setFormData({});
+    setFormKey(prev => prev + 1);
+  };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    window.location.reload();
-  };
+  const handleCloseMessage = () => {
+    setStatusMessage(null);
+  };
 
-  const [formKey, setFormKey] = useState(0);
+  return (
+    <Container ref={containerRef}>
+      <div ref={anchorRef} />
+      <TitleBottom>{editing ? 'Editar Local de Estocagem' : 'Cadastrar Local de Estocagem'}</TitleBottom>
+      <LocalEstocagemForm
+        key={formKey}
+        onSubmit={editing ? handleUpdate : handleCreate}
+        isEditing={!!editing}
+        onCancel={handleCancel}
+        campi={campi}
+        unidades={unidades}
+        responsaveis={responsaveis}
+        formData={formData}
+        onChange={handleChange}
+      />
 
-  const handleEdit = (local) => {
-    setEditing(local);
-    if (anchorRef.current) {
-      anchorRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleCancel = () => {
-    setEditing(null);
-    setFormKey(prev => prev + 1); 
-  };
-
-  return (
-    <Container ref={containerRef}>
-      <div ref={anchorRef} />
-      <TitleBottom>{editing ? TEXTOS.EDITAR_LOCAL : TEXTOS.CADASTRAR_LOCAL}</TitleBottom>
-      <LocalEstocagemForm
-        key={formKey}
-        onSubmit={editing ? handleUpdate : handleCreate}
-        initialData={editing}
-        isEditing={!!editing}
-        isADM={usuario?.isADM}
-        onDelete={editing && usuario?.isADM ? () => handleDelete(editing) : undefined}
-        onCancel={handleCancel}
-      />
-      <CrudTable
-        title="Lista de Locais"
-        columns={[
-          { label: CAMPOS.CODCAMPUS, field: 'codcampus' },
-          { label: CAMPOS.CODUNIDADE, field: 'codunidade' },
-          { label: CAMPOS.CODPREDIO, field: 'codpredio' },
-          { label: CAMPOS.CODLAB, field: 'codlaboratorio' },
-          { label: CAMPOS.NOMLOCAL, field: 'nomlocal' }
-        ]}
-        data={locais}
-        onEdit={handleEdit}
-        editText={TEXTOS.EDITAR_LOCAL}
-        getRowKey={item => item.codlaboratorio}
-      />
-      {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <h3>{TEXTOS.SUCESSO}</h3>
-            <p>{modalMessage}</p>
-            <Button $variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
-          </ModalContent>
-        </ModalOverlay>
-      )}
-    </Container>
-  );
+      {loading ? (
+        <div style={{ textAlign: 'center', margin: '20px' }}>
+          <CircularProgress />
+        </div>
+      ) : (
+      <CrudTable
+        title="Lista de Locais"
+        columns={[
+          { label: CAMPOS.CODCAMPUS, field: 'codCampus' },
+          { label: CAMPOS.CODUNIDADE, field: 'codUnidade' },
+          { label: CAMPOS.CODPREDIO, field: 'codPredio' },
+          { label: CAMPOS.CODLABORATORIO, field: 'codLaboratorio' },
+          { label: CAMPOS.NOMLOCAL, field: 'nomLocal' },
+          { label: CAMPOS.CODCPFRESPONSAVEL, field: 'codCPFResponsavel' }
+        ]}
+        data={locais}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        getRowKey={item => `${item.codCampus}-${item.codUnidade}-${item.codPredio}-${item.codLaboratorio}`}
+        statusMessage={statusMessage}
+        onCloseMessage={handleCloseMessage}
+      />
+      )}
+    </Container>
+  );
 };
 
 export default LocalEstocagemPage;

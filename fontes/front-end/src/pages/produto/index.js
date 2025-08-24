@@ -1,75 +1,104 @@
 
 import { useEffect, useState, useRef } from 'react';
-import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
 import ProdutoForm from '../../features/produto';
-import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
-import produtoService from '../../services/produto/service';
-import { TEXTOS, CAMPOS } from './constantes';
-
+import { Container, TitleBottom } from './styles';
+import produtoService from '../../services/produtoService';
+import orgaoControleService from '../../services/orgaoControleService';
+import { CAMPOS } from '../constants';
+import { CircularProgress } from "@mui/material";
 
 const ProdutoPage = () => {
-  const handleAtivar = async (produto) => {
-    try {
-      const payload = { ...produto, idtAtivo: true };
-      await produtoService.atualizar(payload);
-      setEditing(null);
-      fetchProdutos();
-    } catch (error) {
-      setTooltip({ visible: true, message: 'Erro ao ativar produto' });
-      setTimeout(() => setTooltip({ visible: false, message: '' }), 4000);
-    }
-  };
   const [formKey, setFormKey] = useState(0);
   const [produtos, setProdutos] = useState([]);
-  const [usuario, setUsuario] = useState({});
+  const [orgaosControle, setOrgaosControle] = useState([])
   const [editing, setEditing] = useState(null);
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [tooltip, setTooltip] = useState({ visible: false, message: "" });
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({});
+  const editCancelText = editing ? 'Cancelar' : 'Limpar';
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   useEffect(() => {
     fetchProdutos();
-    const token = localStorage.getItem('userToken');
-    if (token) {
-      fetchUsuario(token);
-    }
-  }, []);
-
-  const fetchUsuario = async (token) => {
-    try {
-      const response = await fetch('http://localhost:8088/api/auth/validate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      });
-      if (!response.ok) throw new Error('Erro ao buscar usuário');
-      const data = await response.json();
-      setUsuario(data);
-    } catch (error) {
-      setUsuario({});
-    }
-  };
+    fetchOrgaosControle()
+  }, []); 
 
   const fetchProdutos = async () => {
-    const res = await produtoService.listar();
-    setProdutos(res.sort((a, b) => a.nomProduto.localeCompare(b.nomProduto)));
+    try {
+      setLoading(true)
+      const response = await produtoService.listar();
+      if (Array.isArray(response)) {
+        setProdutos(response);
+      } else {
+        setStatusMessage(response)
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor.' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false)
+    }
   };
+
+  const fetchOrgaosControle = async () => {
+    try {
+      setLoading(true)
+      const response = await orgaoControleService.listar();
+      if (Array.isArray(response)) {
+        setOrgaosControle(response);
+      } else {
+        setStatusMessage(response)
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor.' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false)
+    }
+  };
+
+  //  função para gerenciar o estado dos checkboxes
+  const handleOrgaoChange = (codOrgaoControle, isChecked) => {
+    setFormData(prevFormData => {
+      const currentOrgaos = prevFormData.orgaosControle || [];
+      
+      if (isChecked) {
+        // Adiciona o objeto completo à lista
+        const selectedOrgao = orgaosControle.find(o => o.codOrgaoControle === codOrgaoControle);
+        return {
+          ...prevFormData,
+          orgaosControle: [...currentOrgaos, selectedOrgao]
+        };
+      } else {
+        // Remove o objeto da lista
+        return {
+          ...prevFormData,
+          orgaosControle: currentOrgaos.filter(o => o.codOrgaoControle !== codOrgaoControle)
+        };
+      }
+    });
+  };
 
   const handleCreate = async (produto) => {
     try {
-      await produtoService.cadastrar(produto);
-      setModalMessage(TEXTOS.PRODUTO_CADASTRADO_SUCESSO);
-      setIsModalOpen(true);
+      const response = await produtoService.cadastrar(produto);
+      setStatusMessage(response)
+      handleCancel();
+      fetchProdutos();
     } catch (error) {
-      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_CADASTRAR_PRODUTO;
-      setTooltip({ visible: true, message: msg });
-      setTimeout(() => setTooltip({ visible: false, message: "" }), 4000);
-    }
+      const msg = 'Erro no servidor.' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } 
   };
 
   const handleUpdate = async (produto) => {
@@ -78,97 +107,94 @@ const ProdutoPage = () => {
       if (!payload.codProduto && editing?.codProduto) {
         payload.codProduto = editing.codProduto;
       }
-      await produtoService.atualizar(payload);
-      setEditing(null);
+      const response = await produtoService.atualizar(payload);
+      setStatusMessage(response)
+      handleCancel();
+      fetchProdutos();
     } catch (error) {
-      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_ATUALIZAR_PRODUTO;
-      setTooltip({ visible: true, message: msg });
-      setTimeout(() => setTooltip({ visible: false, message: "" }), 4000);
-    }
+      const msg = 'Erro no servidor.' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } 
   };
 
 
-  const handleDelete = async (codProduto) => {
-    await produtoService.excluir(codProduto);
-    window.location.reload();
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    window.location.reload();
-  };
-
+  const handleDelete = async (produto) => {
+    try {
+      const response = await produtoService.excluir(produto.codProduto);
+      setStatusMessage(response)
+      fetchProdutos();
+    } catch (error) {
+      const msg = 'Erro no servidor.' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    };
+  }
 
   const handleEdit = (produto) => {
+    setFormData(produto); 
     setEditing(produto);
     if (anchorRef.current) {
       anchorRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
+
   const handleCancel = () => {
     setEditing(null);
+    setFormData({})
     setFormKey(prev => prev + 1);
+  };
+
+  const handleCloseMessage = () => {
+    setStatusMessage(null);
   };
 
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
-      <TitleBottom>{editing ? TEXTOS.EDITAR_PRODUTO : TEXTOS.CADASTRAR_PRODUTO}</TitleBottom>
+      <TitleBottom>{editing ? 'Editar Produto' : 'Cadastrar Produto'}</TitleBottom>
       <ProdutoForm
         key={formKey}
         onSubmit={editing ? handleUpdate : handleCreate}
         initialData={editing}
         isEditing={!!editing}
-        isADM={usuario?.isADM}
-        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codProduto) : undefined}
+        allOrgaosControle={orgaosControle}
+        handleOrgaoChange={handleOrgaoChange}
+        onDelete={editing ? () => handleDelete(editing.codProduto) : undefined}
         onCancel={handleCancel}
+        editCancelText={editCancelText}
+        formData={formData}
+        onChange={handleChange} 
       />
-      <CrudTable
-        title="Lista de Produtos"
-        columns={[
-          { label: CAMPOS.NCM, field: 'ncm' },
-          { label: CAMPOS.NOME, field: 'nomProduto' },
-          { label: CAMPOS.LISTA, field: 'nomLista' },
-          { label: CAMPOS.PUREZA, field: 'perPureza' },
-          { label: CAMPOS.DENSIDADE, field: 'vlrDensidade' },
-          {
-            label: CAMPOS.ATIVO,
-            field: 'idtAtivo',
-            render: (item) => {
-              if (item.idtAtivo) return TEXTOS.SIM;
-              if (usuario?.isADM) {
-                return (
-                  <Button
-                    $variant="primary"
-                    size="small"
-                    onClick={() => handleAtivar(item)}
-                  >Ativar</Button>
-                );
-              }
-              return TEXTOS.NAO;
+      {loading ? (
+        <div style={{ textAlign: 'center', margin: '20px' }}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <CrudTable
+          title="Lista de Produtos"
+          columns={[
+            { label: CAMPOS.NCM, field: 'ncm' },
+            { label: CAMPOS.NOME, field: 'nomProduto' },
+            { label: CAMPOS.LISTA, field: 'nomLista' },
+            { label: CAMPOS.PUREZA, field: 'perPureza' },
+            { label: CAMPOS.DENSIDADE, field: 'vlrDensidade' },
+            { label: CAMPOS.ATIVO,
+              render: (row) => (
+                <input
+                  type="checkbox"
+                  checked={row.idtAtivo}
+                />
+              )
             }
-          }
-        ]}
-        data={produtos}
-        onEdit={handleEdit}
-        editText={TEXTOS.EDITAR}
-        getRowKey={item => item.codProduto}
-      />
-      {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <h3>{TEXTOS.SUCESSO}</h3>
-            <p>{modalMessage}</p>
-            <Button $variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
-          </ModalContent>
-        </ModalOverlay>
-      )}
-      {tooltip.visible && (
-        <TooltipError>
-          <strong>{TEXTOS.ERRO}</strong> {tooltip.message}
-        </TooltipError>
-      )}
+          ]}
+          data={produtos}
+          onEdit={handleEdit}
+          onDelete={handleDelete} 
+          getRowKey={item => item.codProduto}
+          statusMessage={statusMessage}
+          onCloseMessage={handleCloseMessage}
+        />
+      )}  
     </Container>
   );
 };

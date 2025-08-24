@@ -1,5 +1,6 @@
+// src/contexts/auth.js
 import { createContext, useEffect, useState } from "react";
-import { validateToken, getCurrentUser, logout, login } from "../services/auth/service";
+import authService from '../services/authService';
 
 export const AuthContext = createContext({});
 
@@ -8,28 +9,24 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const user = getCurrentUser();
-      if (user && user.token) {
-        try {
-          const validatedUser = await validateToken(user.token);
-          setUsuario(validatedUser);
-        } catch (error) {
-          console.error("Token inválido:", error);
-          logout();
-          setUsuario(null);
-        }
+    async function loadUser() {
+      const usuario = authService.getCurrentUser();
+      
+      if (usuario) {
+        setUsuario(usuario);
       }
+      
       setLoading(false);
-    };
+    }
+    
+    loadUser();
+  }, []); 
 
-    checkAuth();
-  }, []);
-
-  const signin = async (cpf, senha) => {
+  const signin = async (cpf) => {
     try {
-      const result = await login(cpf, senha);
-      setUsuario(result);
+      const usuario = await authService.login(cpf);
+      authService.setCurrentUser(usuario);
+      setUsuario(usuario);
       return null;
     } catch (error) {
       return error.message || "Erro no login";
@@ -38,11 +35,38 @@ export const AuthProvider = ({ children }) => {
 
   const signout = () => {
     setUsuario(null);
-    logout();
+    authService.logout();
   };
 
+  const alterarLaboratorio = (laboratorio) => {
+    // Cria uma cópia do objeto 'usuario'
+    const novoUsuario = { ...usuario };
+    
+    const novoIndice = novoUsuario.laboratorios.findIndex(
+      (lab) =>
+        lab.codCampus === laboratorio.codCampus &&
+        lab.codUnidade === laboratorio.codUnidade &&
+        lab.codPredio === laboratorio.codPredio &&
+        lab.codLaboratorio === laboratorio.codLaboratorio
+    );
+
+    // Atualiza o índice corrente do laboratório no objeto do usuário
+    if (novoIndice !== -1) {
+      novoUsuario.indCorrente = novoIndice;
+      setUsuario(novoUsuario); 
+      authService.setCurrentUser(novoUsuario); 
+      authService.alterarLaboratorioCorrente(novoUsuario)
+    }
+  };
+  
   return (
-    <AuthContext.Provider value={{ usuario, signin, signout, loading }}>
+    <AuthContext.Provider value={{ 
+      usuario, 
+      signin, 
+      signout, 
+      loading,
+      alterarLaboratorio 
+    }}>
       {children}
     </AuthContext.Provider>
   );

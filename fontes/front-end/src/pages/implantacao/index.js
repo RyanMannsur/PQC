@@ -1,111 +1,118 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
 import ImplantacaoList from "../../features/implantacao";
-import Modal from "../../components/Modal"; 
 import { Button, FormGroup } from "../../components";
-import { obterProdutosNaoImplantadosPorLocal, implantarItensLaboratorio } from "../../services/produto/service";
-import { useLocal } from "../../contexts/local";
+import produtoService from "../../services/produtoService";
 import * as C from "./styles";
+import { CircularProgress } from "@mui/material";
+import StatusMessage from "../../components/StatusMensagem";
 
 const Implantacao = () => {
-const [produtos, setProdutos] = useState([]);
-const [implantacoes, setImplantacoes] = useState({});
-const [loading, setLoading] = useState(true);
-const { labId, labName } = useLocal();
-const [isModalOpen, setIsModalOpen] = useState(false); 
-const navigate = useNavigate(); 
+  const [produtos, setProdutos] = useState([]);
+  const [implantacoes, setImplantacoes] = useState({});
+  const [usuario, setUsuario] = useState(null) 
+  const [loading, setLoading] = useState(true);
+  const [statusMessage, setStatusMessage] = useState(null);
+  
+  useEffect(() => {
+    const fetchProdutos = async () => {
+      setLoading(true)
+      const usuario = JSON.parse(localStorage.getItem("usuario"))
+      setUsuario(usuario);
+      if (!usuario) {
+        setStatusMessage({ tipo: 'ERRO', mensagem: ['Erro ao acessar dados do usuário'] });
+        return;
+      }
 
-useEffect(() => {
-  const fetchProdutos = async () => {
-    if (!labId) return;
-    
-    const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
+      const lab = usuario.laboratorios[usuario.indCorrente]
+      if (lab.codCampus === null) {
+        setStatusMessage({ tipo: 'AVISO', mensagem: ['Usuario não está como responsável de nenhum laboratório'] });
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await produtoService.obterProdutosNaoImplantadosPorLocal(lab.codCampus, lab.codUnidade, lab.codPredio, lab.codLaboratorio);
+        if (Array.isArray(response)) {
+          setProdutos(response);
+        } else {
+          setStatusMessage(response);
+        }
+      } catch (error) {
+        const msg = 'Erro no servidor. ' + error;
+        setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProdutos();
+  }, []);
+
+  const handleChange = (updatedImplantacoes) => {
+    setImplantacoes(updatedImplantacoes);
+  };
+
+  const handleConfirm = async () => {
+    const lab = usuario.laboratorios[usuario.indCorrente]
+
+    const dadosParaEnvio = {
+      codCampus: lab.codCampus,
+      codUnidade: lab.codUnidade,
+      codPredio: lab.codPredio,
+      codLaboratorio: lab.codLaboratorio,
+      produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
+        codProduto: parseInt(codProduto),
+        items: items.map((item) => ({
+          codEmbalagem: item.codEmbalagem, 
+          qtdEstoque: parseFloat(item.qtdEstoque),
+          datValidade: item.datValidade,
+          txtJustificativa: item.txtJustificativa,
+        })),
+      })),
+    };
+
     try {
-      const produtosResponse = await obterProdutosNaoImplantadosPorLocal(codCampus, codUnidade, codPredio, codLaboratorio,);
-      setProdutos(produtosResponse);
+      setLoading(true)
+      const response = await produtoService.implantarItensLaboratorio(dadosParaEnvio);
+      setStatusMessage(response);
     } catch (error) {
-      console.error("Erro ao buscar produtos:", error);
+      const msg = 'Erro no servidor. ' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
     } finally {
       setLoading(false);
     }
   };
 
-  fetchProdutos();
-}, [labId]);
-
-const handleChange = (updatedImplantacoes) => {
-  setImplantacoes(updatedImplantacoes);
-};
-
-const handleConfirm = async () => {
-  if (!labId) {
-    console.error("Laboratório não selecionado.");
-    return;
-  }
-
-  const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-
-  const dadosParaEnvio = {
-    codCampus,
-    codUnidade,
-    codPredio,
-    codLaboratorio,
-    produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
-      codProduto: parseInt(codProduto),
-      items: items.map((item) => ({
-        codEmbalagem: item.codEmbalagem,  // ✅ CORRIGIDO: era seqEmbalagem
-        qtdEstoque: parseFloat(item.qtdEstoque),
-        datValidade: item.datValidade,
-        txtJustificativa: item.txtJustificativa,
-      })),
-    })),
+  const handleCloseMessage = () => {
+    setStatusMessage(null);
   };
 
-  try {
-    const response = await implantarItensLaboratorio(dadosParaEnvio);
-    if (response) {
-      console.log("Implantação realizada com sucesso:", response);
-      setIsModalOpen(true); 
-    } else {
-      console.error("Erro ao realizar implantação.");
-      alert("Erro ao realizar implantação.");
-    }
-  } catch (error) {
-    console.error("Erro ao realizar implantação:", error);
-    alert("Erro ao realizar implantação. Verifique os detalhes no console.");
-  }
-};
-
-const handleCloseModal = () => {
-  setIsModalOpen(false); 
-  navigate("/home"); 
-};
-
-if (loading) {
   return (
-    <C.Loading>
-      Carregando produtos...
-    </C.Loading>
+    <>
+      {loading ? (
+        <div style={{ textAlign: 'center', margin: '20px' }}>
+          <CircularProgress />
+        </div>
+      ) : (
+        // Conteúdo principal do formulário
+        <C.Container>
+          <C.Title>Implantação de Produtos no {usuario.laboratorios[usuario.indCorrente].nomLocal}</C.Title>
+          <ImplantacaoList data={produtos} onChange={handleChange} />
+          <FormGroup $justifyContent="center">
+            <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
+          </FormGroup>
+        </C.Container>
+      )}
+
+      {/* RENDERIZA O STATUS MESSAGE AQUI */}
+      {statusMessage && (
+        <StatusMessage
+          message={statusMessage}
+          onClose={handleCloseMessage}
+        />
+      )}
+    </>
   );
-}
-
-return (
-  <C.Container>
-    <C.Title>Implantação de Produtos no {labName}</C.Title>
-    <ImplantacaoList data={produtos} onChange={handleChange} />
-    <FormGroup $justifyContent="center">
-      <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
-    </FormGroup>
-
-    <Modal
-      title="Implantação Realizada"
-      isOpen={isModalOpen}
-      onClose={handleCloseModal}
-    >
-      <p>A implantação foi realizada com sucesso!</p>
-    </Modal>
-  </C.Container>
-);
 };
 
 export default Implantacao;

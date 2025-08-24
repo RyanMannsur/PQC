@@ -1,25 +1,23 @@
-import React from "react";
 import ManualPage from "../pages/manual";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AppLayout from "../layout/AppLayout"
 import Signin from "../pages/Signin";
-import SelecionarLocal from "../pages/SelecionarLocal";
 import Home from "../pages/Home";
 import Inventario from "../pages/Inventario";
-import TransferirProduto from "../pages/Transferencia/tranferirProduto";
 import CreateProdutos from "../pages/createProduto";
 import PrivateRoute from "./private";
 import AppNotSidebar from "../layout/AppNotSidebar";
-import AppLayout from "../layout/App";
 import PublicoLayout from "../layout/publico";
-import Traferencia from "../pages/Transferencia";
+import Transferencia from "../pages/Transferencia";
 import Implantacao from "../pages/implantacao";
 import ConsultaPQCPage from "../pages/consultaPQC";
 import ProdutoPage from "../pages/produto";
+import ImportarNFe from "../pages/ImportarNFe"
 import CampusPage from "../pages/campus";
-import UnidadePage from "../pages/unidadeorganizacional";
-import LocalEstocagemPage from "../pages/localestocagem";
+import UnidadeOrganizacionalPage from "../pages/unidadeOrganizacional";
+import LocalEstocagemPage from "../pages/localEstocagem";
 import UsuariosPage from "../pages/usuario";
-import GerenciarLocaisUsuario from '../pages/usuario/GerenciarLocais';
+import OrgaoControlePage from '../pages/orgaoControle';
 
 const RoutesApp = () => {
   return (
@@ -42,16 +40,7 @@ const RoutesApp = () => {
           }
         />
 
-        <Route
-          path="/selecionar-lab"
-          element={
-            <PrivateRoute>
-              <AppNotSidebar>
-                <SelecionarLocal />
-              </AppNotSidebar>
-            </PrivateRoute>
-          }
-        />
+        
         <Route
           path="/home"
           element={
@@ -77,21 +66,12 @@ const RoutesApp = () => {
           element={
             <PrivateRoute>
               <AppLayout>
-                <Traferencia />
+                <Transferencia />
               </AppLayout>
             </PrivateRoute>
           }
         />
-        <Route
-          path="/transferir/:codProduto/:seqItem"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <TransferirProduto />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
+       
         <Route
           path="/cadastrar-produto"
           element={
@@ -102,6 +82,18 @@ const RoutesApp = () => {
             </PrivateRoute>
           }
         />
+
+        <Route
+          path="/ImportarNFe"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <ImportarNFe />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        
         <Route
           path="/implantacao"
           element={
@@ -151,7 +143,7 @@ const RoutesApp = () => {
           element={
             <PrivateRoute>
               <AppLayout>
-                <UnidadePage />
+                <UnidadeOrganizacionalPage />
               </AppLayout>
             </PrivateRoute>
           }
@@ -191,11 +183,11 @@ const RoutesApp = () => {
         />
 
         <Route
-          path="/usuarios/:token/locais"
+          path="/orgaoControle"
           element={
             <PrivateRoute>
               <AppLayout>
-                <GerenciarLocaisUsuario />
+                <OrgaoControlePage />
               </AppLayout>
             </PrivateRoute>
           }

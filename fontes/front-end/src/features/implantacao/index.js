@@ -58,6 +58,8 @@ const ImplantacaoList = ({ data, onChange }) => {
           <C.Th>Lista</C.Th>
           <C.Th>Pureza</C.Th>
           <C.Th>Densidade</C.Th>
+          <C.Th>NCM</C.Th>
+
           <C.Th>Ações</C.Th>
         </tr>
       </thead>
@@ -69,6 +71,7 @@ const ImplantacaoList = ({ data, onChange }) => {
               <C.Td>{produto.nomLista}</C.Td>
               <C.Td>{produto.perPureza}</C.Td>
               <C.Td>{produto.vlrDensidade}</C.Td>
+              <C.Td>{produto.ncm}</C.Td>
               <C.Td>
                 <Button 
                   $variant="outline" 
@@ -114,7 +117,7 @@ const ImplantacaoList = ({ data, onChange }) => {
                         }
                       />
                     </C.SublistTd>
-                    <C.SublistTd>
+                    <C.SublistTd colSpan={2}>
                       Observação
                       <Input
                         type="text"

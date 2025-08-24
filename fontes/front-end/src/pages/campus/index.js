@@ -1,131 +1,136 @@
 import { useEffect, useState, useRef } from 'react';
-import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
 import CampusForm from '../../features/campus';
-import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
-import campusService from '../../services/campus/service';
-import { TEXTOS, CAMPOS } from './constantes';
+import { Container, TitleBottom } from './styles';
+import campusService from '../../services/campusService';
+import { CAMPOS } from '../constants';
+import { CircularProgress } from "@mui/material";
 
 const CampusPage = () => {
   const [formKey, setFormKey] = useState(0);
   const [campi, setCampi] = useState([]);
-  const [usuario, setUsuario] = useState({});
   const [editing, setEditing] = useState(null);
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [tooltip, setTooltip] = useState({ visible: false, message: "" });
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({});
 
-  useEffect(() => {
-    fetchCampi();
-    const token = localStorage.getItem('userToken');
-    if (token) {
-      fetchUsuario(token);
-    }
-  }, []);
-
-  const fetchUsuario = async (token) => {
-    try {
-      const response = await fetch('http://localhost:8088/api/auth/validate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      });
-      if (!response.ok) throw new Error('Erro ao buscar usuário');
-      const data = await response.json();
-      setUsuario(data);
-    } catch (error) {
-      setUsuario({});
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const fetchCampi = async () => {
-    const res = await campusService.listar();
-    setCampi(res.sort((a, b) => a.nomcampus.localeCompare(b.nomcampus)));
+    try {
+      setLoading(true);
+      const response = await campusService.listar();
+      if (Array.isArray(response)) {
+        setCampi(response);
+      } else {
+        setStatusMessage(response);
+      }
+    } catch (error) {
+      const msg = 'Erro no servidor. ' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchCampi();
+  }, []);
 
   const handleCreate = async (campus) => {
     try {
-      await campusService.cadastrar(campus);
-      setModalMessage(TEXTOS.CAMPUS_CADASTRADO_SUCESSO);
-      setIsModalOpen(true);
+      const response = await campusService.cadastrar(campus);
+      setStatusMessage(response);
+      handleCancel();
+      fetchCampi();
     } catch (error) {
-      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_CADASTRAR_CAMPUS;
-      setTooltip({ visible: true, message: msg });
-      setTimeout(() => setTooltip({ visible: false, message: "" }), 4000);
+      const msg = 'Erro no servidor. ' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
     }
   };
 
   const handleUpdate = async (campus) => {
     try {
-      await campusService.atualizar(campus);
-      setEditing(null);
+      const response = await campusService.alterar(campus);
+      setStatusMessage(response);
+      handleCancel();
+      fetchCampi();
     } catch (error) {
-      const msg = error?.response?.data?.error || error.message || TEXTOS.ERRO_ATUALIZAR_CAMPUS;
-      setTooltip({ visible: true, message: msg });
-      setTimeout(() => setTooltip({ visible: false, message: "" }), 4000);
+      const msg = 'Erro no servidor. ' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
     }
   };
 
-  const handleDelete = async (codCampus) => {
-    await campusService.excluir(codCampus);
-    window.location.reload();
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    window.location.reload();
+  const handleDelete = async (campus) => {
+    try {
+      const response = await campusService.excluir(campus.codCampus);
+      setStatusMessage(response);
+      fetchCampi();
+    } catch (error) {
+      const msg = 'Erro no servidor. ' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    }
   };
 
   const handleEdit = (campus) => {
-    setEditing(campus);
+    setFormData(campus || {}); 
+    setEditing(campus || null);
     if (anchorRef.current) {
       anchorRef.current.scrollIntoView({ behavior: 'smooth' });
     }
+    setFormKey(prev => prev + 1);
   };
 
   const handleCancel = () => {
+    setFormData({});
     setEditing(null);
     setFormKey(prev => prev + 1);
+  };
+
+  const handleCloseMessage = () => {
+    setStatusMessage(null);
   };
 
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
-      <TitleBottom>{editing ? TEXTOS.EDITAR_CAMPUS : TEXTOS.CADASTRAR_CAMPUS}</TitleBottom>
+      <TitleBottom>{editing ? 'Editar Campus' : 'Cadastrar Campus'}</TitleBottom>
+
       <CampusForm
         key={formKey}
         onSubmit={editing ? handleUpdate : handleCreate}
-        initialData={editing}
-        isEditing={!!editing}
-        isADM={usuario?.isADM}
-        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus) : undefined}
+        onChange={handleChange}
+        isEditing={!!editing}
         onCancel={handleCancel}
+        formData={formData}
       />
-      <CrudTable
-        title="Lista de Campi"
-        columns={[{ label: CAMPOS.CODCAMPUS, field: 'codcampus' }, { label: CAMPOS.NOMCAMPUS, field: 'nomcampus' }]}
-        data={campi}
-        onEdit={handleEdit}
-        editText={TEXTOS.EDITAR_CAMPUS}
-        getRowKey={item => item.codcampus}
-      />
-      {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <h3>{TEXTOS.SUCESSO}</h3>
-            <p>{modalMessage}</p>
-            <Button $variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
-          </ModalContent>
-        </ModalOverlay>
-      )}
-      {tooltip.visible && (
-        <TooltipError>
-          <strong>{TEXTOS.ERRO}</strong> {tooltip.message}
-        </TooltipError>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', margin: '20px' }}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <CrudTable
+          title="Lista de Campi"
+          columns={[
+            { label: CAMPOS.CODCAMPUS, field: 'codCampus' },
+            { label: CAMPOS.NOMCAMPUS, field: 'nomCampus' }
+          ]}
+          data={campi}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          getRowKey={item => item.codCampus}
+          statusMessage={statusMessage}
+          onCloseMessage={handleCloseMessage}
+        />
       )}
     </Container>
   );

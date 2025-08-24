@@ -1,89 +1,90 @@
 import { useEffect, useState } from "react";
-import Modal from "../../components/Modal"; 
 import * as C from "./styles";
-import { useLocal } from "../../contexts/local";
-import { obterEstoqueLocalEstocagem } from "../../services/produto/service";
+import produtoService from "../../services/produtoService"
 import InventarioList from "../../features/inventario";
 import Button from "../../components/Button";
 import { formatarData } from "../../helpers/dataHelper";
-import { atualizarQuantidadeProdutosLaboratorio } from "../../services/produto/service";
+import { CircularProgress } from "@mui/material";
+import StatusMessage from "../../components/StatusMensagem";
 
 const Inventario = () => {
-  const { labId } = useLocal();
   const [produtos, setProdutos] = useState([]);
-  const [erro, setErro] = useState("");
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState(""); 
-
-  const dataInicial = "1900-01-01";
+  const [loading, setLoading] = useState(true);
+  const [usuario, setUsuario] = useState(null)
+  const [statusMessage, setStatusMessage] = useState(null);
 
   useEffect(() => {
-    const fetchProdutos = async () => {
-      if (labId) {
-        const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-
-        try {
-          const produtosResponse = await obterEstoqueLocalEstocagem(
-            codCampus,
-            codUnidade,
-            codPredio,
-            codLaboratorio,
-            dataInicial
-          );
-
-          const produtosNegativos = produtosResponse.filter(
-            (produto) => produto.qtdEstoque < 0
-          );
-          if (produtosNegativos.length > 0) {
-            setErro("Há produtos com quantidade negativa no estoque!");
-            setProdutos([]);
-            return;
-          }
-
-          const produtosAgrupados = agruparProdutos(produtosResponse);
-
-          setProdutos(produtosAgrupados);
-          setErro("");
-        } catch (error) {
-          console.error("Erro ao buscar produtos e quantidades:", error);
-          setProdutos([]);
-          setErro("Erro ao buscar produtos e quantidades");
-        }
-      }
-    };
-
-    fetchProdutos();
-  }, [labId]);
-
-  const agruparProdutos = (produtosResponse) => {
-  const mapa = {};
-
-  produtosResponse.forEach((produto) => {
-    const { codProduto, nomProduto, perPureza, vlrDensidade, item } = produto;
-    if (!Array.isArray(item)) return; // garante que é um array
-
-    if (!mapa[codProduto]) {
-      mapa[codProduto] = {
-        codProduto,
-        nomProduto,
-        perPureza,
-        vlrDensidade,
-        itens: [],
-      };
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    setUsuario(usuario);
+    if (!usuario) {
+      setStatusMessage({ tipo: 'ERRO', mensagem: ['Erro ao acessar dados do usuário'] });
+      setLoading(false);
+      return;
     }
 
-    item.forEach(({ seqItem, datValidade, qtdEstoque }) => {
-      mapa[codProduto].itens.push({
-        seqItem,
-        datValidade: formatarData(datValidade),
-        qtdAtual: qtdEstoque,
-        qtdNova: qtdEstoque,
+    const lab = usuario.laboratorios[usuario.indCorrente]
+    if (lab.codCampus === null) {
+      setStatusMessage({ tipo: 'AVISO', mensagem: ['Usuario não está como responsável de nenhum laboratório'] });
+      setLoading(false);
+      return;
+    }
+    const fetchProdutos = async () => {
+      try {
+        setLoading(true)
+        const lab = usuario.laboratorios[usuario.indCorrente]
+        const response = await produtoService.obterEstoqueLocalEstocagem(
+          lab.codCampus,
+          lab.codUnidade,
+          lab.codPredio,
+          lab.codLaboratorio
+        );
+        if (Array.isArray(response)) {
+           const produtosAgrupados = agruparProdutos(response);  
+           setProdutos(produtosAgrupados);
+        } else {
+          setStatusMessage(response);
+        }       
+      } catch (error) {
+        const msg = 'Erro no servidor. ' + error;
+        setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProdutos();
+  }, []);
+
+  const agruparProdutos = (produtosResponse) => {
+    const mapa = {};
+
+    produtosResponse.forEach((produto) => {
+      const { codProduto, nomProduto, perPureza, vlrDensidade, item } = produto;
+      if (!Array.isArray(item)) 
+        return; 
+
+      if (!mapa[codProduto]) {
+        mapa[codProduto] = {
+          codProduto,
+          nomProduto,
+          perPureza,
+          vlrDensidade,
+          itens: [],
+        };
+      }
+
+      item.forEach(({ seqItem, datValidade, codEmbalagem, qtdEstoque }) => {
+        mapa[codProduto].itens.push({
+          seqItem,
+          datValidade: formatarData(datValidade),
+          codEmbalagem: codEmbalagem,
+          qtdAtual: qtdEstoque,
+          qtdNova: qtdEstoque,
+        });
       });
     });
-  });
 
-  return Object.values(mapa);
-};
+    return Object.values(mapa);
+  };
 
 
   const handleQuantityChange = (codProduto, seqItem, newQuantity) => {
@@ -104,19 +105,18 @@ const Inventario = () => {
   };
 
   const enviarAtualizacao = async () => {
-    if (!labId) return;
-
-    const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
+    const lab = usuario.laboratorios[usuario.indCorrente]
 
     const payload = {
-      codCampus,
-      codUnidade,
-      codPredio,
-      codLaboratorio,
+      codCampus: lab.codCampus,
+      codUnidade: lab.codUnidade,
+      codPredio: lab.codPredio,
+      codLaboratorio: lab.codLaboratorio,
       produtos: produtos.flatMap((produto) =>
         produto.itens.map((item) => ({
           codProduto: produto.codProduto,
           seqItem: item.seqItem,
+          codEmbalagem: item.codEmbalagem,
           qtdEstoque: parseFloat(item.qtdAtual),
           qtdNova: parseFloat(item.qtdNova), 
         }))
@@ -124,59 +124,58 @@ const Inventario = () => {
     };
 
     try {
-      const result = await atualizarQuantidadeProdutosLaboratorio(
-        payload.codCampus,
-        payload.codUnidade,
-        payload.codPredio,
-        payload.codLaboratorio,
-        payload.produtos
-      );
-
-      if (result.error) {
-        setModalMessage("Houve um erro ao atualizar. Tente novamente amanhã, pois já foi feita uma atualização hoje.");
-        setModalOpen(true);
-      } else {
-        setModalMessage("Movimentações de estoque criadas com sucesso!");
-        setModalOpen(true);
-      }
-    } catch (err) {
-      console.error("Erro ao enviar atualização:", err);
-      setModalMessage("Houve um erro ao atualizar. Tente novamente amanhã, pois já foi feita uma atualização hoje.");
-      setModalOpen(true);
+      setLoading(true)
+      const response = await produtoService.atualizarInventario(payload)
+      setStatusMessage(response) 
+     } catch (error) {
+      const msg = 'Erro no servidor. ' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    window.location.reload(); 
+
+  const handleCloseMessage = () => {
+    setStatusMessage(null);
   };
 
   return (
-    <C.Container>
-      <h1>Inventário</h1>
-      {erro && <p style={{ color: "red" }}>{erro}</p>}
-      {produtos.length > 0 ? (
-        <InventarioList data={produtos} onQuantityChange={handleQuantityChange} />
+    <>
+      {loading ? (
+        <div style={{ textAlign: 'center', margin: '20px' }}>
+          <CircularProgress />
+        </div>
       ) : (
-        <p>Nenhum produto encontrado no inventário.</p>
+        <C.Container>
+          <h1>Inventário</h1>
+          {produtos.length > 0 ? (
+            <>
+              <InventarioList data={produtos} onQuantityChange={handleQuantityChange} />
+              <C.ButtonGroup>
+                <Button
+                  Text="Confirmar Atualização"
+                  onClick={enviarAtualizacao}
+                  size="large"
+                  $fullWidth
+                />
+              </C.ButtonGroup>
+            </>
+          ) : (
+            <p>Nenhum produto encontrado no inventário.</p>
+          )}
+        </C.Container>
       )}
-      <C.ButtonGroup>
-        <Button
-          Text="Confirmar Atualização"
-          onClick={enviarAtualizacao}
-          size="large"
-          $fullWidth
+      
+      {/* O StatusMessage permanece fora do container principal, como você queria */}
+      {statusMessage && (
+        <StatusMessage
+          message={statusMessage}
+          onClose={handleCloseMessage}
         />
-      </C.ButtonGroup>
-      <Modal
-        title="Aviso"
-        isOpen={isModalOpen}
-        onClose={closeModal}
-      >
-        <p>{modalMessage}</p>
-      </Modal>
-    </C.Container>
-  );
-};
+      )}
+    </>
+  )
+}
 
 export default Inventario;

@@ -1,31 +1,40 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
-import ImplantacaoList from "../../features/implantacao";
-import Modal from "../../components/Modal"; 
 import { Select, Button, FormGroup } from "../../components"; 
-import { obterProdutosPorLaboratorio, cadastrarProdutos } from "../../services/produto/service"; 
-import { useLocal } from "../../contexts/local";
+import ImplantacaoList from "../../features/implantacao";
+import produtoService from "../../services/produtoService"; 
 import * as C from "./styles";
+import { CircularProgress } from "@mui/material";
+import StatusMessage from "../../components/StatusMensagem";
 
 const CreateProdutos = () => {
-const [produtos, setProdutos] = useState([]);
-const [implantacoes, setImplantacoes] = useState({});
-const [tipoCadastro, setTipoCadastro] = useState(""); 
-const [loading, setLoading] = useState(true);
-const { labId, labName } = useLocal(); 
-const [isModalOpen, setIsModalOpen] = useState(false); 
-const navigate = useNavigate(); 
-
-useEffect(() => {
-  const fetchLabDetailsAndProdutos = async () => {
-    if (labId) {
-      const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
+  const [produtos, setProdutos] = useState([]);
+  const [implantacoes, setImplantacoes] = useState({});
+  const [tipoCadastro, setTipoCadastro] = useState(""); 
+  const [usuario, setUsuario] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [statusMessage, setStatusMessage] = useState(null);
+  
+  useEffect(() => {
+    const fetchLabDetailsAndProdutos = async () => {
+      const usuario = JSON.parse(localStorage.getItem("usuario"))
+      setUsuario(usuario);
+      if (!usuario) {
+        setStatusMessage({ tipo: 'ERRO', mensagem: ['Erro ao acessar dados do usuário'] });
+        return;
+      }
+      const lab = usuario.laboratorios[usuario.indCorrente]
+      if (lab.codCampus === null) {
+        setStatusMessage({ tipo: 'AVISO', mensagem: ['Usuario não está como responsável de nenhum laboratório'] });
+        setLoading(false);
+        return;
+      }
+      
       try {
-        const produtosResponse = await obterProdutosPorLaboratorio(
-          codCampus,
-          codUnidade,
-          codPredio,
-          codLaboratorio
+        const produtosResponse = await produtoService.obterProdutosPorLaboratorio(
+          lab.codCampus,
+          lab.codUnidade,
+          lab.codPredio,
+          lab.codLaboratorio
         );
 
         const formattedProdutos = produtosResponse.map((produto) => ({
@@ -34,116 +43,110 @@ useEffect(() => {
           nomLista: produto.nomLista,
           perPureza: produto.perPureza,
           vlrDensidade: produto.vlrDensidade,
+          ncm: produto.ncm,
         }));
 
         setProdutos(formattedProdutos);
       } catch (error) {
-        console.error("Erro ao buscar detalhes do laboratório ou produtos:", error);
+        const msg = 'Erro no servidor. ' + error;
+        setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
       } finally {
         setLoading(false);
       }
-    }
-  };
+    };
 
-  fetchLabDetailsAndProdutos();
-}, [labId]);
+    fetchLabDetailsAndProdutos();
+  }, []);
 
-const handleConfirm = async () => {
-  if (!tipoCadastro) {
-    alert("Por favor, selecione o tipo de cadastro antes de confirmar.");
-    return;
-  }
+  const handleConfirm = async () => {
+    const lab = usuario.laboratorios[usuario.indCorrente]
 
-  if (!labId) {
-    console.error("Laboratório não selecionado.");
-    return;
-  }
-
-  const { codCampus, codUnidade, codPredio, codLaboratorio } = labId;
-
-  const dadosParaEnvio = {
-    tipoCadastro: tipoCadastro?.value || "",
-    codCampus,
-    codUnidade,
-    codPredio,
-    codLaboratorio,
-    produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
-      codProduto: parseInt(codProduto),
-      items: items.map((item) => ({
-        qtd: parseFloat(item.qtdEstoque),
-        validade: item.datValidade,
-        embalagem: item.codEmbalagem,
+    const dadosParaEnvio = {
+      tipoCadastro: tipoCadastro,
+      codCampus: lab.codCampus,
+      codUnidade: lab.codUnidade,
+      codPredio: lab.codPredio,
+      codLaboratorio: lab.codLaboratorio,
+      produtos: Object.entries(implantacoes).map(([codProduto, items]) => ({
+        codProduto: parseInt(codProduto),
+        items: items.map((item) => ({
+          qtdEstoque: parseFloat(item.qtdEstoque),
+          datValidade: item.datValidade,
+          codEmbalagem: item.codEmbalagem,
+          txtJustificativa: item.txtJustificativa,
+        })),
       })),
-    })),
+    };
+
+    try {
+      setLoading(true)
+      const response = await produtoService.atualizarMovtoEstoqueCompraDoacao(dadosParaEnvio);
+      setStatusMessage(response)
+    } catch (error) {
+      const msg = 'Erro no servidor. ' + error;
+      setStatusMessage({ tipo: 'ERRO', mensagem: [msg] });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  try {
-    const response = await cadastrarProdutos(dadosParaEnvio);
-    
-    if (response && (response.message || response.tipo === "SUCESSO")) {
-      setIsModalOpen(true); 
-    } else {
-      alert("Erro ao realizar cadastro.");
-    }
-  } catch (error) {
-    alert("Erro ao realizar cadastro. Verifique os detalhes no console.");
-  }
-};
+  const options = [
+    { value: "EC", label: "Compra" },
+    { value: "ED", label: "Doação" },
+  ];
 
-const handleCloseModal = () => {
-  setIsModalOpen(false); 
-  navigate("/inventario"); 
-};
+  const handleCloseMessage = () => {
+    setStatusMessage(null);
+  };
 
-const options = [
-  { value: "EC", label: "Compra" },
-  { value: "ED", label: "Doação" },
-];
+  return (
+    <>
+      {loading ? (
+        <div style={{ textAlign: 'center', margin: '20px' }}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <C.Container>
+          <h1>Cadastrar Produtos no {usuario.laboratorios[usuario.indCorrente].nomLocal}</h1>
 
-if (loading) {
-  return <C.Loading>Carregando produtos...</C.Loading>;
-}
+          <C.SelectContainer>
+            <label htmlFor="tipoCadastro">Tipo de Cadastro:</label>
+            <Select
+              options={options}
+              value={tipoCadastro}
+              onChange={setTipoCadastro}
+              placeholder="Selecione o tipo de cadastro"
+              name="tipoCadastro"
+              id="tipoCadastro"
+            />
+          </C.SelectContainer>
 
-return (
-  <C.Container>
-    <h1>Cadastrar Produtos no {labName}</h1>
-
-    <C.SelectContainer>
-      <label htmlFor="tipoCadastro">Tipo de Cadastro:</label>
-        <Select
-          options={options}
-          value={tipoCadastro}
-          onChange={setTipoCadastro}
-          placeholder="Selecione o tipo de cadastro"
-          name="tipoCadastro"
-          id="tipoCadastro"
+          {produtos.length > 0 ? (
+            <>
+              <ImplantacaoList
+                data={produtos}
+                onChange={(updatedImplantacoes) =>
+                  setImplantacoes(updatedImplantacoes)
+                }
+              />
+              <FormGroup $justifyContent="center">
+                <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
+              </FormGroup>
+            </>
+          ) : (
+            <p>Nenhum produto encontrado.</p>
+          )}
+        </C.Container>
+      )}
+      
+      {statusMessage && (
+        <StatusMessage
+          message={statusMessage}
+          onClose={handleCloseMessage}
         />
-    </C.SelectContainer>
-
-    {produtos.length > 0 ? (
-      <ImplantacaoList
-        data={produtos} 
-        onChange={(updatedImplantacoes) =>
-          setImplantacoes(updatedImplantacoes)
-        } 
-      />
-    ) : (
-      <p>Nenhum produto encontrado.</p>
-    )}
-
-    <FormGroup $justifyContent="center">
-      <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
-    </FormGroup>
-
-    <Modal
-      title="Cadastro Realizado"
-      isOpen={isModalOpen}
-      onClose={handleCloseModal}
-    >
-      <p>Os produtos foram cadastrados com sucesso!</p>
-    </Modal>
-  </C.Container>
-);
-};
+      )}
+    </>
+  );
+}
 
 export default CreateProdutos;

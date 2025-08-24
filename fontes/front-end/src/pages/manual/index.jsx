@@ -1,4 +1,3 @@
-import React from 'react';
 import { Container, TitleBottom } from '../usuario/styles';
 
 const ManualPage = () => {

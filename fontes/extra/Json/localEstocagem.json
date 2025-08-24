@@ -1,0 +1,18 @@
+[
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.52.11",
+    "codPredio": "17",
+    "codLaboratorio": "101",
+    "nomLocal": "Laboratórios de Química",
+    "codCPFResponsavel": "1"
+  },
+  {
+    "codCampus": "NS",
+    "codUnidade": "11.52.11",
+    "codPredio": "12",
+    "codLaboratorio": "101",
+    "nomLocal": "Laboratórios de Química Experimental",
+    "codCPFResponsavel": "1"
+  }
+]

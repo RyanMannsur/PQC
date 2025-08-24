@@ -1,22 +1,19 @@
-import React from "react";
-import * as C from "./styles";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
 
-const Modal = ({ title, children, isOpen, onClose }) => {
-  if (!isOpen) return null;
-
+const Modal = ({ open, onClose, title, message, onConfirm, confirmDisabled, confirmContent }) => {
   return (
-    <C.Overlay>
-      <C.ModalContainer>
-        <C.ModalHeader>
-          <h2>{title}</h2>
-          <C.CloseButton onClick={onClose}>&times;</C.CloseButton>
-        </C.ModalHeader>
-        <C.ModalContent>{children}</C.ModalContent>
-        <C.ModalFooter>
-          <C.Button onClick={onClose}>OK</C.Button>
-        </C.ModalFooter>
-      </C.ModalContainer>
-    </C.Overlay>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{message}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} disabled={confirmDisabled}>Cancelar</Button>
+        <Button onClick={onConfirm} color="error" disabled={confirmDisabled}>
+          {confirmContent || "Confirmar"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

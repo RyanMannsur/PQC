@@ -73,7 +73,7 @@ class Db:
             
             if atuIdInsert:
                 # busca o id da linha inserida
-                self.idInsert = self.cursor.fetchone()
+                self.idInsert = self.cursor.fetchone()[0]
                 print(f"resposta {self.idInsert}")
 
             self.qtdAtu += self.cursor.rowcount
@@ -118,8 +118,8 @@ class Db:
                 self.conn = None
              
 
-    def getIdInsert(self, posicao):
-        return self.idInsert[posicao]
+    def getIdInsert(self):
+        return self.idInsert
     
     def _get_connection(self):
         return psycopg2.connect(**DB_CONFIG)

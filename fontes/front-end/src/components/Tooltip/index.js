@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import * as C from "./styles";
 
 const Tooltip = ({ message, isVisible, onClose, duration = 3000 }) => {

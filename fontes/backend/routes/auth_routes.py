@@ -1,66 +1,131 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from db import Db, Mode
-from routes.produto_routes import validar_token, obter_laboratorios_usuario
+from valida import Valida
+import util
 
-auth_bp = Blueprint("auth_bp", __name__)
+auth_bp = Blueprint("api", __name__)
 
-@auth_bp.route("/auth/login", methods=["POST"])
+@auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    if not data or 'cpf' not in data or 'senha' not in data:
-        return jsonify({"error": "CPF e senha são obrigatórios"}), 400
-    cpf = data['cpf']
-    senha = data['senha']
-    sql = """
-        SELECT token, cpf, id, isADM 
-        FROM usuario 
-        WHERE cpf = %s AND senha = %s
-    """
-    params = (cpf, senha)
-    try:
-        db = Db()
-        result = db.execSql(sql, params, Mode.SELECT)
-        if not result:
-            return jsonify({"error": "Credenciais inválidas"}), 401
-        usuario = result[0]
-        laboratorios = obter_laboratorios_usuario(usuario[0])
-        return jsonify({
-            "token": usuario[0],
-            "cpf": usuario[1],
-            "id": usuario[2],
-            "isADM": usuario[3],
-            "laboratorios": laboratorios
-        }), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    
+    codCPF = data.get('cpf')
+    valida = Valida()
+    valida.codCPF(codCPF)
+    if valida.temMensagem():
+        return valida.getMensagens()
 
-@auth_bp.route("/auth/validate", methods=["POST"])
-def validate_token():
-    data = request.get_json()
-    if not data or 'token' not in data:
-        return jsonify({"error": "Token é obrigatório"}), 400
-    token = data['token']
-    if not validar_token(token):
-        return jsonify({"error": "Token inválido"}), 401
     sql = """
-        SELECT token, cpf, id, isADM 
-        FROM usuario 
-        WHERE token = %s
+        SELECT A.nomUsuario,
+               A.idtTipoUsuario,
+               A.codCampus, 
+               A.codUnidade,
+               A.codPredio,
+               A.codLaboratorio,
+               B.codCampus, 
+               B.codUnidade,
+               B.codPredio,
+               B.codLaboratorio,
+               B.nomLocal  
+          FROM usuario A
+     LEFT JOIN localEstocagem B
+            ON B.codCPFResponsavel = A.codCPF 
+         WHERE A.codCPF = %s 
     """
-    params = (token,)
+    params = (codCPF,)
     try:
         db = Db()
-        result = db.execSql(sql, params, Mode.SELECT)
-        if not result:
-            return jsonify({"error": "Token inválido"}), 401
-        usuario = result[0]
-        laboratorios = obter_laboratorios_usuario(token)
-        return jsonify({
-            "token": usuario[0],
-            "cpf": usuario[1],
-            "id": usuario[2],
-            "isADM": usuario[3],
-            "laboratorios": laboratorios
-        }), 200
+        usuario = db.execSql(sql, params, Mode.SELECT)
+        if not usuario:
+            return util.formataAviso("Credenciais inválidas")
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return db.getErro(e)
+    
+    
+    usuario_dict = {}
+    labs = []
+    ind = 0
+    for index, usu in enumerate(usuario):
+        if index == 0:  
+            usuario_dict = {
+                "codCPF": codCPF,
+                "nomUsuario": usu[0],
+                "idtTipoUsuario": usu[1],
+                "indCorrente": 0,
+                "laboratorios": labs
+            } 
+            codCampusAtu = usu[2] 
+            codUnidadeAtu = usu[3]
+            codPredioAtu = usu[4]
+            codLaboratorioAtu = usu[5]
+            
+        if codCampusAtu == usu[6] and codUnidadeAtu == usu[7] and codPredioAtu == usu[8] and codLaboratorioAtu == usu[9]:
+            ind = index 
+
+        # Adicionar labs
+        labs.append({
+            "codCampus": usu[6],
+            "codUnidade": usu[7],
+            "codPredio": usu[8],
+            "codLaboratorio": usu[9],
+            "nomLocal": usu[10]
+        })
+    
+    
+    usuario_dict['indCorrente'] = ind   
+    usuario_dict['laboratorios'] = labs
+
+    print("--- Detalhes do Usuário ---")
+    for key, value in usuario_dict.items():
+    # Verifica se o valor é a lista de laboratórios para exibir de forma diferente
+        if key == "laboratorios":
+            print(f"\n--- Lista de Laboratórios ---")
+            for i, lab in enumerate(value):
+                print(f"Laboratório {i + 1}:")
+                # Loop aninhado para exibir as chaves e valores de cada laboratório
+                for lab_key, lab_value in lab.items():
+                    print(f"    - {lab_key}: {lab_value}")
+            print("\n--- Fim da Lista ---")
+        else:
+            # Exibe as outras chaves e valores do dicionário
+            print(f"- {key}: {value}")
+
+
+    return usuario_dict
+
+@auth_bp.route('/alterarLaboratorioCorrente', methods=['PUT'])
+def atu_lab_corrente():
+    data = request.get_json()
+ 
+    codCPF = data.get('codCPF')
+    codCampus = data.get('codCampus')
+    codUnidade = data.get('codUnidade')
+    codPredio = data.get('codPredio')
+    codLaboratorio = data.get('codLaboratorio')
+           
+    valida = Valida()
+    valida.codCPF(codCPF)
+    valida.codCampus(codCampus)
+    valida.codUnidade(codUnidade)
+    valida.codPredio(codPredio)
+    valida.codLaboratorio(codLaboratorio)
+    
+    if valida.temMensagem():
+        return valida.getMensagens()
+
+    sql = """
+        UPDATE Usuario 
+           SET codCampus = %s,
+               codUnidade = %s,
+               codPredio = %s,
+               codLaboratorio = %s
+         WHERE codCPF = %s            
+    """
+    params = (codCampus, codUnidade, codPredio, codLaboratorio, codCPF,)
+    
+    db = Db()
+    try:
+        return db.execSql(sql, params)
+    except Exception as e:
+        return db.getErro(e)
+

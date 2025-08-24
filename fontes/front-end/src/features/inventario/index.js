@@ -12,6 +12,7 @@ return (
         <C.Th>Densidade</C.Th>
         <C.Th>Validade</C.Th>
         <C.Th>Item</C.Th>
+        <C.Th>Embalagem</C.Th>
         <C.Th>Quantidade Atual</C.Th>
         <C.Th>Nova Quantidade</C.Th>
       </tr>
@@ -22,7 +23,6 @@ return (
           {produto.itens.map((item, index) => (
             <tr key={`${produto.codProduto}-${item.seqItem}`}>
               {index === 0 && (
-                
                 <>
                   <C.Td rowSpan={produto.itens.length}>{produto.nomProduto}</C.Td>
                   <C.Td rowSpan={produto.itens.length}>{produto.perPureza}</C.Td>
@@ -31,6 +31,7 @@ return (
               )}
               <C.Td>{item.datValidade}</C.Td>
               <C.Td>{item.seqItem}</C.Td>
+              <C.Td>{item.codEmbalagem}</C.Td>
               <C.Td>{item.qtdAtual}</C.Td>
               <C.Td>
                 <Input
