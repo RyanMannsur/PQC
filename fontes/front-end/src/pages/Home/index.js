@@ -11,6 +11,7 @@ const { labId, labName } = useLocal();
 const [isModalOpen, setIsModalOpen] = useState(false);
 const navigate = useNavigate();
 
+
 useEffect(() => {
   const fetchLabDetails = async () => {
     if (!labId) return;

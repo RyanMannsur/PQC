@@ -18,6 +18,7 @@ const [localData, setLocalData] = useState(null);
 const [isTooltipVisible, setIsTooltipVisible] = useState(false); 
 const [tooltipMessage, setTooltipMessage] = useState(""); 
 
+
 useEffect(() => {
   const localStorageData = JSON.parse(localStorage.getItem("labId"));
   setLocalData(localStorageData);
@@ -87,7 +88,7 @@ return (
   <C.Container>
     <h1>Transferências</h1>
 
-    <FormGroup direction="row" $gap="medium" $alignItems="flex-end" $justifyContent="center">
+    <FormGroup style={{direction: "row", gap: "medium", alignItems: "flex-end", justifyContent: "center"}}>
       <Input
         type="text"
         placeholder="Digite o produto"
