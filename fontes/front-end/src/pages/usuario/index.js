@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
@@ -6,8 +5,8 @@ import { listarUsuarios, transformarUsuarioAdm, removerUsuarioAdm } from '../../
 import { TEXTOS } from './constantes';
 import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import CrudTable from '../../components/CrudTable';
-
-
+import {useTheme, useMediaQuery} from "@mui/material";
+import * as C from "./styles";
 const UsuarioPage = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuarioAtual, setUsuarioAtual] = useState({});
@@ -17,7 +16,8 @@ const UsuarioPage = () => {
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
   const navigate = useNavigate();
-
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
   useEffect(() => {
     fetchUsuarios();
     const token = localStorage.getItem('userToken');
@@ -97,10 +97,14 @@ const UsuarioPage = () => {
   };
 
   return (
-    <Container ref={containerRef}>
+    <Container ref={containerRef} style={{justifyContent: "center"}}>
       <div ref={anchorRef} />
+
+      <C.formStyle>
       <TitleBottom>{TEXTOS.CADASTRAR_USUARIO}</TitleBottom>
+      </C.formStyle>
       <CrudTable
+        style={{ display: "flex", justifyContent: "center", gap: "8px", textAlign: "center" }}
         title="Lista de Usuários"
         columns={[
           { label: 'CPF', field: 'cpf' },
@@ -109,25 +113,33 @@ const UsuarioPage = () => {
             field: 'isADM',
             render: (item) => {
               if (usuarioAtual?.isADM) {
-                if (item.isADM) {
-                  return (
-                    <Button
-                      $variant="danger"
-                      size="small"
-                      onClick={() => handleRemoverAdm(item)}
-                    >Remover de Administrador</Button>
-                  );
-                } else {
-                  return (
-                    <Button
-                      $variant="primary"
-                      size="small"
-                      onClick={() => handleTransformarAdm(item)}
-                    >{TEXTOS.TRANSFORMAR_ADM}</Button>
-                  );
-                }
+                return (
+                  <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
+                    {item.isADM ? (
+                      <Button
+                        $variant="danger"
+                        size="small"
+                        onClick={() => handleRemoverAdm(item)}
+                      >
+                        Remover de Administrador
+                      </Button>
+                    ) : (
+                      <Button
+                        $variant="primary"
+                        size="small"
+                        onClick={() => handleTransformarAdm(item)}
+                      >
+                        {TEXTOS.TRANSFORMAR_ADM}
+                      </Button>
+                    )}
+                  </div>
+                );
               }
-              return item.isADM ? TEXTOS.SIM : TEXTOS.NAO;
+              return (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  {item.isADM ? TEXTOS.SIM : TEXTOS.NAO}
+                </div>
+              );
             }
           }
         ]}
