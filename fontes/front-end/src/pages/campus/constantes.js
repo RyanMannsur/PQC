@@ -15,7 +15,7 @@ export const TEXTOS = {
 };
 
 export const CAMPOS = {
-  CODCAMPUS: 'Código Campus',
-  NOMCAMPUS: 'Nome Campus',
+  CODCAMPUS: 'Código',
+  NOMCAMPUS: 'Nome',
   ACOES: 'Ações',
 };

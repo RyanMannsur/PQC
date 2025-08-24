@@ -25,7 +25,7 @@ return (
                 
                 <>
                   <C.Td rowSpan={produto.itens.length}>{produto.nomProduto}</C.Td>
-                  <C.Td rowSpan={produto.itens.length}>{produto.perPureza}</C.Td>
+                  <C.Td rowSpan={produto.itens.length}>{produto.perPureza != null ? produto.perPureza + "%" : produto.perPureza}</C.Td>
                   <C.Td rowSpan={produto.itens.length}>{produto.vlrDensidade}</C.Td>
                 </>
               )}

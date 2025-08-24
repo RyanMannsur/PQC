@@ -130,7 +130,7 @@ const ProdutoPage = () => {
           { label: CAMPOS.NCM, field: 'ncm' },
           { label: CAMPOS.NOME, field: 'nomProduto' },
           { label: CAMPOS.LISTA, field: 'nomLista' },
-          { label: CAMPOS.PUREZA, field: 'perPureza' },
+          { label: CAMPOS.PUREZA + " (%)", field: 'perPureza' },
           { label: CAMPOS.DENSIDADE, field: 'vlrDensidade' },
           {
             label: CAMPOS.ATIVO,
