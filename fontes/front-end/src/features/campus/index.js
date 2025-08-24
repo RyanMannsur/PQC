@@ -50,8 +50,8 @@ const CampusForm = ({ onSubmit, initialData = {}, isEditing, isADM = true, onCan
   };
 
   const fields = [
-    { label: 'Código Campus', name: 'codcampus', required: true, maxLength: 2, disabled: isEditing },
-    { label: 'Nome Campus', name: 'nomcampus', required: true, maxLength: 30 }
+    { label: 'Código', name: 'codcampus', required: true, maxLength: 2, disabled: isEditing },
+    { label: 'Nome', name: 'nomcampus', required: true, maxLength: 30 }
   ];
 
   return (

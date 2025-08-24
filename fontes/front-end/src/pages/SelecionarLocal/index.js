@@ -69,6 +69,7 @@ const SelecionarLocal = () => {
     navigate("/home");
   };
 
+
   return (
     <C.Container>
       <C.Label>SELECIONE O LOCAL DE ESTOCAGEM</C.Label>

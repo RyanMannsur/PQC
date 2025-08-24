@@ -16,6 +16,6 @@ export const CAMPOS = {
   CODUNIDADE: 'Unidade',
   CODPREDIO: 'Prédio',
   CODLAB: 'Cód. Laboratório',
-  NOMLOCAL: 'Nome Local',
+  NOMLOCAL: 'Local',
   ACOES: 'Ações',
 };

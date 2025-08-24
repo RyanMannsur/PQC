@@ -233,7 +233,7 @@ insert into Campus (codCampus, nomCampus)
     ('CN', 'CONTAGEM (CN)'),
     ('CV', 'CURVELO (CV)'),
     ('NG', 'BH - NOVA GAMELEIRA (NG)'),
-    ('AX', '1 - ARAXÁ (AX)'),
+    ('AX', 'ARAXÁ (AX)'),
     ('DV', 'DIVINÓPOLIS (DV)'),
     ('LP', 'LEOPOLDINA (LP)'),
     ('VG', 'VARGINHA (VG)'),

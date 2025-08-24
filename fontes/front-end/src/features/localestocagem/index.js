@@ -99,7 +99,7 @@ const LocalEstocagemForm = ({ onSubmit, initialData = {}, isEditing, isADM = tru
       disabled: isEditing
     },
     {
-      label: 'Nome Local',
+      label: 'Local',
       name: 'nomlocal',
       required: true,
       maxLength: 100,

@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
@@ -57,6 +56,7 @@ const ProdutoPage = () => {
 
   const fetchProdutos = async () => {
     const res = await produtoService.listar();
+    
     setProdutos(res.sort((a, b) => a.nomProduto.localeCompare(b.nomProduto)));
   };
 
@@ -132,11 +132,31 @@ const ProdutoPage = () => {
           { label: CAMPOS.NCM, field: 'ncm' },
           { label: CAMPOS.NOME, field: 'nomProduto' },
           { label: CAMPOS.LISTA, field: 'nomLista' },
-          { label: CAMPOS.PUREZA + " %", field: 'perPureza' },
-          { label: CAMPOS.DENSIDADE, field: 'vlrDensidade' },
           {
-            label: CAMPOS.ATIVO,
-            field: 'idtAtivo',
+            label: CAMPOS.PUREZA, field: 'perPureza',
+            render: (item) => {
+              const pureza = item?.perPureza;
+              const text = (pureza !== null && pureza !== undefined && pureza !== '') ? `${pureza}%` : '-';
+              return (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  {text}
+                </div>
+              );
+            }
+          },
+          { label: CAMPOS.DENSIDADE, field: 'vlrDensidade',
+            render: (item) => {
+              const densidade = item?.vlrDensidade;
+              const text = (densidade !== null && densidade !== undefined && densidade !== '') ? `${densidade} (g/ml)` : '-';
+              return (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  {text}
+                </div>
+              );
+            },
+          },
+          {
+            label: CAMPOS.ATIVO, field: 'idtAtivo',
             render: (item) => {
               if (item.idtAtivo) return TEXTOS.SIM;
               if (usuario?.isADM) {
