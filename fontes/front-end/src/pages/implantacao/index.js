@@ -91,7 +91,7 @@ if (loading) {
 
 return (
   <C.Container>
-    <C.Title>Implantação de Produtos no {labName}</C.Title>
+    <C.Title>Implantação de Produtos em {labName}.</C.Title>
     <ImplantacaoList data={produtos} onChange={handleChange} />
     <FormGroup $justifyContent="center">
       <Button $variant="primary" onClick={handleConfirm}>Confirmar</Button>
