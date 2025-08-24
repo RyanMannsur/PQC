@@ -77,3 +77,17 @@ export const Row = styled.div`
   gap: 12px;
   margin-bottom: 8px;
 `;
+export const FormStyle = styled.div`
+  background: #f1f1f1ff;
+  padding: 3%;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+  min-width: 400px;
+  text-align: center;
+  margin: 0 auto;
+  input, select, option{
+    width: 100%;
+    text-align: center;
+  }
+`;

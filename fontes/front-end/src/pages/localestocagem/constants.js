@@ -6,8 +6,8 @@ export const TEXTOS = {
   CONFIRMA_EXCLUSAO: 'Tem certeza que deseja excluir este local?',
   SUCESSO: 'Sucesso',
   OK: 'OK',
-  EDITAR_LOCAL: 'Editar Local de Estocagem',
-  CADASTRAR_LOCAL: 'Cadastrar Local de Estocagem',
+  EDITAR_LOCAL: 'Editar local de estocagem',
+  CADASTRAR_LOCAL: 'Cadastrar local de estocagem',
   EXCLUIR: 'Excluir',
 };
 

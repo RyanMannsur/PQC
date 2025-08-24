@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import LocalEstocagemForm from '../../features/localestocagem';
 import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
 import { getLocais, createLocal, updateLocal, deleteLocal } from '../../services/localService';
 import { TEXTOS, CAMPOS } from './constants';
-import { Container, TitleBottom, ModalOverlay, ModalContent } from './styles';
+import { Container, TitleBottom, ModalOverlay, ModalContent, FormStyle } from './styles';
 
 const LocalEstocagemPage = () => {
   const [locais, setLocais] = useState([]);
@@ -99,42 +98,55 @@ const LocalEstocagemPage = () => {
   };
 
   return (
-    <Container ref={containerRef}>
-      <div ref={anchorRef} />
-      <TitleBottom>{editing ? TEXTOS.EDITAR_LOCAL : TEXTOS.CADASTRAR_LOCAL}</TitleBottom>
-      <LocalEstocagemForm
-        key={formKey}
-        onSubmit={editing ? handleUpdate : handleCreate}
-        initialData={editing}
-        isEditing={!!editing}
-        isADM={usuario?.isADM}
-        onDelete={editing && usuario?.isADM ? () => handleDelete(editing) : undefined}
-        onCancel={handleCancel}
-      />
-      <CrudTable
-        title="Lista de Locais"
-        columns={[
-          { label: CAMPOS.CODCAMPUS, field: 'codcampus' },
-          { label: CAMPOS.CODUNIDADE, field: 'codunidade' },
-          { label: CAMPOS.CODPREDIO, field: 'codpredio' },
-          { label: CAMPOS.CODLAB, field: 'codlaboratorio' },
-          { label: CAMPOS.NOMLOCAL, field: 'nomlocal' }
-        ]}
-        data={locais}
-        onEdit={handleEdit}
-        editText={TEXTOS.EDITAR_LOCAL}
-        getRowKey={item => item.codlaboratorio}
-      />
-      {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <h3>{TEXTOS.SUCESSO}</h3>
-            <p>{modalMessage}</p>
-            <Button $variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
-          </ModalContent>
-        </ModalOverlay>
-      )}
-    </Container>
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
+      minHeight: "100vh", // ocupa toda a altura da viewport
+      width: "100%",
+      boxSizing: "border-box"
+    }}>
+      <Container ref={containerRef}>
+        <div ref={anchorRef} />
+          
+          <FormStyle style={{width: "400px"}}>
+            <TitleBottom>{editing ? TEXTOS.EDITAR_LOCAL : TEXTOS.CADASTRAR_LOCAL}</TitleBottom>
+            <LocalEstocagemForm
+            key={formKey}
+            onSubmit={editing ? handleUpdate : handleCreate}
+            initialData={editing}
+            isEditing={!!editing}
+            isADM={usuario?.isADM}
+            onDelete={editing && usuario?.isADM ? () => handleDelete(editing) : undefined}
+            onCancel={handleCancel}
+            />
+          </FormStyle>
+      
+        <CrudTable
+          title="Lista de Locais"
+          columns={[
+            { label: CAMPOS.CODCAMPUS, field: 'codcampus' },
+            { label: CAMPOS.CODUNIDADE, field: 'codunidade' },
+            { label: CAMPOS.CODPREDIO, field: 'codpredio' },
+            { label: CAMPOS.CODLAB, field: 'codlaboratorio' },
+            { label: CAMPOS.NOMLOCAL, field: 'nomlocal' }
+          ]}
+          data={locais}
+          onEdit={handleEdit}
+          editText={TEXTOS.EDITAR_LOCAL}
+          getRowKey={item => item.codlaboratorio}
+        />
+        {isModalOpen && (
+          <ModalOverlay>
+            <ModalContent>
+              <h3>{TEXTOS.SUCESSO}</h3>
+              <p>{modalMessage}</p>
+              <Button $variant="primary" onClick={handleModalClose}>{TEXTOS.OK}</Button>
+            </ModalContent>
+          </ModalOverlay>
+        )}
+      </Container>
+    </div>
   );
 };
 
