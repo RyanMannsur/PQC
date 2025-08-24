@@ -2,10 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
 import CampusForm from '../../features/campus';
-import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
+import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError} from './styles';
 import campusService from '../../services/campus/service';
 import { TEXTOS, CAMPOS } from './constantes';
-
+import { FormStyle } from '../../styles/global';
 const CampusPage = () => {
   const [formKey, setFormKey] = useState(0);
   const [campi, setCampi] = useState([]);
@@ -95,16 +95,19 @@ const CampusPage = () => {
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
-      <TitleBottom>{editing ? TEXTOS.EDITAR_CAMPUS : TEXTOS.CADASTRAR_CAMPUS}</TitleBottom>
-      <CampusForm
-        key={formKey}
-        onSubmit={editing ? handleUpdate : handleCreate}
-        initialData={editing}
-        isEditing={!!editing}
-        isADM={usuario?.isADM}
-        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus) : undefined}
-        onCancel={handleCancel}
-      />
+      
+      <FormStyle>
+        <TitleBottom>{editing ? TEXTOS.EDITAR_CAMPUS : TEXTOS.CADASTRAR_CAMPUS}</TitleBottom>
+        <CampusForm
+          key={formKey}
+          onSubmit={editing ? handleUpdate : handleCreate}
+          initialData={editing}
+          isEditing={!!editing}
+          isADM={usuario?.isADM}
+          onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus) : undefined}
+          onCancel={handleCancel}
+        />
+      </FormStyle>
       <CrudTable
         title="Lista de Campi"
         columns={[{ label: CAMPOS.CODCAMPUS, field: 'codcampus' }, { label: CAMPOS.NOMCAMPUS, field: 'nomcampus' }]}

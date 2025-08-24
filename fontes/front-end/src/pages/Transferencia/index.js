@@ -6,6 +6,7 @@ import ItemList from "../../components/ItemList";
 import Tooltip from "../../components/Tooltip"; 
 import { buscarProdutos } from "../../services/produto/service";
 import { formatarData } from "../../helpers/dataHelper";
+import { FormStyle } from "../../styles/global";
 
 const Transferencias = () => {
 const navigate = useNavigate();
@@ -87,8 +88,8 @@ const data = produtos.filter((produto) => produto.qtdEstoque > 0).map((produto) 
 return (
   <C.Container>
     <h1>Transferências</h1>
-
-    <FormGroup style={{direction: "row", gap: "medium", alignItems: "flex-end", justifyContent: "center"}}>
+    <FormStyle>
+    <FormGroup style={{direction: "row", gap: "medium", alignItems: "center", justifyContent: "center"}}>
       <Input
         type="text"
         placeholder="Digite o produto"
@@ -124,7 +125,7 @@ return (
     ) : (
       <p>Nenhum produto encontrado.</p>
     )}
-
+</FormStyle>
     <Tooltip
       message={tooltipMessage}
       isVisible={isTooltipVisible}

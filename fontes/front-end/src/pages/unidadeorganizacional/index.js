@@ -4,8 +4,8 @@ import unidadeService from '../../services/unidadeorganizacional/service';
 import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
 import { TEXTOS, CAMPOS } from './constants';
-import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
-
+import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError,} from './styles';
+import { FormStyle } from '../../styles/global';
 const UnidadePage = () => {
   const [formKey, setFormKey] = useState(0);
   const [unidades, setUnidades] = useState([]);
@@ -99,16 +99,18 @@ const UnidadePage = () => {
     <Container ref={containerRef}>
       <div ref={anchorRef} />
       
-      <TitleBottom>{editing ? TEXTOS.EDITAR_UNIDADE : TEXTOS.CADASTRAR_UNIDADE}</TitleBottom>
-      <UnidadeForm
-        key={formKey}
-        onSubmit={editing ? handleUpdate : handleCreate}
-        initialData={editing}
-        isEditing={!!editing}
-        isADM={usuario?.isADM}
-        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus, editing.codunidade) : undefined}
-        onCancel={handleCancel}
-      />
+      <FormStyle>
+        <TitleBottom>{editing ? TEXTOS.EDITAR_UNIDADE : TEXTOS.CADASTRAR_UNIDADE}</TitleBottom>
+        <UnidadeForm
+          key={formKey}
+          onSubmit={editing ? handleUpdate : handleCreate}
+          initialData={editing}
+          isEditing={!!editing}
+          isADM={usuario?.isADM}
+          onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codcampus, editing.codunidade) : undefined}
+          onCancel={handleCancel}
+        />
+      </FormStyle>
       <CrudTable
         title="Lista de Unidades"
         columns={[

@@ -3,10 +3,10 @@ import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
 import ProdutoForm from '../../features/produto';
-import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
+import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError} from './styles';
 import produtoService from '../../services/produto/service';
 import { TEXTOS, CAMPOS } from './constantes';
-
+import { FormStyle } from '../../styles/global';
 
 const ProdutoPage = () => {
   const handleAtivar = async (produto) => {
@@ -114,16 +114,18 @@ const ProdutoPage = () => {
   return (
     <Container ref={containerRef}>
       <div ref={anchorRef} />
-      <TitleBottom>{editing ? TEXTOS.EDITAR_PRODUTO : TEXTOS.CADASTRAR_PRODUTO}</TitleBottom>
-      <ProdutoForm
-        key={formKey}
-        onSubmit={editing ? handleUpdate : handleCreate}
-        initialData={editing}
-        isEditing={!!editing}
-        isADM={usuario?.isADM}
-        onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codProduto) : undefined}
-        onCancel={handleCancel}
-      />
+      <FormStyle>
+        <TitleBottom>{editing ? TEXTOS.EDITAR_PRODUTO : TEXTOS.CADASTRAR_PRODUTO}</TitleBottom>
+        <ProdutoForm
+          key={formKey}
+          onSubmit={editing ? handleUpdate : handleCreate}
+          initialData={editing}
+          isEditing={!!editing}
+          isADM={usuario?.isADM}
+          onDelete={editing && usuario?.isADM ? () => handleDelete(editing.codProduto) : undefined}
+          onCancel={handleCancel}
+        />
+      </FormStyle>
       <CrudTable
         title="Lista de Produtos"
         columns={[

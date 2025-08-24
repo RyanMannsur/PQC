@@ -4,8 +4,8 @@ import { Button } from '../../components';
 import CrudTable from '../../components/CrudTable';
 import { getLocais, createLocal, updateLocal, deleteLocal } from '../../services/localService';
 import { TEXTOS, CAMPOS } from './constants';
-import { Container, TitleBottom, ModalOverlay, ModalContent, FormStyle } from './styles';
-
+import { Container, TitleBottom, ModalOverlay, ModalContent} from './styles';
+import { FormStyle } from '../../styles/global';
 const LocalEstocagemPage = () => {
   const [locais, setLocais] = useState([]);
   const [usuario, setUsuario] = useState({});
@@ -109,7 +109,7 @@ const LocalEstocagemPage = () => {
       <Container ref={containerRef}>
         <div ref={anchorRef} />
           
-          <FormStyle style={{width: "400px"}}>
+          <FormStyle>
             <TitleBottom>{editing ? TEXTOS.EDITAR_LOCAL : TEXTOS.CADASTRAR_LOCAL}</TitleBottom>
             <LocalEstocagemForm
             key={formKey}

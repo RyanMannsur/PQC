@@ -6,7 +6,7 @@ import { TEXTOS } from './constantes';
 import { Container, TitleBottom, ModalOverlay, ModalContent, TooltipError } from './styles';
 import CrudTable from '../../components/CrudTable';
 import {useTheme, useMediaQuery} from "@mui/material";
-import * as C from "./styles";
+import { FormStyle } from '../../styles/global';
 const UsuarioPage = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuarioAtual, setUsuarioAtual] = useState({});
@@ -100,9 +100,9 @@ const UsuarioPage = () => {
     <Container ref={containerRef} style={{justifyContent: "center"}}>
       <div ref={anchorRef} />
 
-      <C.formStyle>
+      <FormStyle>
       <TitleBottom>{TEXTOS.CADASTRAR_USUARIO}</TitleBottom>
-      </C.formStyle>
+      </FormStyle>
       <CrudTable
         style={{ display: "flex", justifyContent: "center", gap: "8px", textAlign: "center" }}
         title="Lista de Usuários"

@@ -46,12 +46,3 @@ export const TooltipError = styled.div`
   text-align: center;
 `;
 
-export const formStyle = styled.div`
-  background: #f1f1f1ff;
-  padding: 3%;
-  border-radius: 8px;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-  min-width: 300px;
-  text-align: center;
-  margin: 1% 1% 1% 4%;
-`;
