@@ -13,11 +13,10 @@ CREATE TABLE usuario (
     codCPF CHAR(11) NOT NULL,
     nomUsuario char(50) not null,
     idtTipoUsuario char(1) not null CHECK (idtTipoUsuario IN ('A', 'R')),
-    #Salva o último acesso
     codCampus char(2), 
     codUnidade  char(8),
     codPredio char(2),
-    codLaboratorio char(3)
+    codLaboratorio char(3),
     primary  key (codCPF)
 );  
    
@@ -320,16 +319,9 @@ insert into LocalEstocagem (codCampus, codUnidade, codPredio, codLaboratorio, no
      ('NS', '11.55.11', '11', '102', 'DEPARTAMENTO DE CIÊNCIAS BIOLÓGICAS', '2'),
      ('NP', '11.62.05', '20', '051', 'DEPARTAMENTO DE COMPUTAÇÃO E MECÂNICA', '2'),
      ('NS', '11.55.11', '11', '141', 'DEPARTAMENTO DE CIÊNCIA E TECNOLOGIA AMBIENTAL', '2'),
-    ('AX','11.57.03','01','001','DEPARTAMENTO DE FORMAÇÃO GERAL- (DFG_AX), 1);
+    ('AX','11.57.03','01','001','DEPARTAMENTO DE FORMAÇÃO GERAL- (DFG_AX)', 1);
    
-insert into MovtoEstoque 
-    (codProduto, seqItem, codCampus, codUnidade, codPredio, codLaboratorio, datMovto, idtTipoMovto, qtdEstoque, txtJustificativa)
-values
-   (1, 1, 'NG', '11.56.12', '17', '101', '2024-12-31', 'IM', 100, 'Implantação'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-01', 'IN', 80, 'Inventario'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-01', 'AC', -20, 'Ajuste Saida'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-05', 'EC', 200, 'Implantação'),
-   (1, 1, 'NG', '11.56.12', '17', '101', '2025-01-05', 'ED', 30, 'Implantação');
+
 
 
 
